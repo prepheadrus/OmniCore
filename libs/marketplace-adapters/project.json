@@ -1,0 +1,9 @@
+{
+  "name": "marketplace-adapters",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/marketplace-adapters/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project marketplace-adapters --web",
+  "targets": {}
+}

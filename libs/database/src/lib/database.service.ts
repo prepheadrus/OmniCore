@@ -28,7 +28,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       query: {
         $allModels: {
           // Arrow function kullanarak 'this' bağlamı sorununu çözüyoruz
-          $allOperations: async ({ model, operation, args, query }) => {
+          $allOperations: async ({ model, operation, args, query }: any) => {
             const channelId = cls.get('app.channel_id');
 
             if (!channelId) {

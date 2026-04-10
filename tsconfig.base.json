@@ -15,7 +15,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@omnicore/database": ["libs/database/src/index.ts"]
+      "@omnicore/database": ["libs/database/src/index.ts"],
+      "@omnicore/marketplace-adapters": [
+        "libs/marketplace-adapters/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]
