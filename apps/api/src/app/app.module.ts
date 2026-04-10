@@ -4,6 +4,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ChannelMiddleware } from './middleware/channel.middleware';
 import { DatabaseModule } from '@omnicore/database';
+import { QueueManagementModule } from '@omnicore/queue-management';
+import { MarketplaceAdaptersModule } from '@omnicore/marketplace-adapters';
+import { AiAgentsModule } from '@omnicore/ai-agents';
+import { AiAgentController } from './controllers/ai-agent.controller';
+import { QueueController } from './controllers/queue.controller';
 
 @Module({
   imports: [
@@ -12,8 +17,11 @@ import { DatabaseModule } from '@omnicore/database';
       middleware: { mount: true },
     }),
     DatabaseModule,
+    QueueManagementModule,
+    MarketplaceAdaptersModule,
+    AiAgentsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, AiAgentController, QueueController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {
