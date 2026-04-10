@@ -22,20 +22,22 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
   private createExtendedClient() {
     const cls = this.cls;
+    const prisma = this.prisma; // Prisma istemcisini scope içine alıyoruz
 
-    return this.prisma.$extends({
+    return prisma.$extends({
       query: {
         $allModels: {
-          async $allOperations({ model, operation, args, query }) {
+          // Arrow function kullanarak 'this' bağlamı sorununu çözüyoruz
+          $allOperations: async ({ model, operation, args, query }) => {
             const channelId = cls.get('app.channel_id');
 
             if (!channelId) {
               throw new UnauthorizedException('Database context error: channel_id is missing. Context-free database access is not allowed.');
             }
 
-            // Using sequential queries in a transaction ensures they execute on the same connection.
-            const [, result] = await this.$transaction([
-              this.$executeRawUnsafe(`SELECT set_config('app.channel_id', $1, TRUE)`, channelId),
+            // executeRaw ile SQL Injection'a karşı daha güvenli şablon dizisi kullanıyoruz
+            const [, result] = await prisma.$transaction([
+              prisma.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`,
               query(args)
             ]);
 
