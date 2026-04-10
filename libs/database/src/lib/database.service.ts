@@ -1,4 +1,9 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { ClsService } from 'nestjs-cls';
 
@@ -32,13 +37,15 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
             const channelId = cls.get('app.channel_id');
 
             if (!channelId) {
-              throw new UnauthorizedException('Database context error: channel_id is missing. Context-free database access is not allowed.');
+              throw new UnauthorizedException(
+                'Database context error: channel_id is missing. Context-free database access is not allowed.',
+              );
             }
 
             // executeRaw ile SQL Injection'a karşı daha güvenli şablon dizisi kullanıyoruz
             const [, result] = await prisma.$transaction([
               prisma.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`,
-              query(args)
+              query(args),
             ]);
 
             return result;

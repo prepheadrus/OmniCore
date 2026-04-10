@@ -5,9 +5,12 @@ export class MarketplaceValidationException extends Error {
     public marketplace: string,
     public remoteId: string,
     public validationErrors: ValidationError[],
-    message?: string
+    message?: string,
   ) {
-    super(message || `Validation failed for ${marketplace} entity with remoteId ${remoteId}`);
+    super(
+      message ||
+        `Validation failed for ${marketplace} entity with remoteId ${remoteId}`,
+    );
     this.name = 'MarketplaceValidationException';
   }
 }
