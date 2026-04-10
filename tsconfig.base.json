@@ -19,7 +19,8 @@
       "@omnicore/marketplace-adapters": [
         "libs/marketplace-adapters/src/index.ts"
       ],
-      "@omnicore/queue-management": ["libs/queue-management/src/index.ts"]
+      "@omnicore/queue-management": ["libs/queue-management/src/index.ts"],
+      "@omnicore/ai-agents": ["libs/ai-agents/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
