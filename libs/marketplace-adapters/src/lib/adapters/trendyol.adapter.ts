@@ -14,7 +14,10 @@ export class TrendyolAdapter implements IOrderSync, IProductSync {
 
   constructor(private readonly httpService: HttpService) {}
 
-  async fetchOrders(startDate: Date, endDate: Date): Promise<StandardOrderDto[]> {
+  async fetchOrders(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<StandardOrderDto[]> {
     // Simulate fetching complex nested JSON from Trendyol API
     const mockTrendyolOrdersResponse = {
       content: [
@@ -61,11 +64,21 @@ export class TrendyolAdapter implements IOrderSync, IProductSync {
         standardOrders.push(orderDto);
       } catch (errors) {
         if (Array.isArray(errors) && errors[0] instanceof ValidationError) {
-            this.logger.error(`Validation failed for Trendyol order with remoteId: ${item.id}`, JSON.stringify(errors));
-            throw new MarketplaceValidationException('Trendyol', String(item.id), errors);
+          this.logger.error(
+            `Validation failed for Trendyol order with remoteId: ${item.id}`,
+            JSON.stringify(errors),
+          );
+          throw new MarketplaceValidationException(
+            'Trendyol',
+            String(item.id),
+            errors,
+          );
         } else {
-            this.logger.error(`Unknown error during validation for Trendyol order with remoteId: ${item.id}`, errors);
-            throw errors;
+          this.logger.error(
+            `Unknown error during validation for Trendyol order with remoteId: ${item.id}`,
+            errors,
+          );
+          throw errors;
         }
       }
     }
@@ -73,7 +86,10 @@ export class TrendyolAdapter implements IOrderSync, IProductSync {
     return standardOrders;
   }
 
-  async fetchProducts(limit?: number, offset?: number): Promise<StandardProductDto[]> {
+  async fetchProducts(
+    limit?: number,
+    offset?: number,
+  ): Promise<StandardProductDto[]> {
     // Simulate fetching complex nested JSON from Trendyol API
     const mockTrendyolProductsResponse = {
       content: [
@@ -110,13 +126,19 @@ export class TrendyolAdapter implements IOrderSync, IProductSync {
         await validateOrReject(productDto);
         standardProducts.push(productDto);
       } catch (errors) {
-          if (Array.isArray(errors) && errors[0] instanceof ValidationError) {
-              this.logger.error(`Validation failed for Trendyol product with remoteId: ${item.id}`, JSON.stringify(errors));
-              throw new MarketplaceValidationException('Trendyol', item.id, errors);
-          } else {
-            this.logger.error(`Unknown error during validation for Trendyol product with remoteId: ${item.id}`, errors);
-            throw errors;
-          }
+        if (Array.isArray(errors) && errors[0] instanceof ValidationError) {
+          this.logger.error(
+            `Validation failed for Trendyol product with remoteId: ${item.id}`,
+            JSON.stringify(errors),
+          );
+          throw new MarketplaceValidationException('Trendyol', item.id, errors);
+        } else {
+          this.logger.error(
+            `Unknown error during validation for Trendyol product with remoteId: ${item.id}`,
+            errors,
+          );
+          throw errors;
+        }
       }
     }
 
