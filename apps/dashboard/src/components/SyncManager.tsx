@@ -13,6 +13,10 @@ export default function SyncManager() {
     try {
       const response = await fetch("/api/sync/products", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tenantId: "tenant-123" }),
       });
 
       if (response.status === 202) {
@@ -33,6 +37,10 @@ export default function SyncManager() {
     try {
       const response = await fetch("/api/sync/orders", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tenantId: "tenant-123" }),
       });
 
       if (response.status === 202) {
