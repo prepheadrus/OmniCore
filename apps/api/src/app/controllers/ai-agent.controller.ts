@@ -23,6 +23,7 @@ export class AiAgentController {
 
     try {
       const aiResponse = await this.agentOrchestrator.processChat(chatRequestDto.message);
+      Logger.log('Sending response to client: ' + aiResponse, 'AiAgentController');
       return { response: aiResponse };
     } catch (error: any) {
       Logger.error(`Error processing chat in AiAgentController: ${error.message}`, error.stack, 'AiAgentController');

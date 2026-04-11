@@ -43,11 +43,11 @@ export class AgentOrchestrator {
     const systemPrompt = `You are a supervisor routing customer queries.
 Route to 'TOOL' if the query is about order status, cancellation, or address change.
 Route to 'RAG' if the query is about product features, return policies, or warranty.
-Route to 'FINISH' if it's just a greeting or ending the conversation.
+Route to 'CHAT' if it's just a greeting, casual conversation, or ending the conversation.
 Do NOT output anything else. No chatting, no explanations.`;
 
     const routingSchema = z.object({
-      next: z.enum(['RAG', 'TOOL', 'FINISH']).describe("The next agent to route to."),
+      next: z.enum(['RAG', 'TOOL', 'CHAT']).describe("The next agent to route to."),
     });
 
     const structuredLlm = this.llm.withStructuredOutput(routingSchema);
@@ -81,6 +81,29 @@ Do NOT output anything else. No chatting, no explanations.`;
      return {
         messages: [new AIMessage("TOOL_RESPONSE_MOCK")]
     };
+  }
+
+  private async chatNode(state: AgentStateType): Promise<Partial<AgentStateType>> {
+    const messages = state.messages;
+    const lastMessage = messages[messages.length - 1];
+
+    const systemPrompt = `You are a friendly and polite customer service assistant for OmniCore.
+Please respond to the user in Turkish naturally and politely.
+Keep the response brief, helpful, and friendly.`;
+
+    try {
+      const response = await this.llm.invoke([
+        new SystemMessage(systemPrompt),
+        lastMessage
+      ]);
+
+      return {
+        messages: [response]
+      };
+    } catch (error: any) {
+      this.logger.error(`Error invoking LLM in chatNode: ${error.message}`, error.stack);
+      throw error;
+    }
   }
 
   private async finishNode(state: AgentStateType): Promise<Partial<AgentStateType>> {
@@ -128,8 +151,14 @@ Do NOT output anything else. No chatting, no explanations.`;
         this.logger.debug('Received response from Gemini...');
 
         const lastMessage = result.messages[result.messages.length - 1];
-        const content = lastMessage?.content;
-        return typeof content === 'string' ? content : 'No response generated.';
+
+        // Ensure we only return the content of the final AIMessage, never a routing JSON
+        if (lastMessage && lastMessage instanceof AIMessage) {
+            const content = lastMessage.content;
+            return typeof content === 'string' ? content : 'No response generated.';
+        }
+
+        return 'No response generated.';
       } catch (error: any) {
         this.logger.error('Error parsing LLM response or during graph execution', error?.stack || error);
         throw error;
@@ -141,6 +170,7 @@ Do NOT output anything else. No chatting, no explanations.`;
       .addNode('supervisor', this.supervisorNode.bind(this))
       .addNode('RAG', this.ragNode.bind(this))
       .addNode('TOOL', this.toolNode.bind(this))
+      .addNode('CHAT', this.chatNode.bind(this))
       .addNode('FINISH', this.finishNode.bind(this))
 
       // Connect START to supervisor
@@ -150,12 +180,13 @@ Do NOT output anything else. No chatting, no explanations.`;
       .addConditionalEdges('supervisor', (state) => state.next, {
         RAG: 'RAG',
         TOOL: 'TOOL',
-        FINISH: 'FINISH',
+        CHAT: 'CHAT',
       })
 
       // All nodes go to finish eventually
       .addEdge('RAG', 'FINISH')
       .addEdge('TOOL', 'FINISH')
+      .addEdge('CHAT', 'FINISH')
 
       .addEdge('FINISH', END);
 
