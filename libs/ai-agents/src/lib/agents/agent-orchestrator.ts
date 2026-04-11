@@ -85,12 +85,28 @@ Do NOT output anything else. No chatting, no explanations.`;
       const lastMessage = state.messages[state.messages.length - 1];
       if (lastMessage && lastMessage instanceof AIMessage) {
           const restoredContent = this.piiShieldService.restore(lastMessage.content as string, state.piiVault);
-          // In a real scenario we'd update the message list, but here we just return
-          // the end state. Actually, LangGraph reducer will append it, so we shouldn't return a new message unless needed.
+          return {
+              messages: [new AIMessage(restoredContent)],
+              next: 'END'
+          };
       }
       return { next: 'END' };
   }
 
+  public async processChat(message: string): Promise<string> {
+      const graph = this.createGraph();
+      const config = { configurable: { thread_id: '1' } };
+
+      const initialState = {
+          messages: [new HumanMessage(message)],
+          piiVault: {},
+      };
+
+      const result = await graph.invoke(initialState, config);
+      const lastMessage = result.messages[result.messages.length - 1];
+      const content = lastMessage?.content;
+      return typeof content === 'string' ? content : 'No response generated.';
+  }
 
   public createGraph() {
     const builder = new StateGraph(AgentState)
