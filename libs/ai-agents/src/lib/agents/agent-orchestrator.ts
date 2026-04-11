@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { StateGraph, START, END } from '@langchain/langgraph';
-import { ChatOpenAI } from '@langchain/openai';
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { ConfigService } from '@nestjs/config';
 import { AgentState, AgentStateType } from '../state/agent.state';
 import { PiiShieldService } from '../services/pii-shield.service';
@@ -9,15 +9,15 @@ import { z } from 'zod';
 
 @Injectable()
 export class AgentOrchestrator {
-  private llm: ChatOpenAI;
+  private llm: ChatGoogleGenerativeAI;
 
   constructor(
     private configService: ConfigService,
     private piiShieldService: PiiShieldService,
   ) {
-    this.llm = new ChatOpenAI({
-      openAIApiKey: this.configService.get<string>('OPENAI_API_KEY') || process.env['OPENAI_API_KEY'],
-      modelName: 'gpt-4o-mini', // or 'gpt-3.5-turbo'
+    this.llm = new ChatGoogleGenerativeAI({
+      apiKey: this.configService.get<string>('GEMINI_API_KEY') || process.env['GEMINI_API_KEY'],
+      model: 'gemini-1.5-pro',
       temperature: 0,
     });
   }

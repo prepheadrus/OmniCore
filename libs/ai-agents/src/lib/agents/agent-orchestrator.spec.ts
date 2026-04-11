@@ -19,7 +19,7 @@ describe('AgentOrchestrator', () => {
       piiShieldService
     );
 
-    // Mock ChatOpenAI and its withStructuredOutput
+    // Mock ChatGoogleGenerativeAI and its withStructuredOutput
     const mockStructuredLlmInvoke = jest.fn();
     const mockStructuredLlm = {
       invoke: mockStructuredLlmInvoke,
