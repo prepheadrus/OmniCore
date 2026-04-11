@@ -26,9 +26,9 @@ import { QueueController } from './controllers/queue.controller';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(ChannelMiddleware)
-      .exclude({ path: 'chat', method: RequestMethod.POST })
-      .forRoutes('*');
+    //consumer
+      //.apply(ChannelMiddleware)
+      //.exclude({ path: 'chat', method: RequestMethod.POST })
+      //.forRoutes('*');
   }
 }
