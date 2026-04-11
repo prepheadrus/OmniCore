@@ -2,7 +2,6 @@ import { Controller, Post, Body, Logger } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AgentOrchestrator } from '@omnicore/ai-agents';
 import { ChatRequestDto } from '../dto/chat-request.dto';
-import { HumanMessage } from '@langchain/core/messages';
 import { ClsService } from 'nestjs-cls';
 
 @ApiTags('AI Agents')
@@ -16,29 +15,14 @@ export class AiAgentController {
   @Post()
   @ApiOperation({ summary: 'Process a chat message using AI agents' })
   @ApiResponse({ status: 201, description: 'The response from the AI agents' })
-  async chat(@Body() chatRequestDto: ChatRequestDto) {
+  async chat(@Body() chatRequestDto: ChatRequestDto): Promise<{ response: string }> {
     Logger.log(`Received ChatRequestDto: ${JSON.stringify(chatRequestDto)}`, 'AiAgentController');
 
     // Bypass Prisma 401 error by setting a default channel_id for AI Chat
     this.cls.set('app.channel_id', 'system-ai');
 
-    const graph = this.agentOrchestrator.createGraph();
-    const config = { configurable: { thread_id: '1' } };
+    const aiResponse = await this.agentOrchestrator.processChat(chatRequestDto.message);
 
-    // Initial state setup with the new human message.
-    const initialState = {
-      messages: [new HumanMessage(chatRequestDto.message)],
-      piiVault: {},
-    };
-
-    const result = await graph.invoke(initialState, config);
-
-    // Extracted and restored message handled by the FINISH node and orchestrator
-    // Here we just extract the last AIMessage content from the final state if available
-    const lastMessage = result.messages[result.messages.length - 1];
-
-    return {
-      response: lastMessage?.content || 'No response generated.',
-    };
+    return { response: aiResponse };
   }
 }
