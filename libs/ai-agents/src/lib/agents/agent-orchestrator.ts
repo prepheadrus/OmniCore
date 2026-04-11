@@ -6,6 +6,7 @@ import { AgentState, AgentStateType } from '../state/agent.state';
 import { PiiShieldService } from '../services/pii-shield.service';
 import { HumanMessage, AIMessage, SystemMessage } from '@langchain/core/messages';
 import { z } from 'zod';
+import { GatewayTimeoutException } from '@nestjs/common';
 
 @Injectable()
 export class AgentOrchestrator {
@@ -20,6 +21,8 @@ export class AgentOrchestrator {
       apiKey: this.configService.get<string>('GEMINI_API_KEY') || process.env['GEMINI_API_KEY'],
       model: 'gemini-3-flash-preview',
       temperature: 0,
+      maxRetries: 0,
+      verbose: true,
     });
   }
 
@@ -102,10 +105,35 @@ Do NOT output anything else. No chatting, no explanations.`;
           piiVault: {},
       };
 
-      const result = await graph.invoke(initialState, config);
-      const lastMessage = result.messages[result.messages.length - 1];
-      const content = lastMessage?.content;
-      return typeof content === 'string' ? content : 'No response generated.';
+      this.logger.debug('State initialized');
+      this.logger.debug('Calling Gemini API (graph.invoke)...');
+
+      const abortController = new AbortController();
+      const configWithSignal = { ...config, signal: abortController.signal };
+      let timeoutId: NodeJS.Timeout;
+
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(() => {
+          abortController.abort(); // Cancel the underlying LangChain execution
+          reject(new GatewayTimeoutException('Yapay zeka servisi yanıt vermedi (Zaman Aşımı). Lütfen tekrar deneyin.'));
+        }, 15000);
+      });
+
+      try {
+        const result = await Promise.race([
+          graph.invoke(initialState, configWithSignal),
+          timeoutPromise
+        ]);
+        clearTimeout(timeoutId!); // Clear the timer to avoid memory leaks
+        this.logger.debug('Received response from Gemini...');
+
+        const lastMessage = result.messages[result.messages.length - 1];
+        const content = lastMessage?.content;
+        return typeof content === 'string' ? content : 'No response generated.';
+      } catch (error: any) {
+        this.logger.error('Error parsing LLM response or during graph execution', error?.stack || error);
+        throw error;
+      }
   }
 
   public createGraph() {

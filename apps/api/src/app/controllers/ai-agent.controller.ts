@@ -21,8 +21,12 @@ export class AiAgentController {
     // Bypass Prisma 401 error by setting a default channel_id for AI Chat
     this.cls.set('app.channel_id', 'system-ai');
 
-    const aiResponse = await this.agentOrchestrator.processChat(chatRequestDto.message);
-
-    return { response: aiResponse };
+    try {
+      const aiResponse = await this.agentOrchestrator.processChat(chatRequestDto.message);
+      return { response: aiResponse };
+    } catch (error: any) {
+      Logger.error(`Error processing chat in AiAgentController: ${error.message}`, error.stack, 'AiAgentController');
+      throw error;
+    }
   }
 }
