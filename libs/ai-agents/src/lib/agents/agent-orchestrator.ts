@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { StateGraph, START, END } from '@langchain/langgraph';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { ConfigService } from '@nestjs/config';
@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 @Injectable()
 export class AgentOrchestrator {
+  private readonly logger = new Logger(AgentOrchestrator.name);
   private llm: ChatGoogleGenerativeAI;
 
   constructor(
@@ -48,16 +49,21 @@ Do NOT output anything else. No chatting, no explanations.`;
 
     const structuredLlm = this.llm.withStructuredOutput(routingSchema);
 
-    const response = await structuredLlm.invoke([
-        new SystemMessage(systemPrompt),
-        new HumanMessage(redactedContent)
-    ]);
+    try {
+      const response = await structuredLlm.invoke([
+          new SystemMessage(systemPrompt),
+          new HumanMessage(redactedContent)
+      ]);
 
-    // Ensure the human message is updated with redacted content in the state
-    return {
-        next: response.next,
-        piiVault: state.piiVault // returning to trigger the reducer if necessary, though it mutates in redact
-    };
+      // Ensure the human message is updated with redacted content in the state
+      return {
+          next: response.next,
+          piiVault: state.piiVault // returning to trigger the reducer if necessary, though it mutates in redact
+      };
+    } catch (error: any) {
+      this.logger.error(`Error invoking LLM in supervisorNode: ${error.message}`, error.stack);
+      throw error; // Rethrow so the global exception filter can catch it and return 500
+    }
   }
 
   private async ragNode(state: AgentStateType): Promise<Partial<AgentStateType>> {
