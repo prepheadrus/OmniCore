@@ -13,7 +13,7 @@ import { MarketplaceSyncWorker } from './workers/marketplace-sync.worker';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         connection: {
-          host: configService.get<string>('REDIS_HOST') || 'localhost',
+          host: configService.get<string>('REDIS_HOST') || '127.0.0.1',
           port: configService.get<number>('REDIS_PORT') || 6379,
         },
       }),
