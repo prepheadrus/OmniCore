@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Logger } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AgentOrchestrator } from '@omnicore/ai-agents';
 import { ChatRequestDto } from '../dto/chat-request.dto';
@@ -13,6 +13,8 @@ export class AiAgentController {
   @ApiOperation({ summary: 'Process a chat message using AI agents' })
   @ApiResponse({ status: 201, description: 'The response from the AI agents' })
   async chat(@Body() chatRequestDto: ChatRequestDto) {
+    Logger.log(`Received ChatRequestDto: ${JSON.stringify(chatRequestDto)}`, 'AiAgentController');
+
     const graph = this.agentOrchestrator.createGraph();
     const config = { configurable: { thread_id: '1' } };
 

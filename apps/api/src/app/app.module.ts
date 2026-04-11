@@ -1,4 +1,4 @@
-import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule, RequestMethod } from '@nestjs/common';
 import { ClsModule } from 'nestjs-cls';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -26,6 +26,9 @@ import { QueueController } from './controllers/queue.controller';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ChannelMiddleware).forRoutes('*');
+    consumer
+      .apply(ChannelMiddleware)
+      .exclude({ path: 'chat', method: RequestMethod.POST })
+      .forRoutes('*');
   }
 }
