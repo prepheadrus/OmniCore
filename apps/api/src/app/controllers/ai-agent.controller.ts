@@ -30,4 +30,35 @@ export class AiAgentController {
       throw error;
     }
   }
+
+  @Post('test-ai')
+  @ApiOperation({ summary: 'Test AI Agent with predefined questions' })
+  @ApiResponse({ status: 200, description: 'Returns responses from AI agent for test queries' })
+  async testAi(): Promise<any> {
+    this.cls.set('app.channel_id', 'system-ai');
+    
+    try {
+      const q1 = "Sistemdeki ürünlerim neler?";
+      Logger.log(`Testing Q1: ${q1}`, 'AiAgentController');
+      const ans1 = await this.agentOrchestrator.processChat(q1);
+      
+      const q2 = "Şu ana kadar tamamlanan siparişlerden elde ettiğim toplam ciro nedir?";
+      Logger.log(`Testing Q2: ${q2}`, 'AiAgentController');
+      const ans2 = await this.agentOrchestrator.processChat(q2);
+      
+      return {
+        q1: {
+          question: q1,
+          answer: ans1
+        },
+        q2: {
+          question: q2,
+          answer: ans2
+        }
+      };
+    } catch (error: any) {
+      Logger.error(`Error in test endpoint: ${error.message}`, error.stack, 'AiAgentController');
+      throw error;
+    }
+  }
 }

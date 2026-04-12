@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AgentOrchestrator } from './agents/agent-orchestrator';
 import { PiiShieldService } from './services/pii-shield.service';
+import { DatabaseModule } from '@omnicore/database';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, DatabaseModule],
   providers: [AgentOrchestrator, PiiShieldService],
   exports: [AgentOrchestrator, PiiShieldService],
 })

@@ -7,6 +7,7 @@ import { PiiShieldService } from '../services/pii-shield.service';
 import { HumanMessage, AIMessage, SystemMessage } from '@langchain/core/messages';
 import { z } from 'zod';
 import { GatewayTimeoutException } from '@nestjs/common';
+import { DatabaseService } from '@omnicore/database';
 
 @Injectable()
 export class AgentOrchestrator {
@@ -16,6 +17,7 @@ export class AgentOrchestrator {
   constructor(
     private configService: ConfigService,
     private piiShieldService: PiiShieldService,
+    private databaseService: DatabaseService,
   ) {
     this.llm = new ChatGoogleGenerativeAI({
       apiKey: this.configService.get<string>('GEMINI_API_KEY') || process.env['GEMINI_API_KEY'],
@@ -41,8 +43,8 @@ export class AgentOrchestrator {
     }
 
     const systemPrompt = `You are a supervisor routing customer queries.
-Route to 'TOOL' if the query is about order status, cancellation, or address change.
-Route to 'RAG' if the query is about product features, return policies, or warranty.
+Route to 'TOOL' if the query is about order status, cancellation, address change, or total revenue/ciro.
+Route to 'RAG' if the query is about product features, return policies, warranty, or listing existing products in the system.
 Route to 'CHAT' if it's just a greeting, casual conversation, or ending the conversation.
 Do NOT output anything else. No chatting, no explanations.`;
 
@@ -70,17 +72,63 @@ Do NOT output anything else. No chatting, no explanations.`;
   }
 
   private async ragNode(state: AgentStateType): Promise<Partial<AgentStateType>> {
-    // Mock RAG node
-    return {
-        messages: [new AIMessage("RAG_RESPONSE_MOCK")]
-    };
+    const messages = state.messages;
+    const lastMessage = messages[messages.length - 1];
+    
+    // Fetch products from database
+    const products = await this.databaseService.client.product.findMany();
+    
+    const systemPrompt = `You are an AI assistant for OmniCore answering product related queries.
+Here are the current products in the database:
+${JSON.stringify(products, null, 2)}
+
+Answer the user's question accurately based on this data. Respond in natural Turkish.
+Keep your answer friendly and concise.`;
+
+    try {
+      const response = await this.llm.invoke([
+        new SystemMessage(systemPrompt),
+        lastMessage
+      ]);
+      
+      return {
+        messages: [response]
+      };
+    } catch (error: any) {
+      this.logger.error(`Error invoking LLM in ragNode: ${error.message}`, error.stack);
+      throw error;
+    }
   }
 
   private async toolNode(state: AgentStateType): Promise<Partial<AgentStateType>> {
-     // Mock Tool node
-     return {
-        messages: [new AIMessage("TOOL_RESPONSE_MOCK")]
-    };
+     const messages = state.messages;
+     const lastMessage = messages[messages.length - 1];
+     
+     // Fetch completed orders from database and calculate revenue
+     const completedOrders = await this.databaseService.client.order.findMany({
+         where: { status: 'COMPLETED' }
+     });
+     const totalRevenue = completedOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+     
+     const systemPrompt = `You are an AI assistant for OmniCore answering queries about orders and revenue.
+Here is the calculated total revenue from completed orders: ${totalRevenue} TL.
+
+Answer the user's question accurately based on this data. Respond in natural Turkish.
+Keep your answer friendly and concise.`;
+
+    try {
+      const response = await this.llm.invoke([
+        new SystemMessage(systemPrompt),
+        lastMessage
+      ]);
+      
+      return {
+        messages: [response]
+      };
+    } catch (error: any) {
+      this.logger.error(`Error invoking LLM in toolNode: ${error.message}`, error.stack);
+      throw error;
+    }
   }
 
   private async chatNode(state: AgentStateType): Promise<Partial<AgentStateType>> {

@@ -14,9 +14,16 @@ describe('AgentOrchestrator', () => {
       get: jest.fn().mockReturnValue('mock-api-key'),
     };
     piiShieldService = new PiiShieldService();
+    const mockDatabaseService = {
+      client: {
+        product: { findMany: jest.fn().mockResolvedValue([]) },
+        order: { findMany: jest.fn().mockResolvedValue([]) },
+      }
+    };
     orchestrator = new AgentOrchestrator(
       mockConfigService as ConfigService,
-      piiShieldService
+      piiShieldService,
+      mockDatabaseService as any
     );
 
     // Mock ChatGoogleGenerativeAI and its withStructuredOutput
