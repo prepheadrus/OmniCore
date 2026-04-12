@@ -3,45 +3,97 @@ import { MarketplaceSyncWorker } from './marketplace-sync.worker';
 import { Job, UnrecoverableError } from 'bullmq';
 import { MarketplaceValidationException } from '@omnicore/marketplace-adapters';
 import { AxiosError, AxiosHeaders } from 'axios';
+import { DatabaseService } from '@omnicore/database';
+import { ClsService } from 'nestjs-cls';
+import { JobTypes } from '../constants/queue.constants';
 
 describe('MarketplaceSyncWorker', () => {
   let worker: MarketplaceSyncWorker;
 
+  const mockDatabaseService = {
+    client: {
+      order: {
+        upsert: jest.fn(),
+      },
+    },
+  };
+
+  const mockClsService = {
+    runWith: jest.fn((context, callback) => callback()),
+    set: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MarketplaceSyncWorker],
+      providers: [
+        MarketplaceSyncWorker,
+        { provide: DatabaseService, useValue: mockDatabaseService },
+        { provide: ClsService, useValue: mockClsService },
+      ],
     }).compile();
 
     worker = module.get<MarketplaceSyncWorker>(MarketplaceSyncWorker);
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
     expect(worker).toBeDefined();
   });
 
-  it('should process a job successfully', async () => {
+  it('should process a valid SYNC_ORDER job successfully', async () => {
     const job = {
       id: 'test-job',
-      name: 'sync-order',
-      data: { id: 'payload-id', data: {} },
+      name: JobTypes.SYNC_ORDER,
+      data: {
+        channelId: 'system-ai',
+        type: JobTypes.SYNC_ORDER,
+        payload: {
+          orderNumber: 'ORD-123',
+          totalAmount: 100,
+          status: 'PENDING',
+          createdAt: new Date(),
+        },
+      },
     } as unknown as Job;
+
     const result = await worker.process(job);
+
     expect(result).toEqual({ success: true, jobId: 'test-job' });
+    expect(mockClsService.runWith).toHaveBeenCalled();
+    expect(mockDatabaseService.client.order.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { orderNumber: 'ORD-123' },
+      })
+    );
+  });
+
+  it('should throw UnrecoverableError if channelId is missing', async () => {
+    const job = {
+      id: 'test-job',
+      name: JobTypes.SYNC_ORDER,
+      data: {
+        type: JobTypes.SYNC_ORDER,
+        payload: {},
+      },
+    } as unknown as Job;
+
+    await expect(worker.process(job)).rejects.toThrow(UnrecoverableError);
   });
 
   it('should throw UnrecoverableError for MarketplaceValidationException', async () => {
     const job = {
       id: 'test-job',
       name: 'sync-order',
-      data: {},
+      data: { channelId: 'test' },
     } as unknown as Job;
+
     const error = new MarketplaceValidationException(
       'trendyol',
       'remote-id',
       [],
     );
 
-    jest.spyOn(worker['logger'], 'debug').mockImplementation(() => {
+    mockClsService.runWith.mockImplementationOnce(() => {
       throw error;
     });
 
@@ -52,7 +104,7 @@ describe('MarketplaceSyncWorker', () => {
     const job = {
       id: 'test-job',
       name: 'sync-order',
-      data: {},
+      data: { channelId: 'test' },
     } as unknown as Job;
 
     const axiosError = new AxiosError('Too many requests', '429');
@@ -64,7 +116,7 @@ describe('MarketplaceSyncWorker', () => {
       config: { headers: new AxiosHeaders() },
     };
 
-    jest.spyOn(worker['logger'], 'debug').mockImplementation(() => {
+    mockClsService.runWith.mockImplementationOnce(() => {
       throw axiosError;
     });
 
@@ -75,11 +127,11 @@ describe('MarketplaceSyncWorker', () => {
     const job = {
       id: 'test-job',
       name: 'sync-order',
-      data: {},
+      data: { channelId: 'test' },
     } as unknown as Job;
     const standardError = new Error('Some random error');
 
-    jest.spyOn(worker['logger'], 'debug').mockImplementation(() => {
+    mockClsService.runWith.mockImplementationOnce(() => {
       throw standardError;
     });
 
