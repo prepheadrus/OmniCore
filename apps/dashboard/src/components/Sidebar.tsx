@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import {
   LayoutDashboard,
+  Package,
   Radar,
   Tags,
   RefreshCcw,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -19,6 +20,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
+    { name: 'Ürün Kataloğu', icon: Package, href: '/inventory' },
     { name: 'Rekabet Radarı', icon: Radar, href: '/radar' },
     { name: 'Otonom Fiyatlandırma', icon: Tags, href: '/pricing' },
     { name: 'Senkronizasyon', icon: RefreshCcw, href: '/sync' },
@@ -34,7 +36,9 @@ export default function Sidebar() {
       {/* Sidebar Header / Logo Area */}
       <div className="h-16 flex items-center justify-center border-b border-slate-800">
         {!isCollapsed && (
-          <span className="text-xl font-bold tracking-wider text-indigo-400">OmniCore</span>
+          <span className="text-xl font-bold tracking-wider text-indigo-400">
+            OmniCore
+          </span>
         )}
         {isCollapsed && (
           <span className="text-xl font-bold text-indigo-400">OC</span>
