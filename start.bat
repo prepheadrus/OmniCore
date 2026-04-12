@@ -1,6 +1,9 @@
 @echo off
 title OmniCore E-Ticaret Baslatici
 color 0b
+echo Onceki oturumdan kalan zombiler temizleniyor...
+taskkill /F /IM node.exe >nul 2>&1
+echo Temizlik bitti. Baslatiliyor...
 
 echo ===================================================
 echo      OMNICORE SISTEMI BASLATILIYOR...

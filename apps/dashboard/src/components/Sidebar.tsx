@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import {
   LayoutDashboard,
+  Package,
   Radar,
   Tags,
   RefreshCcw,
@@ -19,6 +20,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
+    { name: 'Ürün Kataloğu', icon: Package, href: '/inventory' },
     { name: 'Rekabet Radarı', icon: Radar, href: '/radar' },
     { name: 'Otonom Fiyatlandırma', icon: Tags, href: '/pricing' },
     { name: 'Senkronizasyon', icon: RefreshCcw, href: '/sync' },

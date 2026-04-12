@@ -19,7 +19,7 @@ export class AgentOrchestrator {
   ) {
     this.llm = new ChatGoogleGenerativeAI({
       apiKey: this.configService.get<string>('GEMINI_API_KEY') || process.env['GEMINI_API_KEY'],
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-2.5-flash',
       temperature: 0,
       maxRetries: 0,
       verbose: true,
