@@ -139,7 +139,7 @@ Keep the response brief, helpful, and friendly.`;
         timeoutId = setTimeout(() => {
           abortController.abort(); // Cancel the underlying LangChain execution
           reject(new GatewayTimeoutException('Yapay zeka servisi yanıt vermedi (Zaman Aşımı). Lütfen tekrar deneyin.'));
-        }, 15000);
+        }, 30000);
       });
 
       try {

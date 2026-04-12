@@ -56,7 +56,16 @@ export default function AiChatInterface() {
           // If we can't parse JSON, throw generic HTTP error
           throw new Error(`Sunucu Hatası: HTTP ${response.status}`);
         }
-        throw new Error(errorData?.message || `Sunucu Hatası: HTTP ${response.status}`);
+
+        // As requested by user:
+        const errorMessage = errorData?.message || errorData?.error || `Sunucu Hatası: HTTP ${response.status}`;
+
+        // If errorData itself is thrown as a string representation, ensure we stringify objects
+        if (typeof errorData === "object" && !errorData?.message && !errorData?.error) {
+           throw new Error(JSON.stringify(errorData));
+        }
+
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -70,20 +79,20 @@ export default function AiChatInterface() {
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error: any) {
       console.error("Chat API Error:", error);
-      let errorText = "Üzgünüm, bir hata oluştu.";
+
+      const errorMessage = error?.message || "Bilinmeyen bir hata oluştu";
+      let errorText = typeof errorMessage === "string" ? errorMessage : JSON.stringify(errorMessage);
 
       if (error instanceof TypeError && error.message === "Failed to fetch") {
          errorText = "Sunucuya ulaşılamadı (Ağ Hatası).";
-      } else if (error instanceof Error) {
-         errorText = error.message;
       }
 
-      const errorMessage: Message = {
+      const errorMessageObj: Message = {
         id: (Date.now() + 1).toString(),
         text: errorText,
         sender: "ai",
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessageObj]);
     } finally {
       setIsLoading(false);
     }
