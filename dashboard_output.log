@@ -1,0 +1,19 @@
+
+> nx run dashboard:dev
+
+> next dev
+
+[1m[38;2;173;127;168m▲ Next.js 16.1.7[39m[22m (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+[32m[1m✓[22m[39m Starting...
+[35m[1mAttention[22m[39m: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+[36mhttps://nextjs.org/telemetry[39m
+
+[32m[1m✓[22m[39m Ready in 5.4s
+[37m[1m○[22m[39m Compiling /settings ...
+ GET /settings [32m200[39m in 17.5s[2m (compile: 15.2s, render: 2.3s)[22m
+ GET /settings [32m200[39m in 2.7s[2m (compile: 2.6s, render: 93ms)[22m
