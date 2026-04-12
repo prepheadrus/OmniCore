@@ -10,6 +10,8 @@ import { AiAgentsModule } from '@omnicore/ai-agents';
 import { AiAgentController } from './controllers/ai-agent.controller';
 import { QueueController } from './controllers/queue.controller';
 import { DashboardController } from './controllers/dashboard.controller';
+import { ScheduleModule } from '@nestjs/schedule';
+import { SyncCronService } from './cron/sync.cron';
 
 @Module({
   imports: [
@@ -17,13 +19,14 @@ import { DashboardController } from './controllers/dashboard.controller';
       global: true,
       middleware: { mount: true },
     }),
+    ScheduleModule.forRoot(),
     DatabaseModule,
     QueueManagementModule,
     MarketplaceAdaptersModule,
     AiAgentsModule,
   ],
   controllers: [AppController, AiAgentController, QueueController, DashboardController],
-  providers: [AppService],
+  providers: [AppService, SyncCronService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

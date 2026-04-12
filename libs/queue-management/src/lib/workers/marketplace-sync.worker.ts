@@ -1,10 +1,12 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job, UnrecoverableError } from 'bullmq';
 import { Logger } from '@nestjs/common';
-import { MARKETPLACE_SYNC_QUEUE } from '../constants/queue.constants';
+import { MARKETPLACE_SYNC_QUEUE, JobTypes } from '../constants/queue.constants';
 import { IMarketplaceJobPayload } from '../interfaces/marketplace-job-payload.interface';
 import { MarketplaceValidationException } from '@omnicore/marketplace-adapters';
 import { isAxiosError } from 'axios';
+import { DatabaseService } from '@omnicore/database';
+import { ClsService } from 'nestjs-cls';
 
 @Processor(MARKETPLACE_SYNC_QUEUE, {
   limiter: {
@@ -15,14 +17,50 @@ import { isAxiosError } from 'axios';
 export class MarketplaceSyncWorker extends WorkerHost {
   private readonly logger = new Logger(MarketplaceSyncWorker.name);
 
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly clsService: ClsService,
+  ) {
+    super();
+  }
+
   async process(job: Job<IMarketplaceJobPayload>): Promise<any> {
     this.logger.log(`Processing job ${job.id} of type ${job.name}`);
 
     try {
-      // Mock processing logic (the actual logic would call an external API)
-      this.logger.debug(`Job ${job.id} payload:`, job.data);
+      const { channelId, type, payload } = job.data as any;
 
-      // Simulate successful processing
+      if (!channelId) {
+        throw new UnrecoverableError(`Job ${job.id} is missing channelId.`);
+      }
+
+      await this.clsService.runWith({} as any, async () => {
+        this.clsService.set('app.channel_id', channelId);
+        if (job.name === JobTypes.SYNC_ORDER && type === JobTypes.SYNC_ORDER) {
+          const order = payload;
+
+          await this.databaseService.client.order.upsert({
+            where: { orderNumber: order.orderNumber },
+            create: {
+              orderNumber: order.orderNumber,
+              totalAmount: order.totalAmount,
+              status: order.status,
+              channelId: channelId,
+              createdAt: order.createdAt,
+            },
+            update: {
+              status: order.status,
+              totalAmount: order.totalAmount,
+              updatedAt: new Date(),
+            },
+          });
+
+          this.logger.log(`Successfully upserted order ${order.orderNumber} for channel ${channelId}`);
+        } else {
+           this.logger.warn(`Job ${job.id} type ${job.name} not implemented or payload type mismatch.`);
+        }
+      });
+
       return { success: true, jobId: job.id };
     } catch (error: any) {
       this.logger.error(
