@@ -49,23 +49,38 @@ export default function AiChatInterface() {
       });
 
       if (!response.ok) {
-        throw new Error("API request failed");
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          // If we can't parse JSON, throw generic HTTP error
+          throw new Error(`Sunucu Hatası: HTTP ${response.status}`);
+        }
+        throw new Error(errorData?.message || `Sunucu Hatası: HTTP ${response.status}`);
       }
 
       const data = await response.json();
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: data.reply || data.message || "Yanıt alınamadı.",
+        text: data.response || data.message || "Yanıt alınamadı.",
         sender: "ai",
       };
 
       setMessages((prev) => [...prev, aiMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Chat API Error:", error);
+      let errorText = "Üzgünüm, bir hata oluştu.";
+
+      if (error instanceof TypeError && error.message === "Failed to fetch") {
+         errorText = "Sunucuya ulaşılamadı (Ağ Hatası).";
+      } else if (error instanceof Error) {
+         errorText = error.message;
+      }
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "Üzgünüm, bir hata oluştu.",
+        text: errorText,
         sender: "ai",
       };
       setMessages((prev) => [...prev, errorMessage]);
