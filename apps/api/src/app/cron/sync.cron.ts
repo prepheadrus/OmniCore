@@ -28,7 +28,7 @@ export class SyncCronService {
         await this.queueService.addSyncJob(JobTypes.SYNC_ORDER, {
           id: order.remoteOrderId,
           data: {
-            channelId: 'system-ai',
+            channelId: 'trendyol-mock',
             type: JobTypes.SYNC_ORDER,
             payload: order,
           }

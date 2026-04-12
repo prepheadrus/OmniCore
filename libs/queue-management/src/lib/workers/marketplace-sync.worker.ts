@@ -28,7 +28,7 @@ export class MarketplaceSyncWorker extends WorkerHost {
     this.logger.log(`Processing job ${job.id} of type ${job.name}`);
 
     try {
-      const { channelId, type, payload } = job.data as any;
+      const { channelId, type, payload } = job.data.data as any;
 
       if (!channelId) {
         throw new UnrecoverableError(`Job ${job.id} is missing channelId.`);

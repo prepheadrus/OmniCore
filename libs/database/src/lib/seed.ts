@@ -12,11 +12,18 @@ async function main() {
   await prisma.salesChannel.deleteMany({});
   
   // 2. Create Sales Channel
-  console.log('Creating Sales Channel...');
+  console.log('Creating Sales Channels...');
   const channel = await prisma.salesChannel.create({
     data: {
       id: 'system-ai',
       name: 'Trendyol Mağazam'
+    }
+  });
+
+  const mockChannel = await prisma.salesChannel.create({
+    data: {
+      id: 'trendyol-mock',
+      name: 'Trendyol Mock Kanalı'
     }
   });
 
@@ -28,19 +35,19 @@ async function main() {
         name: 'Konsantre Cam Suyu',
         sku: 'SKU-001',
         price: 50.0,
-        channelId: channel.id,
+        channelId: mockChannel.id,
       },
       {
         name: '5\'li Fırça Seti',
         sku: 'SKU-002',
         price: 166.0,
-        channelId: channel.id,
+        channelId: mockChannel.id,
       },
       {
         name: 'Lastik Parlatıcı (400 ml)',
         sku: 'SKU-003',
         price: 190.0,
-        channelId: channel.id,
+        channelId: mockChannel.id,
       }
     ]
   });
@@ -53,31 +60,31 @@ async function main() {
         orderNumber: 'ORD-001',
         totalAmount: 166.0,
         status: 'COMPLETED',
-        channelId: channel.id,
+        channelId: mockChannel.id,
       },
       {
         orderNumber: 'ORD-002',
         totalAmount: 380.0,
         status: 'COMPLETED',
-        channelId: channel.id,
+        channelId: mockChannel.id,
       },
       {
         orderNumber: 'ORD-003',
         totalAmount: 50.0,
         status: 'PENDING',
-        channelId: channel.id,
+        channelId: mockChannel.id,
       },
       {
         orderNumber: 'ORD-004',
         totalAmount: 500.0,
         status: 'COMPLETED',
-        channelId: channel.id,
+        channelId: mockChannel.id,
       },
       {
         orderNumber: 'ORD-005',
         totalAmount: 190.0,
         status: 'PENDING',
-        channelId: channel.id,
+        channelId: mockChannel.id,
       }
     ]
   });
