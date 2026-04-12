@@ -9,6 +9,7 @@ import { MarketplaceAdaptersModule } from '@omnicore/marketplace-adapters';
 import { AiAgentsModule } from '@omnicore/ai-agents';
 import { AiAgentController } from './controllers/ai-agent.controller';
 import { QueueController } from './controllers/queue.controller';
+import { DashboardController } from './controllers/dashboard.controller';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { QueueController } from './controllers/queue.controller';
     MarketplaceAdaptersModule,
     AiAgentsModule,
   ],
-  controllers: [AppController, AiAgentController, QueueController],
+  controllers: [AppController, AiAgentController, QueueController, DashboardController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {

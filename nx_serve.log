@@ -1,13 +1,94 @@
 
-> nx run dashboard:dev
+ NX   Running target serve for project api and 1 task it depends on:
 
-> next dev
 
-[1m[38;2;173;127;168m▲ Next.js 16.1.7[39m[22m (Turbopack)
-- Local:         http://localhost:3000
-- Network:       http://192.168.0.2:3000
 
-[32m[1m✓[22m[39m Starting...
-[32m[1m✓[22m[39m Ready in 4.7s
-[37m[1m○[22m[39m Compiling /login ...
- GET /login [32m200[39m in 19.8s[2m (compile: 16.0s, render: 3.8s)[22m
+> nx run api:build  [local cache]
+
+> webpack-cli build --node-env=production
+
+webpack compiled [1m[32msuccessfully[39m[22m (7ed97b570369a824)
+
+> nx run api:serve:development
+
+[2m> [22m[2mnx run[22m api:build:development  [2m[local cache][22m
+[2m> [22mwebpack-cli build --node-env=development
+webpack compiled [1m[32msuccessfully[39m[22m (7ed97b570369a824)
+[2m[32m[39m[22m
+[7m[1m[32m NX [39m[22m[27m  [32mSuccessfully ran target [1mbuild[22m for project api[39m
+[2mNx read the output from the cache instead of running the command for 1 out of 1 tasks.[22m
+[1m[31mDebugger listening on ws://localhost:9229/9f6e257d-996e-4353-87dd-eb31d69e38f5
+Debugger listening on ws://localhost:9229/9f6e257d-996e-4353-87dd-eb31d69e38f5
+For help, see: https://nodejs.org/en/docs/inspector
+[39m[22m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mClsModule dependencies initialized[39m[38;5;3m +45ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mClsCommonModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +9ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mHttpModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mDiscoveryModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mDatabaseModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mClsRootModule dependencies initialized[39m[38;5;3m +3ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMarketplaceAdaptersModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mClsPluginsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mBullModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAiAgentsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mBullModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mBullModule dependencies initialized[39m[38;5;3m +5ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mQueueManagementModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +0ms[39m
+[95m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [95m  DEBUG[39m [38;5;3m[ClsModule] [39m[95mMounting ClsMiddleware to /[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAppController {/api}:[39m[38;5;3m +7ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api, GET} route[39m[38;5;3m +9ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAiAgentController {/api/chat}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/chat, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/chat/test-ai, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mQueueController {/api/sync}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/sync/orders, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/sync/products, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mDashboardController {/api/dashboard}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/dashboard/summary, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 82674  - [39m04/12/2026, 7:30:21 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/dashboard/products, GET} route[39m[38;5;3m +1ms[39m
+[1m[31mAggregateError:
+[90m    at internalConnectMultiple (node:net:1134:18)[31m
+[90m    at afterConnectMultiple (node:net:1715:7)[31m {
+  code: [32m'ECONNREFUSED'[31m,
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+    [90m    at createConnectionError (node:net:1678:14)[31m
+    [90m    at afterConnectMultiple (node:net:1708:16)[31m {
+      errno: [33m-111[31m,
+      code: [32m'ECONNREFUSED'[31m,
+      syscall: [32m'connect'[31m,
+      address: [32m'::1'[31m,
+      port: [33m6379[31m
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:6379
+    [90m    at createConnectionError (node:net:1678:14)[31m
+    [90m    at afterConnectMultiple (node:net:1708:16)[31m {
+      errno: [33m-111[31m,
+      code: [32m'ECONNREFUSED'[31m,
+      syscall: [32m'connect'[31m,
+      address: [32m'127.0.0.1'[31m,
+      port: [33m6379[31m
+    }
+  ]
+}
+[39m[22m
+[1m[31m
+/app/node_modules/.pnpm/@prisma+client@6.19.3_prisma@6.19.3_typescript@5.9.3__typescript@5.9.3/node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:440
+          throw new PrismaClientInitializationError(error.message, this.config.clientVersion!, error.error_code)
+                ^
+PrismaClientInitializationError: Can't reach database server at `127.0.0.1:5432`
+Please make sure your database server is running at `127.0.0.1:5432`.
+    at r (/app/node_modules/.pnpm/@prisma+client@6.19.3_prisma@6.19.3_typescript@5.9.3__typescript@5.9.3/node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:440:17)
+    at DatabaseService.onModuleInit (/app/libs/database/src/lib/database.service.ts:21:5)
+    at async Promise.all (index 0)
+    at callModuleInitHook (/app/node_modules/.pnpm/@nestjs+core@11.1.18_@nestjs+common@11.1.18_class-transformer@0.5.1_class-validator@0.1_cffccdba201e3156057b21bf1e4fc31b/node_modules/@nestjs/core/hooks/on-module-init.hook.js:43:5)
+    at NestApplication.callInitHook (/app/node_modules/.pnpm/@nestjs+core@11.1.18_@nestjs+common@11.1.18_class-transformer@0.5.1_class-validator@0.1_cffccdba201e3156057b21bf1e4fc31b/node_modules/@nestjs/core/nest-application-context.js:252:13)
+    at NestApplication.init (/app/node_modules/.pnpm/@nestjs+core@11.1.18_@nestjs+common@11.1.18_class-transformer@0.5.1_class-validator@0.1_cffccdba201e3156057b21bf1e4fc31b/node_modules/@nestjs/core/nest-application.js:103:9)
+    at NestApplication.listen (/app/node_modules/.pnpm/@nestjs+core@11.1.18_@nestjs+common@11.1.18_class-transformer@0.5.1_class-validator@0.1_cffccdba201e3156057b21bf1e4fc31b/node_modules/@nestjs/core/nest-application.js:175:13)
+    at bootstrap (/app/apps/api/src/main.ts:40:3)
+[39m[22m
+[7m[1m[36m NX [39m[22m[27m [1mProcess exited with code 1, waiting for changes to restart...[22m
