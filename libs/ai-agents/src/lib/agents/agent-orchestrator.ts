@@ -108,7 +108,7 @@ Keep your answer friendly and concise.`;
      const completedOrders = await this.databaseService.client.order.findMany({
          where: { status: 'COMPLETED' }
      });
-     const totalRevenue = completedOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+     const totalRevenue = completedOrders.reduce((sum: number, order: any) => sum + Number(order.totalAmount || 0), 0);
      
      const systemPrompt = `You are an AI assistant for OmniCore answering queries about orders and revenue.
 Here is the calculated total revenue from completed orders: ${totalRevenue} TL.

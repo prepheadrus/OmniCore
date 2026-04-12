@@ -8,6 +8,31 @@
 - Network:       http://192.168.0.2:3000
 
 [32m[1m✓[22m[39m Starting...
-[32m[1m✓[22m[39m Ready in 5.3s
-[37m[1m○[22m[39m Compiling /inventory ...
- GET /inventory [32m200[39m in 14.6s[2m (compile: 12.6s, render: 1988ms)[22m
+[32m[1m✓[22m[39m Ready in 7.7s
+Failed to proxy http://127.0.0.1:3000/api/dashboard/products Error: socket hang up
+    at [3mignore-listed frames[23m {
+  code: [32m'ECONNRESET'[39m
+}
+Error: socket hang up
+    at [3mignore-listed frames[23m {
+  code: [32m'ECONNRESET'[39m
+}
+Failed to proxy http://127.0.0.1:3000/api/dashboard/summary Error: socket hang up
+    at [3mignore-listed frames[23m {
+  code: [32m'ECONNRESET'[39m
+}
+Error: socket hang up
+    at [3mignore-listed frames[23m {
+  code: [32m'ECONNRESET'[39m
+}
+Error fetching dashboard data: Error: Failed to fetch dashboard data
+    at getDashboardData (src/app/page.tsx:17:13)
+    at async Index (src/app/page.tsx:34:33)
+[0m [90m 15 |[39m
+ [90m 16 |[39m     [36mif[39m ([33m![39msummaryRes[33m.[39mok [33m||[39m [33m![39mproductsRes[33m.[39mok) {
+[31m[1m>[22m[39m[90m 17 |[39m       [36mthrow[39m [36mnew[39m [33mError[39m([32m"Failed to fetch dashboard data"[39m)[33m;[39m
+ [90m    |[39m             [31m[1m^[22m[39m
+ [90m 18 |[39m     }
+ [90m 19 |[39m
+ [90m 20 |[39m     [36mconst[39m summary [33m=[39m [36mawait[39m summaryRes[33m.[39mjson()[33m;[39m[0m
+ GET / [32m200[39m in 36.1s[2m (compile: 5.1s, render: 31.0s)[22m
