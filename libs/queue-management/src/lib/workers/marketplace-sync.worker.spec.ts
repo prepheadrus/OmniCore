@@ -45,14 +45,16 @@ describe('MarketplaceSyncWorker', () => {
       id: 'test-job',
       name: JobTypes.SYNC_ORDER,
       data: {
-        channelId: 'system-ai',
-        type: JobTypes.SYNC_ORDER,
-        payload: {
-          orderNumber: 'ORD-123',
-          totalAmount: 100,
-          status: 'PENDING',
-          createdAt: new Date(),
-        },
+        data: {
+          channelId: 'system-ai',
+          type: JobTypes.SYNC_ORDER,
+          payload: {
+            orderNumber: 'ORD-123',
+            totalAmount: 100,
+            status: 'PENDING',
+            createdAt: new Date(),
+          },
+        }
       },
     } as unknown as Job;
 
@@ -72,8 +74,10 @@ describe('MarketplaceSyncWorker', () => {
       id: 'test-job',
       name: JobTypes.SYNC_ORDER,
       data: {
-        type: JobTypes.SYNC_ORDER,
-        payload: {},
+        data: {
+          type: JobTypes.SYNC_ORDER,
+          payload: {},
+        }
       },
     } as unknown as Job;
 
@@ -84,7 +88,7 @@ describe('MarketplaceSyncWorker', () => {
     const job = {
       id: 'test-job',
       name: 'sync-order',
-      data: { channelId: 'test' },
+      data: { data: { channelId: 'test' } },
     } as unknown as Job;
 
     const error = new MarketplaceValidationException(
@@ -104,7 +108,7 @@ describe('MarketplaceSyncWorker', () => {
     const job = {
       id: 'test-job',
       name: 'sync-order',
-      data: { channelId: 'test' },
+      data: { data: { channelId: 'test' } },
     } as unknown as Job;
 
     const axiosError = new AxiosError('Too many requests', '429');
@@ -127,7 +131,7 @@ describe('MarketplaceSyncWorker', () => {
     const job = {
       id: 'test-job',
       name: 'sync-order',
-      data: { channelId: 'test' },
+      data: { data: { channelId: 'test' } },
     } as unknown as Job;
     const standardError = new Error('Some random error');
 
