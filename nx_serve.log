@@ -8,16 +8,6 @@
 - Network:       http://192.168.0.2:3000
 
 [32m[1m✓[22m[39m Starting...
-[32m[1m✓[22m[39m Ready in 4.9s
-[37m[1m○[22m[39m Compiling / ...
- GET / [32m200[39m in 16.6s[2m (compile: 14.5s, render: 2.1s)[22m
-[32m[1m✓[22m[39m Compiled in 8ms
- GET / [32m200[39m in 2.9s[2m (compile: 2.5s, render: 406ms)[22m
-[32m[1m✓[22m[39m Compiled in 8ms
- GET / [32m200[39m in 2.9s[2m (compile: 2.5s, render: 487ms)[22m
-[32m[1m✓[22m[39m Compiled in 7ms
- GET / [32m200[39m in 2.9s[2m (compile: 2.5s, render: 467ms)[22m
-[32m[1m✓[22m[39m Compiled in 8ms
- GET / [32m200[39m in 2.9s[2m (compile: 2.5s, render: 437ms)[22m
-[32m[1m✓[22m[39m Compiled in 8ms
- GET / [32m200[39m in 2.9s[2m (compile: 2.5s, render: 481ms)[22m
+[32m[1m✓[22m[39m Ready in 4.7s
+[37m[1m○[22m[39m Compiling /login ...
+ GET /login [32m200[39m in 19.8s[2m (compile: 16.0s, render: 3.8s)[22m

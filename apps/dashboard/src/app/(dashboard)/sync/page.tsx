@@ -1,4 +1,4 @@
-import SyncManager from '../../components/SyncManager';
+import SyncManager from '../../../components/SyncManager';
 
 export const metadata = {
   title: 'Senkronizasyon | Dashboard',
