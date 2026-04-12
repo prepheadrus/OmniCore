@@ -1,6 +1,6 @@
-import TopMetrics from '../components/TopMetrics';
-import WeeklySalesChart from '../components/WeeklySalesChart';
-import RecentActivityTimeline from '../components/RecentActivityTimeline';
+import TopMetrics from '../../components/TopMetrics';
+import WeeklySalesChart from '../../components/WeeklySalesChart';
+import RecentActivityTimeline from '../../components/RecentActivityTimeline';
 
 export default function Index() {
   // Format the current date elegantly (e.g., "12 Nisan 2026, Pazar")
