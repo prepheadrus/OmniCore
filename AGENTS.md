@@ -31,16 +31,29 @@
 - LLM tabanlı çoklu ajan (Multi-Agent) orkestrasyonu için sadece LangGraph kullanılacaktır.
 - KURAL: Müşteri verileri içeren metinler LLM'e (Gemini/OpenAI) gönderilmeden önce MUTLAKA PII Maskeleme Ara Katmanından (PII Redaction Middleware) geçirilerek isim, telefon ve adres bilgileri `[REDACTED]` formatıyla değiştirilmelidir.
 
+## 2.5 Ürün Odaklı Anlamsal Önbellek ve Temizleme Stratejisi (Product-Bound Semantic Cache Invalidation)
+
+- **Süresiz ve Alan Bazlı İptal (Field-Level Invalidation):** LangGraph ajanlarının ürünlerle ilgili ürettiği yanıtlar Redis üzerinde zamana dayalı (TTL) değil, `productId` referansıyla süresiz saklanmalıdır. Bu RAG anlamsal önbelleği SADECE ürünün statik verilerinde (description, attributes, name, warranty vb.) bir değişiklik olduğunda olay güdümlü (event-driven) olarak silinmelidir.
+- **Dinamik Veri İstisnası (Volatile Data Exclusion):** Ürünün `price` (fiyat) ve `stock` (stok) bilgilerindeki güncellemeler, anlamsal önbellek silinme (cache invalidation) olayını KESİNLİKLE tetiklememelidir.
+- **Gerçek Zamanlı Yönlendirme (Real-time Tooling):** Müşterilerin fiyat veya stok durumu ile ilgili soruları anlamsal önbellekten (RAG) cevaplanmamalı, LangGraph orkestratörü tarafından daima TOOL düğümü üzerinden doğrudan veritabanından anlık olarak çekilmelidir.
+
 # 3. Komutlar ve Kurulum (Build & Setup Commands)
 
 - Bağımlılıkların Kurulumu: pnpm install
 - Arka Uç Geliştirme Sunucusu: pnpm nx serve api
 - Ön Uç Geliştirme Sunucusu: pnpm nx serve dashboard
 - Yeni Kütüphane Üretme (Nx Generator): pnpm nx g @nx/nest:lib <lib-name>
-- Tüm Testleri Çalıştırma: pnpm nx run-many -t test
+- **Geliştirme ve PR Hızlandırma Stratejisi (Nx Affected):** Değişiklikleri gönderirken (submit) veya test koştururken kesinlikle tüm projeyi tarayan global komutlar (örn. `run-many`) kullanmayın. DAİMA Nx'in 'affected' mantığını kullanın:
+  - Linter için: `npx nx affected -t lint`
+  - Testler için: `npx nx affected -t test`
+  - Build için: `npx nx affected -t build`
 
 # 4. Kodlama Stilleri ve İnceleme (Code Style)
 
 - Yalnızca katı kurallı TypeScript kullanılmalıdır. "any" tipinin kullanılması kesinlikle yasaktır.
 - Yazılan her servis metodu için Jest kullanılarak kapsamlı birim (unit) testleri yazılmalıdır.
 - GitHub Pull Request mesajları 'Conventional Commits' standardına uymalıdır.
+
+# 5. Geliştirme Prensibi (Eşzamanlı Servis Güncellemeleri)
+
+- API'deki `SyncRequestDto` gibi kritik DTO değişikliklerinde (örneğin `channelId` eklendiğinde), buna bağlı olan Frontend/Dashboard servislerinin ve bileşenlerinin de eşzamanlı olarak güncellenmesi zorunludur. Aksi takdirde "400 Bad Request" gibi hatalar ortaya çıkabilir.
