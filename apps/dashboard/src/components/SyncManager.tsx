@@ -10,13 +10,14 @@ export default function SyncManager() {
 
   const handleSyncProducts = async () => {
     setIsSyncingProducts(true);
+    const channelId = "trendyol-mock";
     try {
       const response = await fetch("/api/sync/products", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ tenantId: "tenant-123" }),
+        body: JSON.stringify({ tenantId: "tenant-123", channelId }),
       });
 
       if (response.status === 202) {
@@ -34,13 +35,14 @@ export default function SyncManager() {
 
   const handleSyncOrders = async () => {
     setIsSyncingOrders(true);
+    const channelId = "trendyol-mock";
     try {
       const response = await fetch("/api/sync/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ tenantId: "tenant-123" }),
+        body: JSON.stringify({ tenantId: "tenant-123", channelId }),
       });
 
       if (response.status === 202) {
