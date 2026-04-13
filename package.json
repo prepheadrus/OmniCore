@@ -76,12 +76,10 @@
     "@nestjs/schedule": "^6.1.1",
     "@nestjs/swagger": "^11.2.7",
     "@prisma/client": "^6.19.3",
-<<<<<<< Updated upstream
     "@radix-ui/react-avatar": "^1.1.11",
-=======
->>>>>>> Stashed changes
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-slot": "^1.2.4",
+    "@tanstack/react-table": "^8.21.3",
     "axios": "^1.6.0",
     "bullmq": "^5.73.4",
     "class-transformer": "^0.5.1",
