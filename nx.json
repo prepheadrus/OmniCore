@@ -29,17 +29,10 @@
     },
     {
       "plugin": "@nx/jest/plugin",
-      "options": {
-        "targetName": "test"
-      },
+      "options": { "targetName": "test" },
       "exclude": ["apps/api-e2e/**/*"]
     },
-    {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "lint"
-      }
-    },
+    { "plugin": "@nx/eslint/plugin", "options": { "targetName": "lint" } },
     {
       "plugin": "@nx/next/plugin",
       "options": {
@@ -51,24 +44,11 @@
         "watchDepsTargetName": "watch-deps"
       }
     },
-    {
-      "plugin": "@nx/playwright/plugin",
-      "options": {
-        "targetName": "e2e"
-      }
-    }
+    { "plugin": "@nx/playwright/plugin", "options": { "targetName": "e2e" } }
   ],
   "generators": {
-    "@nx/next": {
-      "application": {
-        "style": "css",
-        "linter": "eslint"
-      }
-    },
-    "@nx/react": {
-      "library": {
-        "unitTestRunner": "none"
-      }
-    }
-  }
+    "@nx/next": { "application": { "style": "css", "linter": "eslint" } },
+    "@nx/react": { "library": { "unitTestRunner": "none" } }
+  },
+  "nxCloudId": "69dd4c8c92c75a832e692b7b"
 }
