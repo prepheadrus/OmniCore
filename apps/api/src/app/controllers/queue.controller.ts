@@ -1,6 +1,6 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { MarketplaceQueueService } from '@omnicore/queue-management';
+import { MarketplaceQueueService, JobTypes } from '@omnicore/queue-management';
 import { SyncRequestDto } from '../dto/sync-request.dto';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,12 +18,13 @@ export class QueueController {
   })
   async syncOrders(@Body() syncRequestDto: SyncRequestDto) {
     const jobId = uuidv4();
-    await this.queueService.addSyncJob('sync-orders', {
+    await this.queueService.addSyncJob(JobTypes.SYNC_ORDER, {
       id: jobId,
       data: {
         tenantId: syncRequestDto.tenantId,
         marketplace: syncRequestDto.marketplace,
-        type: 'order',
+        channelId: syncRequestDto.channelId,
+        type: JobTypes.SYNC_ORDER,
       },
     });
 
@@ -42,12 +43,13 @@ export class QueueController {
   })
   async syncProducts(@Body() syncRequestDto: SyncRequestDto) {
     const jobId = uuidv4();
-    await this.queueService.addSyncJob('sync-products', {
+    await this.queueService.addSyncJob(JobTypes.SYNC_PRODUCT, {
       id: jobId,
       data: {
         tenantId: syncRequestDto.tenantId,
         marketplace: syncRequestDto.marketplace,
-        type: 'product',
+        channelId: syncRequestDto.channelId,
+        type: JobTypes.SYNC_PRODUCT,
       },
     });
 
