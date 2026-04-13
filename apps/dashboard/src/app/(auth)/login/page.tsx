@@ -13,7 +13,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-              {isLogin ? 'Hesabınıza Giriş Yapın' : 'Yeni Hesap Oluşturun'}
+              {isLogin ? 'Hesab&apos;ınıza Giriş Yapın' : 'Yeni Hesap Oluşturun'}
             </h2>
             <p className="mt-2 text-sm text-gray-600">
               {isLogin ? 'Hoş geldiniz, devam etmek için bilgilerinizi girin.' : 'E-ticaretin yeni çağına katılmak için kayıt olun.'}
@@ -140,7 +140,7 @@ export default function LoginPage() {
               onClick={() => setIsLogin(!isLogin)}
               className="text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-              {isLogin ? 'Hesabınız yok mu? Kayıt Olun' : 'Zaten hesabınız var mı? Giriş Yapın'}
+              {isLogin ? 'Hesab&apos;ınız yok mu? Kayıt Olun' : 'Zaten hesab&apos;ınız var mı? Giriş Yapın'}
             </button>
           </div>
         </div>
@@ -172,7 +172,7 @@ export default function LoginPage() {
               <div className="ml-5">
                 <h3 className="text-xl font-semibold text-white">Işık Hızında Senkronizasyon</h3>
                 <p className="mt-2 text-indigo-200">
-                  Trendyol, Hepsiburada ve Amazon'daki stoklarınızı milisaniyeler içinde eşitleyin.
+                  Trendyol, Hepsiburada ve Amazon&apos;daki stoklarınızı milisaniyeler içinde eşitleyin.
                 </p>
               </div>
             </div>
@@ -186,7 +186,7 @@ export default function LoginPage() {
               <div className="ml-5">
                 <h3 className="text-xl font-semibold text-white">Yapay Zeka Destekli Otonom Fiyatlandırma</h3>
                 <p className="mt-2 text-indigo-200">
-                  Rakiplerinizi analiz edin, Buybox'ı kâr marjınızı koruyarak ele geçirin.
+                  Rakiplerinizi analiz edin, Buybox&apos;ı kâr marjınızı koruyarak ele geçirin.
                 </p>
               </div>
             </div>

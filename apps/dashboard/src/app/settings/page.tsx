@@ -57,7 +57,7 @@ export default function SettingsPage() {
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-slate-900">Entegrasyonlar ve API Ayarları</h1>
-        <p className="text-sm text-slate-500 mt-1">Pazar yeri mağazalarınızı OmniCore'a bağlayın.</p>
+        <p className="text-sm text-slate-500 mt-1">Pazar yeri mağazalarınızı OmniCore&apos;a bağlayın.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

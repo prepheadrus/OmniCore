@@ -98,7 +98,7 @@ export default function PricingPage() {
                 className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-200"
                 defaultValue="Agresif (Buybox)"
               >
-                <option value="Agresif (Buybox)">Agresif (Buybox'ı al)</option>
+                <option value="Agresif (Buybox)">Agresif (Buybox&apos;ı al)</option>
                 <option value="Dengeli (Eşitle)">Dengeli (Rakibe Eşitle)</option>
                 <option value="Defansif (Kâr Koru)">Defansif (Kârı Koru)</option>
               </select>
