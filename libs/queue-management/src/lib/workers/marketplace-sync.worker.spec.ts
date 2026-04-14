@@ -6,7 +6,7 @@ import { AxiosError, AxiosHeaders } from 'axios';
 import { DatabaseService } from '@omnicore/database';
 import { ClsService } from 'nestjs-cls';
 import { JobTypes } from '../constants/queue.constants';
-import { MarketplaceQueueService } from '../services/marketplace-queue.service';
+import { CoreQueueService } from '../services/core-queue.service';
 
 describe('MarketplaceSyncWorker', () => {
   let worker: MarketplaceSyncWorker;
@@ -26,6 +26,7 @@ describe('MarketplaceSyncWorker', () => {
 
   const mockQueueService = {
     addSyncJob: jest.fn(),
+    addInvoiceJob: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -34,7 +35,7 @@ describe('MarketplaceSyncWorker', () => {
         MarketplaceSyncWorker,
         { provide: DatabaseService, useValue: mockDatabaseService },
         { provide: ClsService, useValue: mockClsService },
-        { provide: MarketplaceQueueService, useValue: mockQueueService },
+        { provide: CoreQueueService, useValue: mockQueueService },
       ],
     }).compile();
 
@@ -71,6 +72,16 @@ describe('MarketplaceSyncWorker', () => {
     expect(mockDatabaseService.client.order.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { orderNumber: 'ORD-123' },
+      })
+    );
+    expect(mockQueueService.addInvoiceJob).toHaveBeenCalledWith(
+      JobTypes.GENERATE_INVOICE,
+      expect.objectContaining({
+        id: 'invoice-ORD-123',
+        data: {
+          orderId: 'ORD-123',
+          channelId: 'system-ai',
+        },
       })
     );
   });

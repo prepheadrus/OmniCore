@@ -7,7 +7,7 @@ import { MarketplaceValidationException } from '@omnicore/marketplace-adapters';
 import { isAxiosError } from 'axios';
 import { DatabaseService } from '@omnicore/database';
 import { ClsService } from 'nestjs-cls';
-import { MarketplaceQueueService } from '../services/marketplace-queue.service';
+import { CoreQueueService } from '../services/core-queue.service';
 
 @Processor(MARKETPLACE_SYNC_QUEUE, {
   limiter: {
@@ -21,7 +21,7 @@ export class MarketplaceSyncWorker extends WorkerHost {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly clsService: ClsService,
-    private readonly queueService: MarketplaceQueueService,
+    private readonly queueService: CoreQueueService,
   ) {
     super();
   }
@@ -99,6 +99,17 @@ export class MarketplaceSyncWorker extends WorkerHost {
           });
 
           this.logger.log(`Successfully upserted order ${order.orderNumber} for channel ${channelId}`);
+
+          // Enqueue invoice generation job
+          await this.queueService.addInvoiceJob(JobTypes.GENERATE_INVOICE, {
+            id: `invoice-${order.orderNumber}`,
+            data: {
+              orderId: order.orderNumber,
+              channelId: channelId,
+            },
+          });
+          this.logger.log(`Enqueued GENERATE_INVOICE job for order ${order.orderNumber}`);
+
         } else if (job.name === JobTypes.SYNC_PRODUCT && type === JobTypes.SYNC_PRODUCT) {
           const product = payload;
 

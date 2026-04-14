@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MockMarketplaceAdapter } from '@omnicore/marketplace-adapters';
-import { MarketplaceQueueService, JobTypes } from '@omnicore/queue-management';
+import { CoreQueueService, JobTypes } from '@omnicore/queue-management';
 
 @Injectable()
 export class SyncCronService {
@@ -9,7 +9,7 @@ export class SyncCronService {
 
   constructor(
     private readonly mockAdapter: MockMarketplaceAdapter,
-    private readonly queueService: MarketplaceQueueService,
+    private readonly queueService: CoreQueueService,
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
