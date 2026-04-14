@@ -1,4 +1,4 @@
-import { cn } from "@omnicore/ui/lib/utils"
+import { cn } from "../../lib/utils"
 
 function Skeleton({
   className,
