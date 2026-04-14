@@ -20,21 +20,13 @@ export class SyncCronService {
       const channelId = 'trendyol-mock';
 
       await this.queueService.addSyncJob(JobTypes.FETCH_ORDERS, {
-        id: `fetch-orders-${Date.now()}`,
-        data: {
-          channelId: channelId,
-          type: JobTypes.FETCH_ORDERS,
-        }
-      });
+        channelId: channelId,
+      }, `fetch-orders-${Date.now()}`);
       this.logger.debug(`Added FETCH_ORDERS job to sync queue for channel ${channelId}.`);
 
       await this.queueService.addSyncJob(JobTypes.FETCH_PRODUCTS, {
-        id: `fetch-products-${Date.now()}`,
-        data: {
-          channelId: channelId,
-          type: JobTypes.FETCH_PRODUCTS,
-        }
-      });
+        channelId: channelId,
+      }, `fetch-products-${Date.now()}`);
       this.logger.debug(`Added FETCH_PRODUCTS job to sync queue for channel ${channelId}.`);
 
     } catch (error) {
