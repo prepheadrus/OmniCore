@@ -7,6 +7,7 @@ import { MarketplaceValidationException } from '@omnicore/marketplace-adapters';
 import { isAxiosError } from 'axios';
 import { DatabaseService } from '@omnicore/database';
 import { ClsService } from 'nestjs-cls';
+import { MarketplaceQueueService } from '../services/marketplace-queue.service';
 
 @Processor(MARKETPLACE_SYNC_QUEUE, {
   limiter: {
@@ -20,6 +21,7 @@ export class MarketplaceSyncWorker extends WorkerHost {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly clsService: ClsService,
+    private readonly queueService: MarketplaceQueueService,
   ) {
     super();
   }
@@ -36,7 +38,48 @@ export class MarketplaceSyncWorker extends WorkerHost {
 
       await this.clsService.runWith({} as any, async () => {
         this.clsService.set('app.channel_id', channelId);
-        if (job.name === JobTypes.SYNC_ORDER && type === JobTypes.SYNC_ORDER) {
+
+        if (job.name === JobTypes.FETCH_ORDERS && type === JobTypes.FETCH_ORDERS) {
+          this.logger.log(`Fetching orders for channelId ${channelId}`);
+
+          // Generate mock orders
+          const mockOrders = [
+            { orderNumber: `ORD-${Date.now()}-1`, totalAmount: 100.50, status: 'CREATED', createdAt: new Date() },
+            { orderNumber: `ORD-${Date.now()}-2`, totalAmount: 250.00, status: 'SHIPPED', createdAt: new Date() },
+          ];
+
+          for (const order of mockOrders) {
+            await this.queueService.addSyncJob(JobTypes.SYNC_ORDER, {
+              id: order.orderNumber,
+              data: {
+                channelId: channelId,
+                type: JobTypes.SYNC_ORDER,
+                payload: order,
+              }
+            });
+            this.logger.debug(`Enqueued SYNC_ORDER job for order ${order.orderNumber}`);
+          }
+        } else if (job.name === JobTypes.FETCH_PRODUCTS && type === JobTypes.FETCH_PRODUCTS) {
+          this.logger.log(`Fetching products for channelId ${channelId}`);
+
+          // Generate mock products
+          const mockProducts = [
+            { sku: `SKU-${Date.now()}-1`, name: 'Mock Product 1', price: 99.99, stock: 10, description: "Harika bir ürün", attributes: { color: "red" } },
+            { sku: `SKU-${Date.now()}-2`, name: 'Mock Product 2', price: 149.99, stock: 5, description: "Efsane bir ürün", attributes: { color: "blue" } },
+          ];
+
+          for (const product of mockProducts) {
+            await this.queueService.addSyncJob(JobTypes.SYNC_PRODUCT, {
+              id: product.sku,
+              data: {
+                channelId: channelId,
+                type: JobTypes.SYNC_PRODUCT,
+                payload: product,
+              }
+            });
+            this.logger.debug(`Enqueued SYNC_PRODUCT job for product ${product.sku}`);
+          }
+        } else if (job.name === JobTypes.SYNC_ORDER && type === JobTypes.SYNC_ORDER) {
           const order = payload;
 
           await this.databaseService.client.order.upsert({
@@ -56,6 +99,29 @@ export class MarketplaceSyncWorker extends WorkerHost {
           });
 
           this.logger.log(`Successfully upserted order ${order.orderNumber} for channel ${channelId}`);
+        } else if (job.name === JobTypes.SYNC_PRODUCT && type === JobTypes.SYNC_PRODUCT) {
+          const product = payload;
+
+          await this.databaseService.client.product.upsert({
+            where: { sku: product.sku },
+            create: {
+              sku: product.sku,
+              name: product.name,
+              price: product.price,
+              description: product.description,
+              attributes: product.attributes,
+              channelId: channelId,
+            },
+            update: {
+              name: product.name,
+              price: product.price,
+              description: product.description,
+              attributes: product.attributes,
+              updatedAt: new Date(),
+            },
+          });
+
+          this.logger.log(`Successfully upserted product ${product.sku} for channel ${channelId}`);
         } else {
            this.logger.warn(`Job ${job.id} type ${job.name} not implemented or payload type mismatch.`);
         }

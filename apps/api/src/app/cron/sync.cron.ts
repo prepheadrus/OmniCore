@@ -16,25 +16,27 @@ export class SyncCronService {
   async handleCron() {
     this.logger.debug('Running marketplace sync cron job...');
 
-    // Şu an - 2 dakika
-    const endDate = new Date();
-    const startDate = new Date(endDate.getTime() - 2 * 60000);
-
     try {
-      const orders = await this.mockAdapter.fetchOrders(startDate, endDate);
-      this.logger.log(`Fetched ${orders.length} mock orders to sync.`);
+      const channelId = 'trendyol-mock';
 
-      for (const order of orders) {
-        await this.queueService.addSyncJob(JobTypes.SYNC_ORDER, {
-          id: order.remoteOrderId,
-          data: {
-            channelId: 'trendyol-mock',
-            type: JobTypes.SYNC_ORDER,
-            payload: order,
-          }
-        });
-        this.logger.debug(`Added order ${order.orderNumber} to sync queue.`);
-      }
+      await this.queueService.addSyncJob(JobTypes.FETCH_ORDERS, {
+        id: `fetch-orders-${Date.now()}`,
+        data: {
+          channelId: channelId,
+          type: JobTypes.FETCH_ORDERS,
+        }
+      });
+      this.logger.debug(`Added FETCH_ORDERS job to sync queue for channel ${channelId}.`);
+
+      await this.queueService.addSyncJob(JobTypes.FETCH_PRODUCTS, {
+        id: `fetch-products-${Date.now()}`,
+        data: {
+          channelId: channelId,
+          type: JobTypes.FETCH_PRODUCTS,
+        }
+      });
+      this.logger.debug(`Added FETCH_PRODUCTS job to sync queue for channel ${channelId}.`);
+
     } catch (error) {
       this.logger.error('Error during marketplace sync cron job', error);
     }
