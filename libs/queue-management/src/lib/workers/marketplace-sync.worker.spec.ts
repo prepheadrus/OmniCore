@@ -6,6 +6,7 @@ import { AxiosError, AxiosHeaders } from 'axios';
 import { DatabaseService } from '@omnicore/database';
 import { ClsService } from 'nestjs-cls';
 import { JobTypes } from '../constants/queue.constants';
+import { MarketplaceQueueService } from '../services/marketplace-queue.service';
 
 describe('MarketplaceSyncWorker', () => {
   let worker: MarketplaceSyncWorker;
@@ -23,12 +24,17 @@ describe('MarketplaceSyncWorker', () => {
     set: jest.fn(),
   };
 
+  const mockQueueService = {
+    addSyncJob: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MarketplaceSyncWorker,
         { provide: DatabaseService, useValue: mockDatabaseService },
         { provide: ClsService, useValue: mockClsService },
+        { provide: MarketplaceQueueService, useValue: mockQueueService },
       ],
     }).compile();
 

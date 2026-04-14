@@ -18,13 +18,13 @@ export class QueueController {
   })
   async syncOrders(@Body() syncRequestDto: SyncRequestDto) {
     const jobId = uuidv4();
-    await this.queueService.addSyncJob(JobTypes.SYNC_ORDER, {
+    await this.queueService.addSyncJob(JobTypes.FETCH_ORDERS, {
       id: jobId,
       data: {
         tenantId: syncRequestDto.tenantId,
         marketplace: syncRequestDto.marketplace,
         channelId: syncRequestDto.channelId,
-        type: JobTypes.SYNC_ORDER,
+        type: JobTypes.FETCH_ORDERS,
       },
     });
 
@@ -43,13 +43,13 @@ export class QueueController {
   })
   async syncProducts(@Body() syncRequestDto: SyncRequestDto) {
     const jobId = uuidv4();
-    await this.queueService.addSyncJob(JobTypes.SYNC_PRODUCT, {
+    await this.queueService.addSyncJob(JobTypes.FETCH_PRODUCTS, {
       id: jobId,
       data: {
         tenantId: syncRequestDto.tenantId,
         marketplace: syncRequestDto.marketplace,
         channelId: syncRequestDto.channelId,
-        type: JobTypes.SYNC_PRODUCT,
+        type: JobTypes.FETCH_PRODUCTS,
       },
     });
 
