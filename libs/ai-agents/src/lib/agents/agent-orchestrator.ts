@@ -9,6 +9,7 @@ import { HumanMessage, AIMessage, SystemMessage } from '@langchain/core/messages
 import { z } from 'zod';
 import { GatewayTimeoutException } from '@nestjs/common';
 import { DatabaseService } from '@omnicore/database';
+import { createSeoDescriptionNode } from '../nodes/seo-description.node';
 
 @Injectable()
 export class AgentOrchestrator {
@@ -46,12 +47,13 @@ export class AgentOrchestrator {
 
     const systemPrompt = `You are a supervisor routing customer queries.
 Route to 'TOOL' if the query is strictly about price, stock, order status, cancellation, address change, or total revenue/ciro.
-Route to 'CACHE_CHECK' if the query is about product features, description, durability, return policies, warranty, or listing existing products in the system.
+Route to 'CACHE_CHECK' if the query is about product features, durability, return policies, warranty, or listing existing products in the system.
 Route to 'CHAT' if it's just a greeting, casual conversation, or ending the conversation.
+Route to 'SEO_DESCRIPTION' if the query is explicitly asking to write a product description or create SEO compliant text for the product (e.g. "Bu ürün için bir açıklama yaz" or "SEO uyumlu metin oluştur").
 Do NOT output anything else. No chatting, no explanations.`;
 
     const routingSchema = z.object({
-      next: z.enum(['CACHE_CHECK', 'TOOL', 'CHAT']).describe("The next agent to route to."),
+      next: z.enum(['CACHE_CHECK', 'TOOL', 'CHAT', 'SEO_DESCRIPTION']).describe("The next agent to route to."),
       productId: z.string().optional().describe("If the query mentions a specific product by ID, extract it here.")
     });
 
@@ -268,6 +270,7 @@ Keep the response brief, helpful, and friendly.`;
       .addNode('RAG', this.ragNode.bind(this))
       .addNode('TOOL', this.toolNode.bind(this))
       .addNode('CHAT', this.chatNode.bind(this))
+      .addNode('SEO_DESCRIPTION', createSeoDescriptionNode(this.llm))
       .addNode('FINISH', this.finishNode.bind(this))
 
       // Connect START to supervisor
@@ -278,6 +281,7 @@ Keep the response brief, helpful, and friendly.`;
         CACHE_CHECK: 'CACHE_CHECK',
         TOOL: 'TOOL',
         CHAT: 'CHAT',
+        SEO_DESCRIPTION: 'SEO_DESCRIPTION',
       })
 
       // Conditional routing from CACHE_CHECK (either hits cache and goes FINISH, or misses and goes to RAG)
@@ -290,6 +294,7 @@ Keep the response brief, helpful, and friendly.`;
       .addEdge('RAG', 'FINISH')
       .addEdge('TOOL', 'FINISH')
       .addEdge('CHAT', 'FINISH')
+      .addEdge('SEO_DESCRIPTION', 'FINISH')
 
       .addEdge('FINISH', END);
 

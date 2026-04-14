@@ -52,6 +52,7 @@ describe('AgentOrchestrator', () => {
       next: '',
       productId: undefined,
       piiVault: {},
+      productContext: undefined
     };
 
     const result = await (orchestrator as any).supervisorNode(state);
@@ -64,6 +65,7 @@ describe('AgentOrchestrator', () => {
       next: '',
       productId: undefined,
       piiVault: {},
+      productContext: undefined
     };
 
     // Set up the mock response to return RAG
@@ -82,6 +84,7 @@ describe('AgentOrchestrator', () => {
       next: '',
       productId: undefined,
       piiVault: {},
+      productContext: undefined
     };
 
     const mockInvoke = (orchestrator as any).llm.withStructuredOutput().invoke;
