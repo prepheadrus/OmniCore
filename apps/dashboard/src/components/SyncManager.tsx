@@ -3,14 +3,24 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { RefreshCw, Package, ShoppingCart } from "lucide-react";
+import { useSettings } from "../contexts/SettingsContext";
 
 export default function SyncManager() {
   const [isSyncingProducts, setIsSyncingProducts] = useState(false);
   const [isSyncingOrders, setIsSyncingOrders] = useState(false);
+  const { getActiveMarketplaces } = useSettings();
 
   const handleSyncProducts = async () => {
     setIsSyncingProducts(true);
-    const channelId = "trendyol-mock";
+    const activeChannels = getActiveMarketplaces();
+
+    if (activeChannels.length === 0) {
+      toast.error("Lütfen ayarlardan en az bir satış kanalı seçin.");
+      setIsSyncingProducts(false);
+      return;
+    }
+
+    const channelId = activeChannels.join(",");
     try {
       const response = await fetch("/api/sync/products", {
         method: "POST",
@@ -35,7 +45,15 @@ export default function SyncManager() {
 
   const handleSyncOrders = async () => {
     setIsSyncingOrders(true);
-    const channelId = "trendyol-mock";
+    const activeChannels = getActiveMarketplaces();
+
+    if (activeChannels.length === 0) {
+      toast.error("Lütfen ayarlardan en az bir satış kanalı seçin.");
+      setIsSyncingOrders(false);
+      return;
+    }
+
+    const channelId = activeChannels.join(",");
     try {
       const response = await fetch("/api/sync/orders", {
         method: "POST",

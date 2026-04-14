@@ -3,6 +3,7 @@ import '../global.css';
 import AiChatInterface from '../../components/AiChatInterface';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
+import { SettingsProvider } from '../../contexts/SettingsContext';
 
 export default function DashboardLayout({
   children,
@@ -10,7 +11,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <SettingsProvider>
       {/* Sidebar Structure */}
       <Sidebar />
 
@@ -31,6 +32,6 @@ export default function DashboardLayout({
 
       {/* Floating Components */}
       <AiChatInterface />
-    </>
+    </SettingsProvider>
   );
 }
