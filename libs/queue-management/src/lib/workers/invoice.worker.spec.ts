@@ -3,9 +3,9 @@ import { InvoiceWorker } from './invoice.worker';
 import { Job, UnrecoverableError } from 'bullmq';
 import { DatabaseService } from '@omnicore/database';
 import { ClsService } from 'nestjs-cls';
-import { JobTypes } from '../constants/queue.constants';
 import { CoreQueueService } from '../services/core-queue.service';
 import { InvoiceAdapterFactory } from '@omnicore/invoice-adapters';
+import { JobTypes } from '../constants/queue.constants';
 
 describe('InvoiceWorker', () => {
   let worker: InvoiceWorker;
@@ -78,10 +78,8 @@ describe('InvoiceWorker', () => {
     expect(mockInvoiceAdapter.generateInvoice).toHaveBeenCalledWith(mockOrder);
     expect(mockQueueService.addCargoJob).toHaveBeenCalledWith(
       JobTypes.GENERATE_CARGO_BARCODE,
-      expect.objectContaining({
-        id: 'cargo-ORD-123',
-        data: { orderId: 'ORD-123', channelId: 'test-channel' },
-      }),
+      expect.objectContaining({ orderId: 'ORD-123', channelId: 'test-channel' }),
+      'cargo-ORD-123'
     );
   });
 

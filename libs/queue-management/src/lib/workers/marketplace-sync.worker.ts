@@ -30,7 +30,7 @@ export class MarketplaceSyncWorker extends WorkerHost {
     this.logger.log(`Processing job ${job.id} of type ${job.name}`);
 
     try {
-      const { channelId, type, payload } = job.data.data as any;
+      const { channelId, type, payload } = job.data as any;
 
       if (!channelId) {
         throw new UnrecoverableError(`Job ${job.id} is missing channelId.`);
@@ -50,13 +50,10 @@ export class MarketplaceSyncWorker extends WorkerHost {
 
           for (const order of mockOrders) {
             await this.queueService.addSyncJob(JobTypes.SYNC_ORDER, {
-              id: order.orderNumber,
-              data: {
-                channelId: channelId,
-                type: JobTypes.SYNC_ORDER,
-                payload: order,
-              }
-            });
+              channelId: channelId,
+              type: JobTypes.SYNC_ORDER,
+              payload: order,
+            }, order.orderNumber);
             this.logger.debug(`Enqueued SYNC_ORDER job for order ${order.orderNumber}`);
           }
         } else if (job.name === JobTypes.FETCH_PRODUCTS && type === JobTypes.FETCH_PRODUCTS) {
@@ -70,13 +67,10 @@ export class MarketplaceSyncWorker extends WorkerHost {
 
           for (const product of mockProducts) {
             await this.queueService.addSyncJob(JobTypes.SYNC_PRODUCT, {
-              id: product.sku,
-              data: {
-                channelId: channelId,
-                type: JobTypes.SYNC_PRODUCT,
-                payload: product,
-              }
-            });
+              channelId: channelId,
+              type: JobTypes.SYNC_PRODUCT,
+              payload: product,
+            }, product.sku);
             this.logger.debug(`Enqueued SYNC_PRODUCT job for product ${product.sku}`);
           }
         } else if (job.name === JobTypes.SYNC_ORDER && type === JobTypes.SYNC_ORDER) {
@@ -102,12 +96,9 @@ export class MarketplaceSyncWorker extends WorkerHost {
 
           // Enqueue invoice generation job
           await this.queueService.addInvoiceJob(JobTypes.GENERATE_INVOICE, {
-            id: `invoice-${order.orderNumber}`,
-            data: {
-              orderId: order.orderNumber,
-              channelId: channelId,
-            },
-          });
+            orderId: order.orderNumber,
+            channelId: channelId,
+          }, `invoice-${order.orderNumber}`);
           this.logger.log(`Enqueued GENERATE_INVOICE job for order ${order.orderNumber}`);
 
         } else if (job.name === JobTypes.SYNC_PRODUCT && type === JobTypes.SYNC_PRODUCT) {

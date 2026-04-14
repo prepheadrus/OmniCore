@@ -19,14 +19,11 @@ export class QueueController {
   async syncOrders(@Body() syncRequestDto: SyncRequestDto) {
     const jobId = uuidv4();
     await this.queueService.addSyncJob(JobTypes.FETCH_ORDERS, {
-      id: jobId,
-      data: {
-        tenantId: syncRequestDto.tenantId,
-        marketplace: syncRequestDto.marketplace,
-        channelId: syncRequestDto.channelId,
-        type: JobTypes.FETCH_ORDERS,
-      },
-    });
+      tenantId: syncRequestDto.tenantId,
+      marketplace: syncRequestDto.marketplace,
+      channelId: syncRequestDto.channelId,
+      type: JobTypes.FETCH_ORDERS,
+    }, jobId);
 
     return {
       message: 'Order synchronization job accepted',
@@ -44,14 +41,11 @@ export class QueueController {
   async syncProducts(@Body() syncRequestDto: SyncRequestDto) {
     const jobId = uuidv4();
     await this.queueService.addSyncJob(JobTypes.FETCH_PRODUCTS, {
-      id: jobId,
-      data: {
-        tenantId: syncRequestDto.tenantId,
-        marketplace: syncRequestDto.marketplace,
-        channelId: syncRequestDto.channelId,
-        type: JobTypes.FETCH_PRODUCTS,
-      },
-    });
+      tenantId: syncRequestDto.tenantId,
+      marketplace: syncRequestDto.marketplace,
+      channelId: syncRequestDto.channelId,
+      type: JobTypes.FETCH_PRODUCTS,
+    }, jobId);
 
     return {
       message: 'Product synchronization job accepted',

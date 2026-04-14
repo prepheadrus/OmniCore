@@ -55,12 +55,9 @@ export class InvoiceWorker extends WorkerHost {
 
         // Enqueue cargo barcode generation job
         await this.queueService.addCargoJob(JobTypes.GENERATE_CARGO_BARCODE, {
-            id: `cargo-${order.orderNumber}`,
-            data: {
-              orderId: order.orderNumber,
-              channelId: channelId,
-            },
-        });
+            orderId: order.orderNumber,
+            channelId: channelId,
+        }, `cargo-${order.orderNumber}`);
         this.logger.log(`Enqueued GENERATE_CARGO_BARCODE job for order ${order.orderNumber}`);
       });
 

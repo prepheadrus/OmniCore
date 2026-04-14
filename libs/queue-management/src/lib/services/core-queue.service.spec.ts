@@ -44,12 +44,12 @@ describe('CoreQueueService', () => {
   });
 
   it('should add a job to the sync queue with correct options (idempotency and backoff)', async () => {
-    const payload = { id: 'test-id-123', data: { some: 'data' } };
+    const payload = { channelId: '123', type: 'SYNC' };
 
-    await service.addSyncJob(JobTypes.SYNC_ORDER, payload);
+    await service.addSyncJob(JobTypes.SYNC_ORDER, payload, 'test-id-123');
 
     expect(syncQueue.add).toHaveBeenCalledWith(JobTypes.SYNC_ORDER, payload, {
-      jobId: payload.id,
+      jobId: 'test-id-123',
       attempts: 5,
       backoff: {
         type: 'exponential',
@@ -59,12 +59,12 @@ describe('CoreQueueService', () => {
   });
 
   it('should add a job to the invoice queue with correct options', async () => {
-    const payload = { id: 'test-id-invoice', data: { orderId: 'order1' } };
+    const payload = { orderId: 'order1' };
 
-    await service.addInvoiceJob(JobTypes.GENERATE_INVOICE, payload);
+    await service.addInvoiceJob(JobTypes.GENERATE_INVOICE, payload, 'test-id-invoice');
 
     expect(invoiceQueue.add).toHaveBeenCalledWith(JobTypes.GENERATE_INVOICE, payload, {
-      jobId: payload.id,
+      jobId: 'test-id-invoice',
       attempts: 5,
       backoff: {
         type: 'exponential',
@@ -74,12 +74,12 @@ describe('CoreQueueService', () => {
   });
 
   it('should add a job to the cargo queue with correct options', async () => {
-    const payload = { id: 'test-id-cargo', data: { orderId: 'order1' } };
+    const payload = { orderId: 'order1' };
 
-    await service.addCargoJob(JobTypes.GENERATE_CARGO_BARCODE, payload);
+    await service.addCargoJob(JobTypes.GENERATE_CARGO_BARCODE, payload, 'test-id-cargo');
 
     expect(cargoQueue.add).toHaveBeenCalledWith(JobTypes.GENERATE_CARGO_BARCODE, payload, {
-      jobId: payload.id,
+      jobId: 'test-id-cargo',
       attempts: 5,
       backoff: {
         type: 'exponential',

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { MARKETPLACE_SYNC_QUEUE, INVOICE_QUEUE, CARGO_QUEUE } from '../constants/queue.constants';
-import { IMarketplaceJobPayload } from '../interfaces/marketplace-job-payload.interface';
 
 @Injectable()
 export class CoreQueueService {
@@ -17,10 +16,11 @@ export class CoreQueueService {
 
   async addSyncJob(
     jobName: string,
-    payload: IMarketplaceJobPayload,
+    payload: any,
+    jobId: string,
   ): Promise<void> {
     await this.syncQueue.add(jobName, payload, {
-      jobId: payload.id,
+      jobId: jobId,
       attempts: 5,
       backoff: {
         type: 'exponential',
@@ -32,9 +32,10 @@ export class CoreQueueService {
   async addInvoiceJob(
     jobName: string,
     payload: any,
+    jobId: string,
   ): Promise<void> {
     await this.invoiceQueue.add(jobName, payload, {
-      jobId: payload.id,
+      jobId: jobId,
       attempts: 5,
       backoff: {
         type: 'exponential',
@@ -46,9 +47,10 @@ export class CoreQueueService {
   async addCargoJob(
     jobName: string,
     payload: any,
+    jobId: string,
   ): Promise<void> {
     await this.cargoQueue.add(jobName, payload, {
-      jobId: payload.id,
+      jobId: jobId,
       attempts: 5,
       backoff: {
         type: 'exponential',

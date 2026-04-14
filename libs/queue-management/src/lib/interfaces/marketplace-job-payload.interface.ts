@@ -1,4 +1,5 @@
-export interface IMarketplaceJobPayload<T = any> {
-  id: string;
-  data: T;
+export interface IMarketplaceJobPayload {
+  channelId: string;
+  type: string;
+  payload?: any;
 }
