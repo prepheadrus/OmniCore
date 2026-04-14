@@ -4,6 +4,7 @@ import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { ConfigService } from '@nestjs/config';
 import { AgentState, AgentStateType } from '../state/agent.state';
 import { PiiShieldService } from '../services/pii-shield.service';
+import { SemanticCacheService } from '../services/semantic-cache.service';
 import { HumanMessage, AIMessage, SystemMessage } from '@langchain/core/messages';
 import { z } from 'zod';
 import { GatewayTimeoutException } from '@nestjs/common';
@@ -18,6 +19,7 @@ export class AgentOrchestrator {
     private configService: ConfigService,
     private piiShieldService: PiiShieldService,
     private databaseService: DatabaseService,
+    private semanticCacheService: SemanticCacheService,
   ) {
     this.llm = new ChatGoogleGenerativeAI({
       apiKey: this.configService.get<string>('GEMINI_API_KEY') || process.env['GEMINI_API_KEY'],
@@ -43,13 +45,14 @@ export class AgentOrchestrator {
     }
 
     const systemPrompt = `You are a supervisor routing customer queries.
-Route to 'TOOL' if the query is about order status, cancellation, address change, or total revenue/ciro.
-Route to 'RAG' if the query is about product features, return policies, warranty, or listing existing products in the system.
+Route to 'TOOL' if the query is strictly about price, stock, order status, cancellation, address change, or total revenue/ciro.
+Route to 'CACHE_CHECK' if the query is about product features, description, durability, return policies, warranty, or listing existing products in the system.
 Route to 'CHAT' if it's just a greeting, casual conversation, or ending the conversation.
 Do NOT output anything else. No chatting, no explanations.`;
 
     const routingSchema = z.object({
-      next: z.enum(['RAG', 'TOOL', 'CHAT']).describe("The next agent to route to."),
+      next: z.enum(['CACHE_CHECK', 'TOOL', 'CHAT']).describe("The next agent to route to."),
+      productId: z.string().optional().describe("If the query mentions a specific product by ID, extract it here.")
     });
 
     const structuredLlm = this.llm.withStructuredOutput(routingSchema);
@@ -60,14 +63,52 @@ Do NOT output anything else. No chatting, no explanations.`;
           new HumanMessage(redactedContent)
       ]);
 
-      // Ensure the human message is updated with redacted content in the state
       return {
           next: response.next,
-          piiVault: state.piiVault // returning to trigger the reducer if necessary, though it mutates in redact
+          productId: response.productId,
+          piiVault: state.piiVault, // returning to trigger the reducer if necessary, though it mutates in redact
       };
     } catch (error: any) {
       this.logger.error(`Error invoking LLM in supervisorNode: ${error.message}`, error.stack);
       throw error; // Rethrow so the global exception filter can catch it and return 500
+    }
+  }
+
+  private async cacheCheckNode(state: AgentStateType): Promise<Partial<AgentStateType>> {
+    const messages = state.messages;
+    const lastMessage = messages[messages.length - 1];
+    const query = lastMessage.content as string;
+
+    let productId = state.productId;
+    if (!productId) {
+      // If LLM couldn't extract a product ID, attempt to pick a default one or just use global
+      // Note: Ideally, the user provides a specific product ID in real scenario.
+      const products = await this.databaseService.client.product.findMany({ take: 1 });
+      productId = products.length > 0 ? products[0].id : 'global';
+    }
+
+    const results = await this.semanticCacheService.searchSimilar(productId, query, 1);
+
+    if (results && results.length > 0) {
+       const [doc, score] = results[0];
+       // Langchain Redis integration returns distance (0 = identical).
+       // We assume < 0.25 is a good semantic match threshold.
+       if (score < 0.25) {
+         this.logger.log(`Semantic cache HIT for product ${productId} (Score: ${score})`);
+         const cachedAnswer = doc.metadata['answer'] as string;
+         return {
+           messages: [new AIMessage(cachedAnswer)],
+           next: 'FINISH'
+         }
+       } else {
+         this.logger.log(`Semantic cache SCORE TOO HIGH (Miss) for product ${productId} (Score: ${score})`);
+       }
+    } else {
+        this.logger.log(`Semantic cache MISS (No results) for product ${productId}. Routing to RAG.`);
+    }
+
+    return {
+      next: 'RAG'
     }
   }
 
@@ -91,6 +132,13 @@ Keep your answer friendly and concise.`;
         lastMessage
       ]);
       
+      // Store in semantic cache
+      let productId = state.productId;
+      if (!productId) {
+         productId = products.length > 0 ? products[0].id : 'global';
+      }
+      await this.semanticCacheService.storeAnswer(productId, lastMessage.content as string, response.content as string);
+
       return {
         messages: [response]
       };
@@ -216,6 +264,7 @@ Keep the response brief, helpful, and friendly.`;
   public createGraph() {
     const builder = new StateGraph(AgentState)
       .addNode('supervisor', this.supervisorNode.bind(this))
+      .addNode('CACHE_CHECK', this.cacheCheckNode.bind(this))
       .addNode('RAG', this.ragNode.bind(this))
       .addNode('TOOL', this.toolNode.bind(this))
       .addNode('CHAT', this.chatNode.bind(this))
@@ -226,9 +275,15 @@ Keep the response brief, helpful, and friendly.`;
 
       // Conditional routing from supervisor
       .addConditionalEdges('supervisor', (state) => state.next, {
-        RAG: 'RAG',
+        CACHE_CHECK: 'CACHE_CHECK',
         TOOL: 'TOOL',
         CHAT: 'CHAT',
+      })
+
+      // Conditional routing from CACHE_CHECK (either hits cache and goes FINISH, or misses and goes to RAG)
+      .addConditionalEdges('CACHE_CHECK', (state) => state.next === 'FINISH' ? 'FINISH' : 'RAG', {
+        FINISH: 'FINISH',
+        RAG: 'RAG'
       })
 
       // All nodes go to finish eventually

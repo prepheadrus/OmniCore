@@ -10,6 +10,10 @@ export const AgentState = Annotation.Root({
     reducer: (x, y) => y ?? x,
     default: () => '',
   }),
+  productId: Annotation<string | undefined>({
+    reducer: (x, y) => y ?? x,
+    default: () => undefined,
+  }),
   piiVault: Annotation<Record<string, string>>({
     reducer: (x, y) => ({ ...x, ...y }),
     default: () => ({}),

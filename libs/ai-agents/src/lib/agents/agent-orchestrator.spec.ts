@@ -1,6 +1,7 @@
 import { AgentOrchestrator } from './agent-orchestrator';
 import { ConfigService } from '@nestjs/config';
 import { PiiShieldService } from '../services/pii-shield.service';
+import { SemanticCacheService } from '../services/semantic-cache.service';
 import { HumanMessage } from '@langchain/core/messages';
 import { AgentStateType } from '../state/agent.state';
 
@@ -8,6 +9,8 @@ describe('AgentOrchestrator', () => {
   let orchestrator: AgentOrchestrator;
   let mockConfigService: Partial<ConfigService>;
   let piiShieldService: PiiShieldService;
+
+  let mockSemanticCacheService: Partial<SemanticCacheService>;
 
   beforeEach(() => {
     mockConfigService = {
@@ -20,10 +23,17 @@ describe('AgentOrchestrator', () => {
         order: { findMany: jest.fn().mockResolvedValue([]) },
       }
     };
+
+    mockSemanticCacheService = {
+      searchSimilar: jest.fn().mockResolvedValue([]),
+      storeAnswer: jest.fn().mockResolvedValue(undefined),
+    };
+
     orchestrator = new AgentOrchestrator(
       mockConfigService as ConfigService,
       piiShieldService,
-      mockDatabaseService as any
+      mockDatabaseService as any,
+      mockSemanticCacheService as any
     );
 
     // Mock ChatGoogleGenerativeAI and its withStructuredOutput
@@ -40,6 +50,7 @@ describe('AgentOrchestrator', () => {
     const state: AgentStateType = {
       messages: [],
       next: '',
+      productId: undefined,
       piiVault: {},
     };
 
@@ -51,6 +62,7 @@ describe('AgentOrchestrator', () => {
     const state: AgentStateType = {
       messages: [new HumanMessage('Ürün özellikleri nelerdir?')],
       next: '',
+      productId: undefined,
       piiVault: {},
     };
 
@@ -68,6 +80,7 @@ describe('AgentOrchestrator', () => {
     const state: AgentStateType = {
       messages: [new HumanMessage('Kargom test@example.com adresine gelsin')],
       next: '',
+      productId: undefined,
       piiVault: {},
     };
 
