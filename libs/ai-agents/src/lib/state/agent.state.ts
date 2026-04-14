@@ -18,6 +18,10 @@ export const AgentState = Annotation.Root({
     reducer: (x, y) => ({ ...x, ...y }),
     default: () => ({}),
   }),
+  productContext: Annotation<Record<string, unknown> | undefined>({
+    reducer: (x, y) => y ?? x,
+    default: () => undefined,
+  }),
 });
 
 export type AgentStateType = typeof AgentState.State;
