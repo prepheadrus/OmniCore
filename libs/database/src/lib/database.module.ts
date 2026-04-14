@@ -1,8 +1,10 @@
 import { Global, Module } from '@nestjs/common';
 import { DatabaseService } from './database.service';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Global()
 @Module({
+  imports: [EventEmitterModule.forRoot()],
   providers: [DatabaseService],
   exports: [DatabaseService],
 })
