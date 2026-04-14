@@ -1,13 +1,13 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { MarketplaceQueueService, JobTypes } from '@omnicore/queue-management';
+import { CoreQueueService, JobTypes } from '@omnicore/queue-management';
 import { SyncRequestDto } from '../dto/sync-request.dto';
 import { v4 as uuidv4 } from 'uuid';
 
 @ApiTags('Queue Management')
 @Controller('sync')
 export class QueueController {
-  constructor(private readonly queueService: MarketplaceQueueService) {}
+  constructor(private readonly queueService: CoreQueueService) {}
 
   @Post('orders')
   @HttpCode(HttpStatus.ACCEPTED)
