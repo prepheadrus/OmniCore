@@ -39,6 +39,23 @@ export class MarketplaceSyncWorker extends WorkerHost {
       await this.clsService.runWith({} as any, async () => {
         this.clsService.set('app.channel_id', channelId);
 
+        // Ensure channel exists before doing any operations
+        if ([JobTypes.SYNC_ORDER, JobTypes.SYNC_PRODUCT].includes(job.name as JobTypes)) {
+          const channelName = channelId
+            .split('-')
+            .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+
+          await this.databaseService.client.salesChannel.upsert({
+            where: { id: channelId },
+            create: {
+              id: channelId,
+              name: channelName,
+            },
+            update: {}, // We only want to ensure it exists, not override if it already exists
+          });
+        }
+
         if (job.name === JobTypes.FETCH_ORDERS && type === JobTypes.FETCH_ORDERS) {
           this.logger.log(`Fetching orders for channelId ${channelId}`);
 

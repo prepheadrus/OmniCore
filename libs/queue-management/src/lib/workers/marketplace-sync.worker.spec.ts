@@ -16,6 +16,9 @@ describe('MarketplaceSyncWorker', () => {
       order: {
         upsert: jest.fn(),
       },
+      salesChannel: {
+        upsert: jest.fn(),
+      },
     },
   };
 
