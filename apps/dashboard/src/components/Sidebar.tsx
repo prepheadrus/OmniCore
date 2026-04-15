@@ -21,7 +21,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
-    { name: 'Ürün Kataloğu', icon: Package, href: '/inventory' },
+    { name: 'Ürün Kataloğu', icon: Package, href: '/products' },
     { name: 'Siparişler', icon: ShoppingCart, href: '/orders' },
     { name: 'Rekabet Radarı', icon: Radar, href: '/radar' },
     { name: 'Otonom Fiyatlandırma', icon: Tags, href: '/pricing' },
