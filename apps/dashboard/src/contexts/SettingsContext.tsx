@@ -29,9 +29,9 @@ const defaultState: SettingsState = {
   },
   invoiceProvider: 'none',
   shippingProvider: 'none',
-  toggleMarketplace: () => {},
-  setInvoiceProvider: () => {},
-  setShippingProvider: () => {},
+  toggleMarketplace: () => { /* default noop */ },
+  setInvoiceProvider: () => { /* default noop */ },
+  setShippingProvider: () => { /* default noop */ },
   getActiveMarketplaces: () => ['trendyol'],
 };
 

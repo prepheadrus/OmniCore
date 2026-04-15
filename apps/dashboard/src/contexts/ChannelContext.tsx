@@ -22,7 +22,7 @@ const defaultChannels: Channel[] = [
 const defaultState: ChannelState = {
   availableChannels: defaultChannels,
   selectedChannelId: 'trendyol',
-  setSelectedChannelId: () => {},
+  setSelectedChannelId: () => { /* default noop */ },
 };
 
 const ChannelContext = createContext<ChannelState>(defaultState);
