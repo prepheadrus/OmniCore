@@ -20,19 +20,19 @@ export default function SyncManager() {
       return;
     }
 
-    const channelId = activeChannels.join(",");
+    const channelIds = activeChannels;
     try {
       const response = await fetch("/api/sync/products", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ tenantId: "tenant-123", channelId }),
+        body: JSON.stringify({ tenantId: "tenant-123", channelIds }),
       });
 
       if (response.status === 202) {
         const data = await response.json();
-        toast.success(`Ürün senkronizasyonu kuyruğa eklendi (Job ID: ${data.jobId})`);
+        toast.success(`Ürün senkronizasyonu kuyruğa eklendi (Job IDler: ${data.jobIds.join(", ")})`);
       } else {
         toast.error("Ürün senkronizasyonu başlatılamadı.");
       }
@@ -53,19 +53,19 @@ export default function SyncManager() {
       return;
     }
 
-    const channelId = activeChannels.join(",");
+    const channelIds = activeChannels;
     try {
       const response = await fetch("/api/sync/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ tenantId: "tenant-123", channelId }),
+        body: JSON.stringify({ tenantId: "tenant-123", channelIds }),
       });
 
       if (response.status === 202) {
         const data = await response.json();
-        toast.success(`Sipariş senkronizasyonu kuyruğa eklendi (Job ID: ${data.jobId})`);
+        toast.success(`Sipariş senkronizasyonu kuyruğa eklendi (Job IDler: ${data.jobIds.join(", ")})`);
       } else {
         toast.error("Sipariş senkronizasyonu başlatılamadı.");
       }

@@ -17,17 +17,22 @@ export class QueueController {
     description: 'Order sync job created',
   })
   async syncOrders(@Body() syncRequestDto: SyncRequestDto) {
-    const jobId = uuidv4();
-    await this.queueService.addSyncJob(JobTypes.FETCH_ORDERS, {
-      tenantId: syncRequestDto.tenantId,
-      marketplace: syncRequestDto.marketplace,
-      channelId: syncRequestDto.channelId,
-      type: JobTypes.FETCH_ORDERS,
-    }, jobId);
+    const jobIds: string[] = [];
+
+    for (const channelId of syncRequestDto.channelIds) {
+      const jobId = uuidv4();
+      await this.queueService.addSyncJob(JobTypes.FETCH_ORDERS, {
+        tenantId: syncRequestDto.tenantId,
+        marketplace: syncRequestDto.marketplace,
+        channelId: channelId,
+        type: JobTypes.FETCH_ORDERS,
+      }, jobId);
+      jobIds.push(jobId);
+    }
 
     return {
-      message: 'Order synchronization job accepted',
-      jobId,
+      message: 'Order synchronization jobs accepted',
+      jobIds,
     };
   }
 
@@ -39,17 +44,22 @@ export class QueueController {
     description: 'Product sync job created',
   })
   async syncProducts(@Body() syncRequestDto: SyncRequestDto) {
-    const jobId = uuidv4();
-    await this.queueService.addSyncJob(JobTypes.FETCH_PRODUCTS, {
-      tenantId: syncRequestDto.tenantId,
-      marketplace: syncRequestDto.marketplace,
-      channelId: syncRequestDto.channelId,
-      type: JobTypes.FETCH_PRODUCTS,
-    }, jobId);
+    const jobIds: string[] = [];
+
+    for (const channelId of syncRequestDto.channelIds) {
+      const jobId = uuidv4();
+      await this.queueService.addSyncJob(JobTypes.FETCH_PRODUCTS, {
+        tenantId: syncRequestDto.tenantId,
+        marketplace: syncRequestDto.marketplace,
+        channelId: channelId,
+        type: JobTypes.FETCH_PRODUCTS,
+      }, jobId);
+      jobIds.push(jobId);
+    }
 
     return {
-      message: 'Product synchronization job accepted',
-      jobId,
+      message: 'Product synchronization jobs accepted',
+      jobIds,
     };
   }
 }

@@ -19,10 +19,11 @@ export class SyncRequestDto {
   marketplace?: string;
 
   @ApiProperty({
-    description: 'The ID of the sales channel to sync',
-    example: 'trendyol-123',
+    description: 'The IDs of the sales channels to sync',
+    example: ['trendyol-123', 'hepsiburada-456'],
+    type: [String]
   })
-  @IsString()
+  @IsString({ each: true })
   @IsNotEmpty()
-  channelId: string;
+  channelIds: string[];
 }
