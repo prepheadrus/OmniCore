@@ -1,0 +1,30 @@
+
+> nx run dashboard:dev
+
+> next dev
+
+[1m[38;2;173;127;168m▲ Next.js 16.1.7[39m[22m (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+[32m[1m✓[22m[39m Starting...
+[32m[1m✓[22m[39m Ready in 4.8s
+[37m[1m○[22m[39m Compiling /radar ...
+The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+ GET /radar [32m200[39m in 30.4s[2m (compile: 23.1s, render: 7.3s)[22m
+[32m[1m✓[22m[39m Finished writing to filesystem cache in 11.4s
+The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+ GET /radar [32m200[39m in 4.6s[2m (compile: 4.3s, render: 335ms)[22m
+Warning: command "next dev" exited with non-zero status code
+
+
+ NX   Successfully ran target dev for project dashboard
+
+
+View logs and investigate cache misses at https://nx.app/runs/XXjNxCDW3G
