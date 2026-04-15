@@ -3,24 +3,23 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { RefreshCw, Package, ShoppingCart } from "lucide-react";
-import { useSettings } from "../contexts/SettingsContext";
+import { useChannel } from "../contexts/ChannelContext";
 
 export default function SyncManager() {
   const [isSyncingProducts, setIsSyncingProducts] = useState(false);
   const [isSyncingOrders, setIsSyncingOrders] = useState(false);
-  const { getActiveMarketplaces } = useSettings();
+  const { selectedChannelId } = useChannel();
 
   const handleSyncProducts = async () => {
     setIsSyncingProducts(true);
-    const activeChannels = getActiveMarketplaces();
 
-    if (activeChannels.length === 0) {
-      toast.error("Lütfen ayarlardan en az bir satış kanalı seçin.");
+    if (!selectedChannelId) {
+      toast.error("Lütfen bir satış kanalı seçin.");
       setIsSyncingProducts(false);
       return;
     }
 
-    const channelIds = activeChannels;
+    const channelIds = [selectedChannelId];
     try {
       const response = await fetch("/api/sync/products", {
         method: "POST",
@@ -45,15 +44,14 @@ export default function SyncManager() {
 
   const handleSyncOrders = async () => {
     setIsSyncingOrders(true);
-    const activeChannels = getActiveMarketplaces();
 
-    if (activeChannels.length === 0) {
-      toast.error("Lütfen ayarlardan en az bir satış kanalı seçin.");
+    if (!selectedChannelId) {
+      toast.error("Lütfen bir satış kanalı seçin.");
       setIsSyncingOrders(false);
       return;
     }
 
-    const channelIds = activeChannels;
+    const channelIds = [selectedChannelId];
     try {
       const response = await fetch("/api/sync/orders", {
         method: "POST",

@@ -1,8 +1,20 @@
+"use client";
+
 import React from 'react';
 import { Bell, User, Search, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { useChannel } from '../contexts/ChannelContext';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@omnicore/ui/components/ui/select";
 
 export default function Header() {
+  const { availableChannels, selectedChannelId, setSelectedChannelId } = useChannel();
+
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-10">
 
@@ -15,6 +27,22 @@ export default function Header() {
 
       {/* Right Actions Area */}
       <div className="flex items-center space-x-6">
+
+        {/* Channel Selection Dropdown */}
+        <div className="hidden md:block w-48">
+          <Select value={selectedChannelId} onValueChange={setSelectedChannelId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Kanal Seçin" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableChannels.map((channel) => (
+                <SelectItem key={channel.id} value={channel.id}>
+                  {channel.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Search Bar (Static Mock) */}
         <div className="relative hidden md:block">

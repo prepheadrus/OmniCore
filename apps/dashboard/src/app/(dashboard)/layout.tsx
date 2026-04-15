@@ -4,6 +4,7 @@ import AiChatInterface from '../../components/AiChatInterface';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { SettingsProvider } from '../../contexts/SettingsContext';
+import { ChannelProvider } from '../../contexts/ChannelContext';
 
 export default function DashboardLayout({
   children,
@@ -12,7 +13,8 @@ export default function DashboardLayout({
 }) {
   return (
     <SettingsProvider>
-      {/* Sidebar Structure */}
+      <ChannelProvider>
+        {/* Sidebar Structure */}
       <Sidebar />
 
       {/* Main Content Area */}
@@ -30,8 +32,9 @@ export default function DashboardLayout({
 
       </div>
 
-      {/* Floating Components */}
-      <AiChatInterface />
+        {/* Floating Components */}
+        <AiChatInterface />
+      </ChannelProvider>
     </SettingsProvider>
   );
 }
