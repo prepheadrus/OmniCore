@@ -1,5 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -8,12 +8,13 @@ datasource db {
 }
 
 model SalesChannel {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  products  Product[]
-  orders    Order[]
+  id             String          @id @default(uuid())
+  name           String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  products       Product[]
+  orders         Order[]
+  stockMovements StockMovement[]
 }
 
 model Category {
@@ -52,20 +53,42 @@ model Product {
 }
 
 model ProductVariant {
-  id             String   @id @default(uuid())
+  id             String          @id @default(uuid())
   productId      String
-  sku            String   @unique
-  barcode        String?  @unique
+  sku            String          @unique
+  barcode        String?         @unique
   price          Float
-  stock          Int      @default(0)
-  attributes     Json?    // e.g., {"color": "Red", "size": "M"} or {"volume": "400ml"}
-  technicalSpecs Json?    // Variant specific specs
+  stock          Int             @default(0)
+  attributes     Json? // e.g., {"color": "Red", "size": "M"} or {"volume": "400ml"}
+  technicalSpecs Json? // Variant specific specs
   desi           Float?
   weight         Float?
-  dimensions     Json?    // e.g., {"width": 10, "height": 20, "depth": 5}
-  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  dimensions     Json? // e.g., {"width": 10, "height": 20, "depth": 5}
+  product        Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  stockMovements StockMovement[]
+}
+
+enum StockMovementEventType {
+  SALE
+  RESTOCK
+  CANCEL
+  RETURN
+  MANUAL_ADJUST
+}
+
+model StockMovement {
+  id               String                 @id @default(uuid())
+  productVariantId String
+  channelId        String
+  eventType        StockMovementEventType
+  quantityChange   Int
+  referenceId      String?
+  createdAt        DateTime               @default(now())
+
+  productVariant ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+  channel        SalesChannel   @relation(fields: [channelId], references: [id])
 }
 
 model Order {

@@ -7,6 +7,7 @@ import { DatabaseService } from '@omnicore/database';
 import { ClsService } from 'nestjs-cls';
 import { JobTypes } from '../constants/queue.constants';
 import { CoreQueueService } from '../services/core-queue.service';
+import { getRedisConnectionToken } from '@nestjs-modules/ioredis';
 
 describe('MarketplaceSyncWorker', () => {
   let worker: MarketplaceSyncWorker;
@@ -19,6 +20,7 @@ describe('MarketplaceSyncWorker', () => {
       salesChannel: {
         upsert: jest.fn(),
       },
+      $transaction: jest.fn(),
     },
   };
 
@@ -32,6 +34,11 @@ describe('MarketplaceSyncWorker', () => {
     addInvoiceJob: jest.fn(),
   };
 
+  const mockRedisService = {
+    get: jest.fn(),
+    set: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -39,6 +46,7 @@ describe('MarketplaceSyncWorker', () => {
         { provide: DatabaseService, useValue: mockDatabaseService },
         { provide: ClsService, useValue: mockClsService },
         { provide: CoreQueueService, useValue: mockQueueService },
+        { provide: getRedisConnectionToken('default'), useValue: mockRedisService },
       ],
     }).compile();
 
@@ -66,11 +74,28 @@ describe('MarketplaceSyncWorker', () => {
       },
     } as unknown as Job;
 
+    const mockTx = {
+      order: {
+        upsert: jest.fn(),
+      },
+      productVariant: {
+        findFirst: jest.fn().mockResolvedValue({ id: 'variant-1' }),
+        update: jest.fn(),
+      },
+      stockMovement: {
+        create: jest.fn(),
+      },
+    };
+
+    mockDatabaseService.client.$transaction.mockImplementationOnce(async (cb: any) => {
+      return cb(mockTx);
+    });
+
     const result = await worker.process(job);
 
     expect(result).toEqual({ success: true, jobId: 'test-job' });
     expect(mockClsService.runWith).toHaveBeenCalled();
-    expect(mockDatabaseService.client.order.upsert).toHaveBeenCalledWith(
+    expect(mockTx.order.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { orderNumber: 'ORD-123' },
       })

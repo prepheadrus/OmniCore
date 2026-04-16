@@ -8,6 +8,8 @@ import { isAxiosError } from 'axios';
 import { DatabaseService } from '@omnicore/database';
 import { ClsService } from 'nestjs-cls';
 import { CoreQueueService } from '../services/core-queue.service';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import { Redis } from 'ioredis';
 
 @Processor(MARKETPLACE_SYNC_QUEUE, {
   limiter: {
@@ -22,6 +24,7 @@ export class MarketplaceSyncWorker extends WorkerHost {
     private readonly databaseService: DatabaseService,
     private readonly clsService: ClsService,
     private readonly queueService: CoreQueueService,
+    @InjectRedis() private readonly redis: Redis,
   ) {
     super();
   }
@@ -59,6 +62,19 @@ export class MarketplaceSyncWorker extends WorkerHost {
         if (job.name === JobTypes.FETCH_ORDERS && type === JobTypes.FETCH_ORDERS) {
           this.logger.log(`Fetching orders for channelId ${channelId}`);
 
+          const cursorKey = `sellerId:${channelId}:last_cursor`;
+          let lastCursor = await this.redis.get(cursorKey);
+
+          if (!lastCursor) {
+            // Fallback to 24 hours ago
+            const fallbackDate = new Date();
+            fallbackDate.setHours(fallbackDate.getHours() - 24);
+            lastCursor = fallbackDate.toISOString();
+            this.logger.log(`No cursor found. Using fallback: ${lastCursor}`);
+          } else {
+             this.logger.log(`Resuming fetch from cursor: ${lastCursor}`);
+          }
+
           // Generate mock orders
           const mockOrders = [
             { orderNumber: `ORD-${Date.now()}-1`, totalAmount: 100.50, status: 'CREATED', createdAt: new Date() },
@@ -73,6 +89,11 @@ export class MarketplaceSyncWorker extends WorkerHost {
             }, order.orderNumber);
             this.logger.debug(`Enqueued SYNC_ORDER job for order ${order.orderNumber}`);
           }
+
+          // Update cursor to current time after fetch
+          await this.redis.set(cursorKey, new Date().toISOString());
+          this.logger.log(`Updated cursor to current time.`);
+
         } else if (job.name === JobTypes.FETCH_PRODUCTS && type === JobTypes.FETCH_PRODUCTS) {
           this.logger.log(`Fetching products for channelId ${channelId}`);
 
@@ -93,23 +114,53 @@ export class MarketplaceSyncWorker extends WorkerHost {
         } else if (job.name === JobTypes.SYNC_ORDER && type === JobTypes.SYNC_ORDER) {
           const order = payload;
 
-          await this.databaseService.client.order.upsert({
-            where: { orderNumber: order.orderNumber },
-            create: {
-              orderNumber: order.orderNumber,
-              totalAmount: order.totalAmount,
-              status: order.status,
-              channelId: channelId,
-              createdAt: order.createdAt,
-            },
-            update: {
-              status: order.status,
-              totalAmount: order.totalAmount,
-              updatedAt: new Date(),
-            },
+          // CQRS and Event Sourcing: Order UPSERT + StockMovement Insert + ProductVariant stock update in a single transaction
+          await this.databaseService.client.$transaction(async (tx) => {
+            // 1. Save the Order
+            await tx.order.upsert({
+              where: { orderNumber: order.orderNumber },
+              create: {
+                orderNumber: order.orderNumber,
+                totalAmount: order.totalAmount,
+                status: order.status,
+                channelId: channelId,
+                createdAt: order.createdAt,
+              },
+              update: {
+                status: order.status,
+                totalAmount: order.totalAmount,
+                updatedAt: new Date(),
+              },
+            });
+
+            // For now, we assume a generic sale of -1 for a mock/existing product variant
+            // In a real scenario, this would iterate over order line items.
+            // We fetch the first available product variant to demonstrate the stock reduction CQRS pattern.
+            const firstVariant = await tx.productVariant.findFirst({
+               where: { product: { channelId } }
+            });
+
+            if (firstVariant) {
+               // 2. Event Sourcing: Insert StockMovement
+               await tx.stockMovement.create({
+                 data: {
+                   productVariantId: firstVariant.id,
+                   channelId: channelId,
+                   eventType: 'SALE',
+                   quantityChange: -1,
+                   referenceId: order.orderNumber,
+                 }
+               });
+
+               // 3. CQRS Read Model: Update ProductVariant stock
+               await tx.productVariant.update({
+                 where: { id: firstVariant.id },
+                 data: { stock: { decrement: 1 } }
+               });
+            }
           });
 
-          this.logger.log(`Successfully upserted order ${order.orderNumber} for channel ${channelId}`);
+          this.logger.log(`Successfully processed order ${order.orderNumber} with CQRS stock update for channel ${channelId}`);
 
           // Enqueue invoice generation job
           await this.queueService.addInvoiceJob(JobTypes.GENERATE_INVOICE, {
