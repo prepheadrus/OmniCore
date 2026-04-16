@@ -17,30 +17,16 @@ model SalesChannel {
 }
 
 model Product {
-  id            String            @id @default(uuid())
-  name          String
-  description   String?
-  sku           String            @unique
-  price         Float
-  stock         Int               @default(0)
-  attributes    Json?
-  channelId     String
-  channel       SalesChannel      @relation(fields: [channelId], references: [id])
-  bundleItems   BundleComponent[] @relation("ParentBundle")
-  partOfBundles BundleComponent[] @relation("ChildBundle")
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-}
-
-model BundleComponent {
-  id        String   @id @default(uuid())
-  parentId  String
-  parent    Product  @relation("ParentBundle", fields: [parentId], references: [id])
-  childId   String
-  child     Product  @relation("ChildBundle", fields: [childId], references: [id])
-  quantity  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String       @id @default(uuid())
+  name        String
+  description String?
+  sku         String       @unique
+  price       Float
+  attributes  Json?
+  channelId   String
+  channel     SalesChannel @relation(fields: [channelId], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Order {
