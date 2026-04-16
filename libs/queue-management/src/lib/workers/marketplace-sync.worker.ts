@@ -121,26 +121,52 @@ export class MarketplaceSyncWorker extends WorkerHost {
         } else if (job.name === JobTypes.SYNC_PRODUCT && type === JobTypes.SYNC_PRODUCT) {
           const product = payload;
 
-          await this.databaseService.client.product.upsert({
+          // Try to find if variant already exists
+          const existingVariant = await this.databaseService.client.productVariant.findUnique({
             where: { sku: product.sku },
-            create: {
-              sku: product.sku,
-              name: product.name,
-              price: product.price,
-              description: product.description,
-              attributes: product.attributes,
-              channelId: channelId,
-            },
-            update: {
-              name: product.name,
-              price: product.price,
-              description: product.description,
-              attributes: product.attributes,
-              updatedAt: new Date(),
-            },
+            include: { product: true }
           });
 
-          this.logger.log(`Successfully upserted product ${product.sku} for channel ${channelId}`);
+          if (existingVariant) {
+            // Update existing variant and its parent product
+            await this.databaseService.client.product.update({
+              where: { id: existingVariant.productId },
+              data: {
+                name: product.name,
+                description: product.description,
+                updatedAt: new Date(),
+              }
+            });
+
+            await this.databaseService.client.productVariant.update({
+              where: { id: existingVariant.id },
+              data: {
+                price: product.price,
+                stock: product.stock !== undefined ? product.stock : existingVariant.stock,
+                attributes: product.attributes,
+                updatedAt: new Date(),
+              }
+            });
+            this.logger.log(`Successfully updated product & variant ${product.sku} for channel ${channelId}`);
+          } else {
+            // Create new product and variant
+            await this.databaseService.client.product.create({
+              data: {
+                name: product.name,
+                description: product.description,
+                channelId: channelId,
+                variants: {
+                  create: {
+                    sku: product.sku,
+                    price: product.price,
+                    attributes: product.attributes,
+                    stock: product.stock || 0,
+                  }
+                }
+              },
+            });
+            this.logger.log(`Successfully created product & variant ${product.sku} for channel ${channelId}`);
+          }
         } else {
            this.logger.warn(`Job ${job.id} type ${job.name} not implemented or payload type mismatch.`);
         }

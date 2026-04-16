@@ -26,7 +26,8 @@
       "@omnicore/ui": ["libs/ui/src/index.ts"],
       "@omnicore/invoice-adapters": ["libs/invoice-adapters/src/index.ts"],
       "@omnicore/cargo-adapters": ["libs/cargo-adapters/src/index.ts"],
-      "@omnicore/pricing": ["libs/pricing/src/index.ts"]
+      "@omnicore/pricing": ["libs/pricing/src/index.ts"],
+      "@omnicore/pim": ["libs/pim/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
