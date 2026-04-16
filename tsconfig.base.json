@@ -10,48 +10,17 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
+    "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@omnicore/database": [
-        "libs/database/src/index.ts"
-      ],
+      "@omnicore/database": ["libs/database/src/index.ts"],
       "@omnicore/marketplace-adapters": [
         "libs/marketplace-adapters/src/index.ts"
       ],
-      "@omnicore/queue-management": [
-        "libs/queue-management/src/index.ts"
-      ],
-      "@omnicore/ai-agents": [
-        "libs/ai-agents/src/index.ts"
-      ],
-      "@omnicore/ui/components/ui/*": [
-        "libs/ui/src/components/ui/*"
-      ],
-      "@omnicore/ui/lib/*": [
-        "libs/ui/src/lib/*"
-      ],
-      "@omnicore/ui": [
-        "libs/ui/src/index.ts"
-      ],
-      "@omnicore/invoice-adapters": [
-        "libs/invoice-adapters/src/index.ts"
-      ],
-      "@omnicore/cargo-adapters": [
-        "libs/cargo-adapters/src/index.ts"
-      ],
-      "@omnicore/core-domain": [
-        "libs/core-domain/src/index.ts"
-      ]
+
     }
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["node_modules", "tmp"]
 }

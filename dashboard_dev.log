@@ -1,1 +1,14 @@
-Waiting for dashboard:dev in another nx process
+
+> nx run dashboard:dev --port 4200
+
+> next dev --port 4200
+
+[1m[38;2;173;127;168m▲ Next.js 16.1.7[39m[22m (Turbopack)
+- Local:         http://localhost:4200
+- Network:       http://192.168.0.2:4200
+
+[32m[1m✓[22m[39m Starting...
+[32m[1m✓[22m[39m Ready in 7.9s
+[37m[1m○[22m[39m Compiling /returns ...
+ GET /returns [32m200[39m in 18.5s[2m (compile: 17.4s, render: 1134ms)[22m
+ GET /returns [32m200[39m in 2.7s[2m (compile: 2.6s, render: 101ms)[22m
