@@ -29,8 +29,8 @@ describe('SyncCronService', () => {
     service = module.get<SyncCronService>(SyncCronService);
     queueService = module.get<CoreQueueService>(CoreQueueService);
 
-    loggerErrorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
-    jest.spyOn(Logger.prototype, 'debug').mockImplementation(() => {});
+    loggerErrorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
+    jest.spyOn(Logger.prototype, 'debug').mockImplementation();
   });
 
   afterEach(() => {
