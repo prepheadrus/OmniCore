@@ -1,8 +1,8 @@
 import { AIMessage, SystemMessage } from '@langchain/core/messages';
-import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
+import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 import { AgentStateType } from '../state/agent.state';
 
-export const createSeoDescriptionNode = (llm: ChatGoogleGenerativeAI) => {
+export const createSeoDescriptionNode = (llm: BaseChatModel) => {
   return async (state: AgentStateType): Promise<Partial<AgentStateType>> => {
     if (!state.productContext || Object.keys(state.productContext).length === 0) {
       return {

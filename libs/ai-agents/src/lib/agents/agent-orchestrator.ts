@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { StateGraph, START, END } from '@langchain/langgraph';
-import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
+import { ChatOpenAI } from '@langchain/openai';
 import { ConfigService } from '@nestjs/config';
 import { AgentState, AgentStateType } from '../state/agent.state';
 import { PiiShieldService } from '../services/pii-shield.service';
 import { SemanticCacheService } from '../services/semantic-cache.service';
+import { OpenClawService } from '../services/open-claw.service';
 import { HumanMessage, AIMessage, SystemMessage } from '@langchain/core/messages';
 import { z } from 'zod';
 import { GatewayTimeoutException } from '@nestjs/common';
@@ -14,21 +15,16 @@ import { createSeoDescriptionNode } from '../nodes/seo-description.node';
 @Injectable()
 export class AgentOrchestrator {
   private readonly logger = new Logger(AgentOrchestrator.name);
-  private llm: ChatGoogleGenerativeAI;
+  private llm: ChatOpenAI;
 
   constructor(
     private configService: ConfigService,
     private piiShieldService: PiiShieldService,
     private databaseService: DatabaseService,
     private semanticCacheService: SemanticCacheService,
+    private openClawService: OpenClawService,
   ) {
-    this.llm = new ChatGoogleGenerativeAI({
-      apiKey: this.configService.get<string>('GEMINI_API_KEY') || process.env['GEMINI_API_KEY'],
-      model: 'gemini-2.5-flash',
-      temperature: 0,
-      maxRetries: 0,
-      verbose: true,
-    });
+    this.llm = this.openClawService.getModel();
   }
 
   // Define nodes
@@ -227,7 +223,7 @@ Keep the response brief, helpful, and friendly.`;
       };
 
       this.logger.debug('State initialized');
-      this.logger.debug('Calling Gemini API (graph.invoke)...');
+      this.logger.debug('Calling OpenClaw API (graph.invoke)...');
 
       const abortController = new AbortController();
       const configWithSignal = { ...config, signal: abortController.signal };
@@ -246,7 +242,7 @@ Keep the response brief, helpful, and friendly.`;
           timeoutPromise
         ]);
         clearTimeout(timeoutId!); // Clear the timer to avoid memory leaks
-        this.logger.debug('Received response from Gemini...');
+        this.logger.debug('Received response from OpenClaw...');
 
         const lastMessage = result.messages[result.messages.length - 1];
 
