@@ -29,14 +29,24 @@ describe('AgentOrchestrator', () => {
       storeAnswer: jest.fn().mockResolvedValue(undefined),
     };
 
+    const mockOpenClawService = {
+      getModel: jest.fn().mockReturnValue({
+        withStructuredOutput: jest.fn().mockReturnValue({
+           invoke: jest.fn()
+        }),
+        invoke: jest.fn()
+      })
+    };
+
     orchestrator = new AgentOrchestrator(
       mockConfigService as ConfigService,
       piiShieldService,
       mockDatabaseService as any,
-      mockSemanticCacheService as any
+      mockSemanticCacheService as any,
+      mockOpenClawService as any
     );
 
-    // Mock ChatGoogleGenerativeAI and its withStructuredOutput
+    // Mock ChatOpenAI and its withStructuredOutput
     const mockStructuredLlmInvoke = jest.fn();
     const mockStructuredLlm = {
       invoke: mockStructuredLlmInvoke,
