@@ -293,11 +293,14 @@ export function BundleForm({ open, onOpenChange, existingProducts, onSuccess }: 
                             <CommandList>
                                 <CommandEmpty>Ürün bulunamadı.</CommandEmpty>
                                 <CommandGroup>
-                                    {selectableProducts.map((p) => (
+                                    {selectableProducts.map((p) => {
+                                        const isAlreadyAdded = components.some(c => c.productId === p.id);
+                                        return (
                                         <CommandItem
                                             key={p.id}
                                             value={`${p.name} ${p.sku}`}
                                             onSelect={() => addComponent(p)}
+                                            disabled={isAlreadyAdded}
                                             className="flex items-center justify-between p-2 cursor-pointer hover:bg-indigo-50"
                                         >
                                             <div className="flex flex-col">
@@ -306,7 +309,8 @@ export function BundleForm({ open, onOpenChange, existingProducts, onSuccess }: 
                                             </div>
                                             <Plus className="h-4 w-4 text-indigo-600" />
                                         </CommandItem>
-                                    ))}
+                                        );
+                                    })}
                                 </CommandGroup>
                             </CommandList>
                         </Command>
