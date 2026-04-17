@@ -50,7 +50,16 @@ export class CargoWorker extends WorkerHost {
         const barcodeResult = await adapter.generateBarcode(order);
 
         this.logger.log(`Successfully generated cargo barcode for order ${order.orderNumber}. Result: ${barcodeResult}`);
-        this.logger.log(`Sipariş ${order.orderNumber} için barkod oluşturuldu`);
+
+        // Update database with shipping label url
+        await this.databaseService.client.order.update({
+          where: { orderNumber: order.orderNumber },
+          data: {
+            shippingLabelUrl: barcodeResult,
+          },
+        });
+
+        this.logger.log(`Sipariş ${order.orderNumber} için barkod oluşturuldu ve veritabanı güncellendi`);
       });
 
       return { success: true, jobId: job.id };

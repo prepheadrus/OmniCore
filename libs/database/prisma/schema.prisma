@@ -92,12 +92,15 @@ model StockMovement {
 }
 
 model Order {
-  id          String       @id @default(uuid())
-  orderNumber String       @unique
-  totalAmount Float
-  status      String
-  channelId   String
-  channel     SalesChannel @relation(fields: [channelId], references: [id])
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id               String       @id @default(uuid())
+  orderNumber      String       @unique
+  totalAmount      Float
+  status           String
+  invoiceStatus    String?
+  invoicePdfUrl    String?
+  shippingLabelUrl String?
+  channelId        String
+  channel          SalesChannel @relation(fields: [channelId], references: [id])
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 }
