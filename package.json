@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev:all": "concurrently -c \"blue,green\" -n \"BACKEND,FRONTEND\" \"pnpm nx serve api\" \"pnpm nx serve dashboard\"",
+    "dev:all": "concurrently -c \"blue,green\" -n \"BACKEND,FRONTEND\" \"pnpm nx serve api\" \"pnpm nx dev dashboard --port 4200\"",
     "db:seed": "ts-node libs/database/src/lib/seed.ts"
   },
   "private": true,
