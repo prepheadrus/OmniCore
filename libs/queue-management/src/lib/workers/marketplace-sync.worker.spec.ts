@@ -58,7 +58,59 @@ describe('MarketplaceSyncWorker', () => {
     expect(worker).toBeDefined();
   });
 
-  it('should process a valid SYNC_ORDER job successfully', async () => {
+  it('should process a valid SYNC_ORDER job successfully and enqueue invoice if SHIPPED', async () => {
+    const job = {
+      id: 'test-job',
+      name: JobTypes.SYNC_ORDER,
+      data: {
+        channelId: 'system-ai',
+        type: JobTypes.SYNC_ORDER,
+        payload: {
+          orderNumber: 'ORD-123',
+          totalAmount: 100,
+          status: 'SHIPPED',
+          createdAt: new Date(),
+        },
+      },
+    } as unknown as Job;
+
+    const mockTx = {
+      order: {
+        upsert: jest.fn(),
+      },
+      productVariant: {
+        findFirst: jest.fn().mockResolvedValue({ id: 'variant-1' }),
+        update: jest.fn(),
+      },
+      stockMovement: {
+        create: jest.fn(),
+      },
+    };
+
+    mockDatabaseService.client.$transaction.mockImplementationOnce(async (cb: any) => {
+      return cb(mockTx);
+    });
+
+    const result = await worker.process(job);
+
+    expect(result).toEqual({ success: true, jobId: 'test-job' });
+    expect(mockClsService.runWith).toHaveBeenCalled();
+    expect(mockTx.order.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { orderNumber: 'ORD-123' },
+      })
+    );
+    expect(mockQueueService.addInvoiceJob).toHaveBeenCalledWith(
+      JobTypes.GENERATE_INVOICE,
+      expect.objectContaining({
+        orderId: 'ORD-123',
+        channelId: 'system-ai',
+      }),
+      'invoice-ORD-123'
+    );
+  });
+
+  it('should process a valid SYNC_ORDER job but not enqueue invoice if PENDING', async () => {
     const job = {
       id: 'test-job',
       name: JobTypes.SYNC_ORDER,
@@ -100,14 +152,7 @@ describe('MarketplaceSyncWorker', () => {
         where: { orderNumber: 'ORD-123' },
       })
     );
-    expect(mockQueueService.addInvoiceJob).toHaveBeenCalledWith(
-      JobTypes.GENERATE_INVOICE,
-      expect.objectContaining({
-        orderId: 'ORD-123',
-        channelId: 'system-ai',
-      }),
-      'invoice-ORD-123'
-    );
+    expect(mockQueueService.addInvoiceJob).not.toHaveBeenCalled();
   });
 
   it('should throw UnrecoverableError if channelId is missing', async () => {

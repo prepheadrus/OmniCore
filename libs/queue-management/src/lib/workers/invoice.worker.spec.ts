@@ -14,6 +14,7 @@ describe('InvoiceWorker', () => {
     client: {
       order: {
         findUnique: jest.fn(),
+        update: jest.fn(),
       },
     },
   };

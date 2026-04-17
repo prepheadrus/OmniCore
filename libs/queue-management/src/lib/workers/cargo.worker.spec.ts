@@ -12,6 +12,7 @@ describe('CargoWorker', () => {
     client: {
       order: {
         findUnique: jest.fn(),
+        update: jest.fn(),
       },
     },
   };

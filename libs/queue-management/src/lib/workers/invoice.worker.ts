@@ -53,6 +53,17 @@ export class InvoiceWorker extends WorkerHost {
 
         this.logger.log(`Successfully generated invoice for order ${order.orderNumber}. Result: ${invoiceResult}`);
 
+        // Update database with invoice status and url
+        await this.databaseService.client.order.update({
+          where: { orderNumber: order.orderNumber },
+          data: {
+            invoiceStatus: 'SIGNED',
+            invoicePdfUrl: invoiceResult,
+          },
+        });
+
+        this.logger.log(`Updated database with invoice details for order ${order.orderNumber}`);
+
         // Enqueue cargo barcode generation job
         await this.queueService.addCargoJob(JobTypes.GENERATE_CARGO_BARCODE, {
             orderId: order.orderNumber,

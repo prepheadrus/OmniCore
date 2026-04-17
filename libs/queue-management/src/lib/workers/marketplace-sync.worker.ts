@@ -162,12 +162,16 @@ export class MarketplaceSyncWorker extends WorkerHost {
 
           this.logger.log(`Successfully processed order ${order.orderNumber} with CQRS stock update for channel ${channelId}`);
 
-          // Enqueue invoice generation job
-          await this.queueService.addInvoiceJob(JobTypes.GENERATE_INVOICE, {
-            orderId: order.orderNumber,
-            channelId: channelId,
-          }, `invoice-${order.orderNumber}`);
-          this.logger.log(`Enqueued GENERATE_INVOICE job for order ${order.orderNumber}`);
+          // Enqueue invoice generation job only if status is SHIPPED or DELIVERED
+          if (order.status === 'SHIPPED' || order.status === 'DELIVERED') {
+            await this.queueService.addInvoiceJob(JobTypes.GENERATE_INVOICE, {
+              orderId: order.orderNumber,
+              channelId: channelId,
+            }, `invoice-${order.orderNumber}`);
+            this.logger.log(`Enqueued GENERATE_INVOICE job for order ${order.orderNumber}`);
+          } else {
+            this.logger.log(`Skipped GENERATE_INVOICE job for order ${order.orderNumber} because status is ${order.status}`);
+          }
 
         } else if (job.name === JobTypes.SYNC_PRODUCT && type === JobTypes.SYNC_PRODUCT) {
           const product = payload;
