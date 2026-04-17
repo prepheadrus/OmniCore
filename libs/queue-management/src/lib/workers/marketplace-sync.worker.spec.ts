@@ -8,6 +8,7 @@ import { ClsService } from 'nestjs-cls';
 import { JobTypes } from '../constants/queue.constants';
 import { CoreQueueService } from '../services/core-queue.service';
 import { getRedisConnectionToken } from '@nestjs-modules/ioredis';
+import { BomResolverService } from '@omnicore/pim';
 
 describe('MarketplaceSyncWorker', () => {
   let worker: MarketplaceSyncWorker;
@@ -39,6 +40,10 @@ describe('MarketplaceSyncWorker', () => {
     set: jest.fn(),
   };
 
+  const mockBomResolverService = {
+    resolveBundle: jest.fn().mockResolvedValue(new Map([['variant-1', 1]])),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -47,6 +52,7 @@ describe('MarketplaceSyncWorker', () => {
         { provide: ClsService, useValue: mockClsService },
         { provide: CoreQueueService, useValue: mockQueueService },
         { provide: getRedisConnectionToken('default'), useValue: mockRedisService },
+        { provide: BomResolverService, useValue: mockBomResolverService },
       ],
     }).compile();
 
