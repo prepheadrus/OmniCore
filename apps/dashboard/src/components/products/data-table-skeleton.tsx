@@ -1,6 +1,4 @@
-"use client";
-
-import { Skeleton } from "@omnicore/ui/components/ui/skeleton";
+import { Skeleton } from "@omnicore/ui/components/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -8,54 +6,55 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@omnicore/ui/components/ui/table";
+} from "@omnicore/ui/components/ui/table"
 
 export function DataTableSkeleton() {
   return (
     <div className="w-full space-y-4">
-      {/* Header section with search and filter */}
       <div className="flex items-center justify-between">
-        <Skeleton className="h-10 w-[250px]" />
-        <Skeleton className="h-10 w-[150px]" />
+        <div className="flex flex-1 items-center space-x-2">
+          <Skeleton className="h-10 w-full max-w-sm rounded-md" />
+          <Skeleton className="h-10 w-[100px] rounded-md" />
+        </div>
+        <Skeleton className="h-10 w-[100px] rounded-md ml-auto" />
       </div>
 
-      <div className="rounded-md border border-slate-200">
+      <div className="rounded-md border bg-white overflow-hidden">
         <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-              <TableHead><Skeleton className="h-4 w-12" /></TableHead>
-              <TableHead><Skeleton className="h-4 w-32" /></TableHead>
-              <TableHead><Skeleton className="h-4 w-24" /></TableHead>
-              <TableHead><Skeleton className="h-4 w-20" /></TableHead>
-              <TableHead><Skeleton className="h-4 w-20" /></TableHead>
-              <TableHead><Skeleton className="h-4 w-20" /></TableHead>
-              <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+          <TableHeader className="bg-slate-50/50">
+            <TableRow>
+              <TableHead className="w-[40px]"><Skeleton className="h-4 w-4 rounded" /></TableHead>
+              <TableHead className="w-[60px]"></TableHead>
+              <TableHead><Skeleton className="h-4 w-[150px] rounded" /></TableHead>
+              <TableHead><Skeleton className="h-4 w-[100px] rounded" /></TableHead>
+              <TableHead className="text-right"><Skeleton className="h-4 w-[80px] rounded ml-auto" /></TableHead>
+              <TableHead className="text-right"><Skeleton className="h-4 w-[60px] rounded ml-auto" /></TableHead>
+              <TableHead><Skeleton className="h-4 w-[80px] rounded" /></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {Array.from({ length: 5 }).map((_, i) => (
-              <TableRow key={i} className="hover:bg-slate-50/50">
+              <TableRow key={i} className="hover:bg-transparent">
+                <TableCell><Skeleton className="h-4 w-4 rounded" /></TableCell>
                 <TableCell><Skeleton className="h-10 w-10 rounded-md" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-40" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-28" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-12" /></TableCell>
-                <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-[200px] rounded" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-[120px] rounded" /></TableCell>
+                <TableCell className="text-right"><Skeleton className="h-8 w-[80px] rounded ml-auto" /></TableCell>
+                <TableCell className="text-right"><Skeleton className="h-8 w-[60px] rounded ml-auto" /></TableCell>
+                <TableCell><Skeleton className="h-6 w-[80px] rounded-full" /></TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
 
-      {/* Pagination section */}
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Skeleton className="h-4 w-20" />
-        <div className="space-x-2">
-          <Skeleton className="inline-block h-9 w-20" />
-          <Skeleton className="inline-block h-9 w-20" />
+      <div className="flex items-center justify-between py-4">
+        <Skeleton className="h-4 w-[150px] rounded" />
+        <div className="space-x-2 flex">
+          <Skeleton className="h-9 w-[80px] rounded-md" />
+          <Skeleton className="h-9 w-[80px] rounded-md" />
         </div>
       </div>
     </div>
-  );
+  )
 }
