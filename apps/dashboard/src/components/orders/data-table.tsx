@@ -22,6 +22,8 @@ import {
 
 import { Button } from "@omnicore/ui/components/ui/button";
 import { Input } from "@omnicore/ui/components/ui/input";
+import { Loader2, Printer } from "lucide-react";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -34,17 +36,20 @@ import { OrderData } from "./columns";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onUpdateOrder?: (id: string) => void;
 }
 
 export function DataTable<TData extends OrderData, TValue>({
   columns,
   data,
+  onUpdateOrder,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
@@ -53,9 +58,11 @@ export function DataTable<TData extends OrderData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: setRowSelection,
     state: {
       columnFilters,
       globalFilter,
+      rowSelection,
     },
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: (row, columnId, filterValue) => {
@@ -66,6 +73,9 @@ export function DataTable<TData extends OrderData, TValue>({
       pagination: {
         pageSize: 10,
       },
+    },
+    meta: {
+      handleUpdateOrder: onUpdateOrder,
     },
   });
 
@@ -78,6 +88,18 @@ export function DataTable<TData extends OrderData, TValue>({
     }
   }, [statusFilter, table]);
 
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const hasSelectedRows = selectedRows.length > 0;
+  const [isPrinting, setIsPrinting] = React.useState(false);
+
+  const handlePrintLabels = () => {
+    setIsPrinting(true);
+    setTimeout(() => {
+      setIsPrinting(false);
+      table.toggleAllPageRowsSelected(false);
+      toast.success("Kargo etiketleri başarıyla birleştirildi!");
+    }, 1500);
+  };
 
   return (
     <div className="space-y-4">
@@ -183,6 +205,38 @@ export function DataTable<TData extends OrderData, TValue>({
           </Button>
         </div>
       </div>
+
+      {hasSelectedRows && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <div className="flex items-center gap-4 px-6 py-3 bg-[oklch(100%_0_0/0.8)] dark:bg-[oklch(18%_0.02_250/0.8)] backdrop-blur-md border border-slate-200 dark:border-slate-800 shadow-lg rounded-full">
+            <div className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              <span className="bg-primary text-primary-foreground px-2 py-0.5 rounded-full text-xs font-bold mr-2">
+                {selectedRows.length}
+              </span>
+              sipariş seçildi
+            </div>
+            <div className="h-4 w-px bg-slate-300 dark:bg-slate-700"></div>
+            <Button
+              size="sm"
+              onClick={handlePrintLabels}
+              disabled={isPrinting}
+              className="rounded-full shadow-sm"
+            >
+              {isPrinting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  İşleniyor...
+                </>
+              ) : (
+                <>
+                  <Printer className="mr-2 h-4 w-4" />
+                  Kargo Etiketlerini Yazdır
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

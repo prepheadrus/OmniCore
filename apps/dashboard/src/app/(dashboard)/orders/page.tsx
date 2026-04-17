@@ -6,6 +6,8 @@ import { OrderData, OrderStatus, columns } from '../../../components/orders/colu
 import { DataTable } from '../../../components/orders/data-table';
 import { DataTableSkeleton } from '../../../components/orders/data-table-skeleton';
 
+import { toast } from "sonner";
+
 // Generate dummy data function
 const generateData = (channelName: string): OrderData[] => {
   return Array.from({ length: 25 }).map((_, i) => {
@@ -18,6 +20,9 @@ const generateData = (channelName: string): OrderData[] => {
       status,
       amount: `₺${(Math.random() * 1000).toFixed(2)}`,
       channel: channelName,
+      invoiceStatus: status === "Teslim Edildi" ? "SIGNED" : "PENDING",
+      invoicePdfUrl: status === "Teslim Edildi" ? "https://example.com/invoice.pdf" : undefined,
+      shippingLabelUrl: status !== "Bekliyor" ? "https://example.com/label.pdf" : undefined,
     };
   });
 };
@@ -43,6 +48,24 @@ export default function OrdersPage() {
     return () => clearTimeout(timer);
   }, [selectedChannelId, availableChannels]);
 
+  const handleUpdateOrder = (id: string) => {
+    setData((prev) =>
+      prev.map((order) => {
+        if (order.id === id) {
+          toast.success(`Sipariş ${id} kargoya verildi!`);
+          return {
+            ...order,
+            status: "Kargolandı",
+            invoiceStatus: "SIGNED",
+            invoicePdfUrl: "https://example.com/mock-invoice.pdf",
+            shippingLabelUrl: "https://example.com/mock-label.pdf",
+          };
+        }
+        return order;
+      })
+    );
+  };
+
   return (
     <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto">
       <div>
@@ -57,7 +80,7 @@ export default function OrdersPage() {
       {isLoading ? (
         <DataTableSkeleton />
       ) : (
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={data} onUpdateOrder={handleUpdateOrder} />
       )}
     </div>
   );
