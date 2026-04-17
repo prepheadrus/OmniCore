@@ -5,6 +5,9 @@ import { useChannel } from '../../../contexts/ChannelContext';
 import { ProductData, ProductStatus, columns } from '../../../components/products/columns';
 import { DataTable } from '../../../components/products/data-table';
 import { DataTableSkeleton } from '../../../components/products/data-table-skeleton';
+import { BundleForm } from '../../../components/products/bundle-form';
+import { Button } from '@omnicore/ui/components/ui/button';
+import { PackagePlus } from 'lucide-react';
 
 // Generate dummy data function
 const generateData = (channelName: string): ProductData[] => {
@@ -47,6 +50,7 @@ export function ProductsPageContent() {
   const { selectedChannelId, availableChannels } = useChannel();
   const [data, setData] = useState<ProductData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isBundleFormOpen, setIsBundleFormOpen] = useState(false);
 
   useEffect(() => {
     // Determine current channel name
@@ -68,5 +72,30 @@ export function ProductsPageContent() {
       return <DataTableSkeleton />
   }
 
-  return <DataTable columns={columns} data={data} setData={setData} />;
+  const handleBundleSuccess = (newBundle: ProductData) => {
+    setData(prev => [newBundle, ...prev]);
+  };
+
+  return (
+    <>
+      <div className="absolute top-8 right-0 md:right-8 z-10">
+        <Button
+          onClick={() => setIsBundleFormOpen(true)}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md font-bold gap-2"
+        >
+          <PackagePlus className="h-4 w-4" />
+          Yeni Paket/Set Oluştur
+        </Button>
+      </div>
+
+      <DataTable columns={columns} data={data} setData={setData} />
+
+      <BundleForm
+        open={isBundleFormOpen}
+        onOpenChange={setIsBundleFormOpen}
+        existingProducts={data}
+        onSuccess={handleBundleSuccess}
+      />
+    </>
+  );
 }
