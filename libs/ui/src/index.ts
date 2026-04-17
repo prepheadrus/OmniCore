@@ -5,3 +5,8 @@ export * from './components/ui/table';
 export * from './components/ui/scroll-area';
 export * from './components/ui/avatar';
 export * from './lib/utils';
+export * from './components/ui/checkbox';
+export * from './components/ui/badge';
+export * from './components/ui/dropdown-menu';
+export * from './components/ui/skeleton';
+export * from './components/ui/select';
