@@ -1,14 +1,15 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { ProductService } from '../services/product.service';
 import { Product, ProductVariant } from '@prisma/client';
+import { GetProductsFilterDto } from '@omnicore/core-domain';
 
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  async getProducts() {
-    return this.productService.getProducts();
+  async getProducts(@Query() filter: GetProductsFilterDto) {
+    return this.productService.getProducts(filter);
   }
 
   @Get(':id')

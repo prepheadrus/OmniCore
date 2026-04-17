@@ -1,18 +1,74 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@omnicore/database';
+import { Prisma } from '@prisma/client';
+import { GetProductsFilterDto } from '@omnicore/core-domain';
 
 @Injectable()
 export class ProductService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async getProducts() {
-    return this.databaseService.client.product.findMany({
-      include: {
-        category: true,
-        brand: true,
-        variants: true,
+  async getProducts(filter: GetProductsFilterDto) {
+    const page = filter.page ?? 1;
+    const limit = filter.limit ?? 10;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.ProductWhereInput = {};
+
+    if (filter.channelId) {
+      where.channelId = filter.channelId;
+    }
+
+    if (filter.q) {
+      where.OR = [
+        { name: { contains: filter.q, mode: 'insensitive' } },
+        { variants: { some: { sku: { contains: filter.q, mode: 'insensitive' } } } }
+      ];
+    }
+
+    if (filter.stockStatus) {
+      if (filter.stockStatus === 'in_stock') {
+        where.variants = {
+          some: {
+            stock: { gt: 0 }
+          }
+        };
+      } else if (filter.stockStatus === 'out_of_stock') {
+        where.variants = {
+          every: {
+            stock: { equals: 0 }
+          }
+        };
+      }
+    }
+
+    const orderBy: Prisma.ProductOrderByWithRelationInput = {
+      [filter.sortBy ?? 'createdAt']: filter.sortOrder ?? 'desc',
+    };
+
+    const [data, total] = await Promise.all([
+      this.databaseService.client.product.findMany({
+        where,
+        orderBy,
+        skip,
+        take: limit,
+        include: {
+          category: true,
+          brand: true,
+          variants: true,
+        },
+      }),
+      this.databaseService.client.product.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-    });
+    };
   }
 
   async getProduct(id: string) {
