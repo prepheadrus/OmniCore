@@ -64,10 +64,30 @@ model ProductVariant {
   desi           Float?
   weight         Float?
   dimensions     Json? // e.g., {"width": 10, "height": 20, "depth": 5}
+
+  isBundle       Boolean         @default(false)
+  bundleItems    BundleComponent[] @relation("ParentVariant")
+  partOfBundles  BundleComponent[] @relation("ChildVariant")
+
   product        Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   stockMovements StockMovement[]
+}
+
+model BundleComponent {
+  id              String   @id @default(uuid())
+  parentVariantId String
+  childVariantId  String
+  quantity        Int
+
+  parentVariant   ProductVariant @relation("ParentVariant", fields: [parentVariantId], references: [id], onDelete: Cascade)
+  childVariant    ProductVariant @relation("ChildVariant", fields: [childVariantId], references: [id], onDelete: Restrict)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([parentVariantId, childVariantId])
 }
 
 enum StockMovementEventType {

@@ -10,6 +10,7 @@ import { ClsService } from 'nestjs-cls';
 import { CoreQueueService } from '../services/core-queue.service';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
+import { BomResolverService } from '@omnicore/pim';
 
 @Processor(MARKETPLACE_SYNC_QUEUE, {
   limiter: {
@@ -25,6 +26,7 @@ export class MarketplaceSyncWorker extends WorkerHost {
     private readonly clsService: ClsService,
     private readonly queueService: CoreQueueService,
     @InjectRedis() private readonly redis: Redis,
+    private readonly bomResolverService: BomResolverService,
   ) {
     super();
   }
@@ -133,30 +135,34 @@ export class MarketplaceSyncWorker extends WorkerHost {
               },
             });
 
-            // For now, we assume a generic sale of -1 for a mock/existing product variant
+            // For now, we assume order has a list of items to process, here represented by a single mock variant.
             // In a real scenario, this would iterate over order line items.
-            // We fetch the first available product variant to demonstrate the stock reduction CQRS pattern.
-            const firstVariant = await tx.productVariant.findFirst({
+            const variantToProcess = await tx.productVariant.findFirst({
                where: { product: { channelId } }
             });
 
-            if (firstVariant) {
-               // 2. Event Sourcing: Insert StockMovement
-               await tx.stockMovement.create({
-                 data: {
-                   productVariantId: firstVariant.id,
-                   channelId: channelId,
-                   eventType: 'SALE',
-                   quantityChange: -1,
-                   referenceId: order.orderNumber,
-                 }
-               });
+            if (variantToProcess) {
+               // Resolve BOM if it's a bundle or just get the item itself
+               const quantitySold = 1; // Simulated order quantity
+               const resolvedItems = await this.bomResolverService.resolveBundle(variantToProcess.id, quantitySold);
 
-               // 3. CQRS Read Model: Update ProductVariant stock
-               await tx.productVariant.update({
-                 where: { id: firstVariant.id },
-                 data: { stock: { decrement: 1 } }
-               });
+               // 2 & 3. For each physical item, log StockMovement and decrement stock
+               for (const [physicalVariantId, totalDeduction] of resolvedItems.entries()) {
+                 await tx.stockMovement.create({
+                   data: {
+                     productVariantId: physicalVariantId,
+                     channelId: channelId,
+                     eventType: 'SALE',
+                     quantityChange: -totalDeduction,
+                     referenceId: order.orderNumber,
+                   }
+                 });
+
+                 await tx.productVariant.update({
+                   where: { id: physicalVariantId },
+                   data: { stock: { decrement: totalDeduction } }
+                 });
+               }
             }
           });
 
