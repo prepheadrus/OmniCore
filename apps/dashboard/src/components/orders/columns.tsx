@@ -2,6 +2,17 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@omnicore/ui/components/ui/badge";
+import { FileText, Barcode, MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@omnicore/ui/components/ui/dropdown-menu";
+import { Button } from "@omnicore/ui/components/ui/button";
+import { Checkbox } from "@omnicore/ui/components/ui/checkbox";
 
 export type OrderStatus = "Bekliyor" | "Kargolandı" | "Teslim Edildi";
 
@@ -12,9 +23,34 @@ export interface OrderData {
   status: OrderStatus;
   amount: string;
   channel: string;
+  invoiceStatus?: string;
+  invoicePdfUrl?: string;
+  shippingLabelUrl?: string;
 }
 
 export const columns: ColumnDef<OrderData>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "id",
     header: "Sipariş No",
@@ -64,6 +100,79 @@ export const columns: ColumnDef<OrderData>[] = [
     header: () => <div className="text-right">Tutar</div>,
     cell: ({ row }) => {
       return <div className="text-right font-medium">{row.getValue("amount")}</div>;
+    },
+  },
+  {
+    id: "documents",
+    header: "Belgeler",
+    cell: ({ row }) => {
+      const order = row.original;
+      const showPdf = order.invoiceStatus === "SIGNED" || !!order.invoicePdfUrl;
+      const showBarcode = !!order.shippingLabelUrl;
+
+      return (
+        <div className="flex items-center gap-2">
+          {showPdf && (
+            <a
+              href={order.invoicePdfUrl || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-500 hover:text-primary transition-colors"
+              title="Fatura PDF"
+            >
+              <FileText className="h-5 w-5" />
+            </a>
+          )}
+          {showBarcode && (
+            <a
+              href={order.shippingLabelUrl || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-500 hover:text-primary transition-colors"
+              title="Kargo Etiketi"
+            >
+              <Barcode className="h-5 w-5" />
+            </a>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row, table }) => {
+      const order = row.original;
+      // Define handleUpdateOrder type implicitly via the function call
+      const meta = table.options.meta as { handleUpdateOrder?: (id: string) => void } | undefined;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Menüyü aç</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(order.id)}
+            >
+              Sipariş No Kopyala
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                if (meta?.handleUpdateOrder) {
+                  meta.handleUpdateOrder(order.id);
+                }
+              }}
+            >
+              Test: Kargoya Ver
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
     },
   },
 ];
