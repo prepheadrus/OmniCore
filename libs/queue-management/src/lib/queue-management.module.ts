@@ -9,6 +9,7 @@ import { CargoWorker } from './workers/cargo.worker';
 import { InvoiceAdaptersModule } from '@omnicore/invoice-adapters';
 import { CargoAdaptersModule } from '@omnicore/cargo-adapters';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { PimModule } from '@omnicore/pim';
 
 @Global()
 @Module({
@@ -48,6 +49,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     }),
     InvoiceAdaptersModule,
     CargoAdaptersModule,
+    PimModule,
   ],
   providers: [CoreQueueService, MarketplaceSyncWorker, InvoiceWorker, CargoWorker],
   exports: [BullModule, CoreQueueService, RedisModule], // 2. EKLENEN KISIM: RedisModule export edildi
