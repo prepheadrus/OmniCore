@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "dev:all": "concurrently -c \"blue,green\" -n \"BACKEND,FRONTEND\" \"pnpm nx serve api\" \"pnpm nx serve dashboard\"",
     "db:seed": "ts-node libs/database/src/lib/seed.ts"
   },
   "private": true,
@@ -39,6 +40,7 @@
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
     "autoprefixer": "10.4.13",
+    "concurrently": "^9.2.1",
     "eslint": "~8.57.0",
     "eslint-config-next": "14.2.3",
     "eslint-config-prettier": "^10.0.0",
