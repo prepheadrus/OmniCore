@@ -4,7 +4,7 @@ import { DataTableSkeleton } from '../../../components/products/data-table-skele
 
 export default function ProductsPage() {
   return (
-    <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto">
+    <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto relative">
       <div>
         <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
           Ürünler
