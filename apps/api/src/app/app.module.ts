@@ -14,6 +14,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { SyncCronService } from './cron/sync.cron';
 import { PimModule } from '@omnicore/pim';
 import { OrderModule } from './order/order.module';
+import { ProcurementModule } from './procurement/procurement.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { OrderModule } from './order/order.module';
     PimModule,
     OrderModule,
     DashboardModule,
+    ProcurementModule,
   ],
   controllers: [AppController, AiAgentController, QueueController, ],
   providers: [AppService, SyncCronService],
