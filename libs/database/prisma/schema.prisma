@@ -15,6 +15,8 @@ model SalesChannel {
   products       Product[]
   orders         Order[]
   stockMovements StockMovement[]
+  suppliers      Supplier[]
+  purchaseOrders PurchaseOrder[]
 }
 
 model Category {
@@ -59,6 +61,7 @@ model ProductVariant {
   barcode        String?         @unique
   price          Float
   stock          Int             @default(0)
+  movingAverageCost Decimal      @default(0)
   attributes     Json? // e.g., {"color": "Red", "size": "M"} or {"volume": "400ml"}
   technicalSpecs Json? // Variant specific specs
   desi           Float?
@@ -73,6 +76,7 @@ model ProductVariant {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   stockMovements StockMovement[]
+  purchaseOrderItems PurchaseOrderItem[]
 }
 
 model BundleComponent {
@@ -110,6 +114,7 @@ model StockMovement {
   channelId        String
   eventType        StockMovementEventType
   quantityChange   Int
+  unitCost         Decimal?
   referenceId      String?
   createdAt        DateTime               @default(now())
 
@@ -136,4 +141,53 @@ model Order {
   channel          SalesChannel @relation(fields: [channelId], references: [id])
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
+}
+
+model Supplier {
+  id             String          @id @default(uuid())
+  name           String
+  taxNumber      String?
+  email          String?
+  phone          String?
+  address        String?
+  channelId      String
+  channel        SalesChannel    @relation(fields: [channelId], references: [id])
+  purchaseOrders PurchaseOrder[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+enum PurchaseOrderStatus {
+  DRAFT
+  SENT
+  PARTIAL_RECEIPT
+  RECEIVED
+  CANCELLED
+}
+
+model PurchaseOrder {
+  id          String              @id @default(uuid())
+  supplierId  String
+  supplier    Supplier            @relation(fields: [supplierId], references: [id])
+  status      PurchaseOrderStatus @default(DRAFT)
+  orderDate   DateTime            @default(now())
+  totalAmount Decimal
+  channelId   String
+  channel     SalesChannel        @relation(fields: [channelId], references: [id])
+  items       PurchaseOrderItem[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+}
+
+model PurchaseOrderItem {
+  id               String         @id @default(uuid())
+  purchaseOrderId  String
+  purchaseOrder    PurchaseOrder  @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
+  quantity         Int
+  unitCost         Decimal
+  totalCost        Decimal
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 }
