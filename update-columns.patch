@@ -1,0 +1,12 @@
+--- apps/dashboard/src/components/orders/columns.tsx
++++ apps/dashboard/src/components/orders/columns.tsx
+@@ -95,7 +95,7 @@
+   {
+     accessorKey: "amount",
+     header: () => <div className="text-right">Tutar</div>,
+     cell: ({ row }) => {
+       return <div className="text-right font-medium">{row.getValue("amount")}</div>;
+     },
+   },
+--- apps/dashboard/src/components/products/columns.tsx
++++ apps/dashboard/src/components/products/columns.tsx
