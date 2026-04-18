@@ -41,15 +41,15 @@ const activities = [
 
 export default function RecentActivityTimeline() {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 h-full">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-slate-900">Son Aktiviteler</h3>
-        <button className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-base font-semibold text-slate-800">Son Aktiviteler</h3>
+        <button className="text-[13px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
           Tümünü Gör
         </button>
       </div>
 
-      <div className="relative border-l border-slate-200 ml-3 space-y-6 mt-2">
+      <div className="relative border-l border-slate-200 ml-3 space-y-5 mt-2">
         {activities.map((activity) => {
           const Icon = activity.icon;
           return (
@@ -61,13 +61,13 @@ export default function RecentActivityTimeline() {
 
               <div className="flex flex-col gap-1">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h4 className="text-sm font-semibold text-slate-900">{activity.title}</h4>
-                  <span className="flex items-center text-xs text-slate-500 font-medium">
+                  <h4 className="text-[13px] font-semibold text-slate-800">{activity.title}</h4>
+                  <span className="flex items-center text-[11px] text-slate-500 font-medium">
                     <Clock className="w-3 h-3 mr-1" />
                     {activity.time}
                   </span>
                 </div>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-[13px] text-slate-600 leading-relaxed">
                   {activity.description}
                 </p>
               </div>

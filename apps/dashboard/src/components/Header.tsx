@@ -16,13 +16,13 @@ export default function Header() {
   const { availableChannels, selectedChannelId, setSelectedChannelId } = useChannel();
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-10">
+    <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 shadow-sm z-10">
 
       {/* Breadcrumb Area (Static for now) */}
-      <div className="flex items-center text-sm text-slate-500">
+      <div className="flex items-center text-[13px] text-slate-500">
         <Link href="/" className="hover:text-indigo-600 transition-colors">OmniCore</Link>
         <ChevronRight size={16} className="mx-2 text-slate-400" />
-        <span className="font-medium text-slate-900">Dashboard</span>
+        <span className="font-medium text-slate-800">Dashboard</span>
       </div>
 
       {/* Right Actions Area */}
@@ -32,7 +32,7 @@ export default function Header() {
         <div className="hidden md:block w-48">
           <Select value={selectedChannelId} onValueChange={setSelectedChannelId}>
             <SelectTrigger>
-              <SelectValue placeholder="Kanal Seçin" />
+              <SelectValue placeholder="Kanal Seçin" className="text-[13px]" />
             </SelectTrigger>
             <SelectContent>
               {availableChannels.map((channel) => (
@@ -52,13 +52,13 @@ export default function Header() {
           <input
             type="text"
             placeholder="Arama yap..."
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-colors"
+            className="block w-full pl-9 pr-3 py-1.5 border border-slate-200 rounded-md leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:placeholder-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-[13px] transition-colors"
           />
         </div>
 
         {/* Notifications */}
         <button className="relative text-slate-500 hover:text-indigo-600 transition-colors">
-          <Bell size={20} />
+          <Bell size={18} />
           {/* Notification Badge */}
           <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
         </button>
@@ -66,11 +66,11 @@ export default function Header() {
         {/* User Profile Dropdown (Static Mock) */}
         <div className="flex items-center space-x-3 cursor-pointer group">
           <div className="flex flex-col text-right">
-            <span className="text-sm font-medium text-slate-900 group-hover:text-indigo-600 transition-colors">Yönetici User</span>
-            <span className="text-xs text-slate-500">Süper Admin</span>
+            <span className="text-[13px] font-medium text-slate-800 group-hover:text-indigo-600 transition-colors">Yönetici User</span>
+            <span className="text-[11px] text-slate-500">Süper Admin</span>
           </div>
-          <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 border border-indigo-200">
-            <User size={18} />
+          <div className="h-8 w-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100">
+            <User size={16} />
           </div>
         </div>
 

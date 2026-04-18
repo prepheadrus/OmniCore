@@ -38,31 +38,31 @@ export default function Sidebar() {
   return (
     <aside
       className={`bg-slate-900 text-white transition-all duration-300 flex flex-col relative ${
-        isCollapsed ? 'w-20' : 'w-64'
+        isCollapsed ? 'w-16' : 'w-56'
       }`}
     >
       {/* Sidebar Header / Logo Area */}
-      <div className="h-16 flex items-center justify-center border-b border-slate-800">
+      <div className="h-14 flex items-center justify-center border-b border-slate-800">
         {!isCollapsed && (
-          <span className="text-xl font-bold tracking-wider text-indigo-400">OmniCore</span>
+          <span className="text-lg font-bold tracking-wider text-indigo-400">OmniCore</span>
         )}
         {isCollapsed && (
-          <span className="text-xl font-bold text-indigo-400">OC</span>
+          <span className="text-lg font-bold text-indigo-400">OC</span>
         )}
       </div>
 
       {/* Collapse Toggle Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-20 bg-slate-800 rounded-full p-1 border border-slate-700 hover:bg-slate-700 transition-colors z-10 text-white"
+        className="absolute -right-3 top-16 bg-slate-800 rounded-full p-1 border border-slate-700 hover:bg-slate-700 transition-colors z-10 text-white"
         title={isCollapsed ? 'Genişlet' : 'Daralt'}
       >
-        {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
 
       {/* Navigation Links */}
-      <nav className="flex-1 overflow-y-auto py-4">
-        <ul className="space-y-2 px-3">
+      <nav className="flex-1 overflow-y-auto py-3">
+        <ul className="space-y-1 px-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -71,14 +71,14 @@ export default function Sidebar() {
               <li key={item.name}>
                 <Link
                   href={item.href}
-                  className={`flex items-center rounded-lg p-3 transition-colors ${
+                  className={`flex items-center rounded-md p-2 text-[13px] transition-colors ${
                     isActive
                       ? 'bg-indigo-600 text-white'
-                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      : 'text-slate-400 hover:bg-slate-800 hover:text-slate-50'
                   } ${isCollapsed ? 'justify-center' : 'justify-start'}`}
                   title={isCollapsed ? item.name : undefined}
                 >
-                  <Icon size={20} className={isCollapsed ? '' : 'mr-3'} />
+                  <Icon size={18} className={isCollapsed ? '' : 'mr-2.5'} />
                   {!isCollapsed && <span>{item.name}</span>}
                 </Link>
               </li>
@@ -89,7 +89,7 @@ export default function Sidebar() {
 
       {/* Sidebar Footer Area (Optional) */}
       {!isCollapsed && (
-        <div className="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
+        <div className="p-3 border-t border-slate-800 text-[11px] text-slate-500 text-center">
           OmniCore v1.0
         </div>
       )}

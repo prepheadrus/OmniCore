@@ -8,7 +8,7 @@ import { DataTableSkeleton } from '../../../components/shared/data-table-skeleto
 import { BundleForm } from '../../../components/products/bundle-form';
 import { Button } from '@omnicore/ui/components/ui/button';
 import { PackagePlus } from 'lucide-react';
-import { GetProductsFilterDto } from '@omnicore/core-domain';
+import { GetProductsFilterDto } from '../../../../../../libs/core-domain/src/lib/dto';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Tabs, TabsList, TabsTrigger } from "@omnicore/ui/components/ui/tabs";
 
