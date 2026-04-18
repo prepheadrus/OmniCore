@@ -28,7 +28,8 @@
       "@omnicore/cargo-adapters": ["libs/cargo-adapters/src/index.ts"],
       "@omnicore/pricing": ["libs/pricing/src/index.ts"],
       "@omnicore/pim": ["libs/pim/src/index.ts"],
-      "@omnicore/core-domain": ["libs/core-domain/src/index.ts"]
+      "@omnicore/core-domain": ["libs/core-domain/src/index.ts"],
+      "@omnicore/erpnext-client": ["libs/erpnext-client/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
