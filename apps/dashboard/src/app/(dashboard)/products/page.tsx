@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { ProductsPageContent } from './ProductsPageContent';
-import { DataTableSkeleton } from '../../../components/products/data-table-skeleton';
+import { DataTableSkeleton } from '../../../components/shared/data-table-skeleton';
 
 export default function ProductsPage() {
   return (

@@ -1,6 +1,10 @@
 import { IsString, IsOptional, IsEmail } from 'class-validator';
 
 export class CreateSupplierDto {
+  constructor() {
+    this.name = "";
+    this.channelId = "";
+  }
   @IsString()
   name: string;
 

@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useChannel } from '../../../contexts/ChannelContext';
 import { OrderData, OrderStatus, columns } from '../../../components/orders/columns';
 import { DataTable } from '../../../components/orders/data-table';
-import { DataTableSkeleton } from '../../../components/orders/data-table-skeleton';
+import { DataTableSkeleton } from '../../../components/shared/data-table-skeleton';
 import { toast } from "sonner";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Tabs, TabsList, TabsTrigger } from "@omnicore/ui/components/ui/tabs";

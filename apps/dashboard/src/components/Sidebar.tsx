@@ -11,7 +11,9 @@ import {
   RefreshCcw,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Truck,
+  FileText
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -25,6 +27,8 @@ export default function Sidebar() {
     { name: 'Ürün Kataloğu', icon: Package, href: '/products' },
     { name: 'Siparişler', icon: ShoppingCart, href: '/orders' },
     { name: 'İadeler', icon: Undo, href: '/returns' },
+    { name: 'Tedarikçiler', icon: Truck, href: '/procurement/suppliers' },
+    { name: 'Alım Faturaları', icon: FileText, href: '/procurement/purchase-orders' },
     { name: 'Rekabet Radarı', icon: Radar, href: '/radar' },
     { name: 'Otonom Fiyatlandırma', icon: Tags, href: '/pricing' },
     { name: 'Senkronizasyon', icon: RefreshCcw, href: '/sync' },
