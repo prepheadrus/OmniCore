@@ -24,6 +24,7 @@ import { Loader2, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { OrderData } from "./columns";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { FinancialForm } from "./financial-form";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,16 +47,21 @@ export function DataTable<TData extends OrderData, TValue>({
 
   const [searchTerm, setSearchTerm] = React.useState(searchParams.get("q") || "");
 
+  const [expanded, setExpanded] = React.useState({});
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
+    onExpandedChange: setExpanded,
+    getRowCanExpand: () => true,
     manualPagination: true,
     manualFiltering: true,
     pageCount: meta?.totalPages ?? -1,
     state: {
       rowSelection,
+      expanded,
     },
     meta: {
       handleUpdateOrder: onUpdateOrder,
@@ -150,20 +156,37 @@ export function DataTable<TData extends OrderData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-slate-50/50"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <React.Fragment key={row.id}>
+                  <TableRow
+                    data-state={row.getIsSelected() && "selected"}
+                    className="hover:bg-slate-50/50"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {row.getIsExpanded() && (
+                    <TableRow>
+                      <TableCell colSpan={row.getVisibleCells().length} className="p-0 border-b">
+                        <div className="p-2 bg-white">
+                          <FinancialForm
+                            order={row.original as any as OrderData}
+                            onUpdate={(updatedOrder) => {
+                              if (onUpdateOrder) {
+                                onUpdateOrder(updatedOrder);
+                              }
+                            }}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <TableRow>

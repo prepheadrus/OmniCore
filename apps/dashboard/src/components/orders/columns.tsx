@@ -26,9 +26,32 @@ export interface OrderData {
   invoiceStatus?: string;
   invoicePdfUrl?: string;
   shippingLabelUrl?: string;
+  netProfit?: string;
+  costPrice?: string;
+  commissionAmount?: string;
+  shippingCost?: string;
+  taxAmount?: string;
+  discountAmount?: string;
 }
 
 export const columns: ColumnDef<OrderData>[] = [
+  {
+    id: "expander",
+    header: () => null,
+    cell: ({ row }) => {
+      return row.getCanExpand() ? (
+        <button
+          {...{
+            onClick: row.getToggleExpandedHandler(),
+            style: { cursor: 'pointer' },
+          }}
+          className="p-1 rounded-md hover:bg-slate-100 text-slate-500"
+        >
+          {row.getIsExpanded() ? '▼' : '▶'}
+        </button>
+      ) : null;
+    },
+  },
   {
     id: "select",
     header: ({ table }) => (
@@ -100,6 +123,47 @@ export const columns: ColumnDef<OrderData>[] = [
     header: () => <div className="text-right">Tutar</div>,
     cell: ({ row }) => {
       return <div className="text-right font-medium">{row.getValue("amount")}</div>;
+    },
+  },
+  {
+    accessorKey: "netProfit",
+    header: () => <div className="text-right">Net Kâr</div>,
+    cell: ({ row }) => {
+      const netProfitStr = row.getValue("netProfit") as string | undefined;
+      const amountStr = row.getValue("amount") as string;
+
+      let netProfit = 0;
+      if (netProfitStr) {
+        netProfit = parseFloat(netProfitStr);
+      }
+
+      if (!netProfitStr && !amountStr) {
+        return <div className="text-right font-medium">-</div>;
+      }
+
+      let badgeClasses = "bg-slate-50 text-slate-700";
+      if (netProfit > 0) {
+        badgeClasses = "bg-emerald-50 text-emerald-700 hover:bg-emerald-50/80 border-transparent";
+      } else if (netProfit < 0) {
+        badgeClasses = "bg-rose-50 text-rose-700 hover:bg-rose-50/80 border-transparent";
+      }
+
+      const formatted = new Intl.NumberFormat("tr-TR", {
+        style: "currency",
+        currency: "TRY",
+      }).format(netProfit);
+
+      return (
+        <div className="text-right">
+          {netProfitStr ? (
+            <Badge variant="outline" className={`font-medium ${badgeClasses}`}>
+              {formatted}
+            </Badge>
+          ) : (
+            <span className="text-slate-400">-</span>
+          )}
+        </div>
+      );
     },
   },
   {
