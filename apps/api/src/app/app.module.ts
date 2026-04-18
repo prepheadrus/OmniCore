@@ -9,7 +9,7 @@ import { MarketplaceAdaptersModule } from '@omnicore/marketplace-adapters';
 import { AiAgentsModule } from '@omnicore/ai-agents';
 import { AiAgentController } from './controllers/ai-agent.controller';
 import { QueueController } from './controllers/queue.controller';
-import { DashboardController } from './controllers/dashboard.controller';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SyncCronService } from './cron/sync.cron';
 import { PimModule } from '@omnicore/pim';
@@ -28,8 +28,9 @@ import { OrderModule } from './order/order.module';
     AiAgentsModule,
     PimModule,
     OrderModule,
+    DashboardModule,
   ],
-  controllers: [AppController, AiAgentController, QueueController, DashboardController],
+  controllers: [AppController, AiAgentController, QueueController, ],
   providers: [AppService, SyncCronService],
 })
 export class AppModule implements NestModule {
