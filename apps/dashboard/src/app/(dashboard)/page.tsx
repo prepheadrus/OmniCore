@@ -14,12 +14,12 @@ export default function Index() {
   const formattedDate = today.toLocaleDateString('tr-TR', dateOptions);
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto">
+    <div className="flex flex-col gap-4 w-full max-w-7xl mx-auto">
       {/* 1. Karşılama Alanı */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-2">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-0">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Hoş Geldiniz, Demo User</h1>
-          <p className="text-slate-500 mt-1.5 font-medium">{formattedDate}</p>
+          <h1 className="text-xl font-bold text-slate-800 tracking-tight">Hoş Geldiniz, Demo User</h1>
+          <p className="text-slate-500 mt-1 font-medium">{formattedDate}</p>
         </div>
       </div>
 
@@ -27,7 +27,7 @@ export default function Index() {
       <TopMetrics />
 
       {/* 3 & 4. Ana Grafik Alanı & Son Aktiviteler */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
           <WeeklySalesChart />
         </div>

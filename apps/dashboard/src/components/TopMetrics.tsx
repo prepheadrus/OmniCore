@@ -45,7 +45,7 @@ const metrics = [
 
 export default function TopMetrics() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {metrics.map((metric, index) => {
         const Icon = metric.icon;
         const trendColor = metric.trendGood ? 'text-emerald-600' : 'text-red-600';
@@ -54,20 +54,20 @@ export default function TopMetrics() {
         return (
           <div
             key={index}
-            className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col"
+            className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-col"
           >
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm font-medium text-slate-500 mb-1">{metric.title}</p>
-                <h3 className="text-2xl font-bold text-slate-900">{metric.value}</h3>
+                <p className="text-[13px] font-medium text-slate-500 mb-1">{metric.title}</p>
+                <h3 className="text-xl font-bold text-slate-800">{metric.value}</h3>
               </div>
-              <div className={`p-3 rounded-lg ${metric.bgColor}`}>
-                <Icon className={`w-5 h-5 ${metric.color}`} />
+              <div className={`p-2.5 rounded-lg ${metric.bgColor}`}>
+                <Icon className={`w-3.5 h-3.5 ${metric.color}`} />
               </div>
             </div>
-            <div className="mt-4 flex items-center text-sm">
+            <div className="mt-3 flex items-center text-[13px]">
               <span className={`flex items-center font-medium ${trendColor}`}>
-                <TrendIcon className="w-4 h-4 mr-1" />
+                <TrendIcon className="w-3.5 h-3.5 mr-1" />
                 {metric.trend}
               </span>
               <span className="text-slate-500 ml-2">geçen haftaya göre</span>
