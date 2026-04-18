@@ -90,6 +90,12 @@ model BundleComponent {
   @@unique([parentVariantId, childVariantId])
 }
 
+enum SettlementStatus {
+  PENDING
+  CALCULATED
+  RECONCILED
+}
+
 enum StockMovementEventType {
   SALE
   RESTOCK
@@ -114,7 +120,14 @@ model StockMovement {
 model Order {
   id               String       @id @default(uuid())
   orderNumber      String       @unique
-  totalAmount      Float
+  totalAmount      Decimal
+  costPrice        Decimal      @default(0)
+  commissionAmount Decimal      @default(0)
+  shippingCost     Decimal      @default(0)
+  taxAmount        Decimal      @default(0)
+  discountAmount   Decimal      @default(0)
+  netProfit        Decimal      @default(0)
+  settlementStatus SettlementStatus @default(PENDING)
   status           String
   invoiceStatus    String?
   invoicePdfUrl    String?

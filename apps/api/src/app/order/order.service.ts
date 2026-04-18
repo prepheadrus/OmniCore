@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '@omnicore/database';
-import { GetOrdersFilterDto } from '@omnicore/core-domain';
+import { GetOrdersFilterDto, CalculateFinanceRequestDto } from '@omnicore/core-domain';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -52,5 +52,65 @@ export class OrderService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async calculateNetProfit(orderId: string, dto: CalculateFinanceRequestDto) {
+    return this.databaseService.client.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: orderId }
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Order with id ${orderId} not found`);
+      }
+
+      const costPrice = new Prisma.Decimal(dto.costPrice ?? order.costPrice);
+      const commissionAmount = new Prisma.Decimal(dto.commissionAmount ?? order.commissionAmount);
+      const shippingCost = new Prisma.Decimal(dto.shippingCost ?? order.shippingCost);
+      const taxAmount = new Prisma.Decimal(dto.taxAmount ?? order.taxAmount);
+      const discountAmount = new Prisma.Decimal(dto.discountAmount ?? order.discountAmount);
+
+      const totalAmount = new Prisma.Decimal(order.totalAmount);
+
+      const totalDeductions = costPrice.add(commissionAmount).add(shippingCost).add(taxAmount).add(discountAmount);
+      const netProfit = totalAmount.sub(totalDeductions);
+
+      return tx.order.update({
+        where: { id: orderId },
+        data: {
+          costPrice,
+          commissionAmount,
+          shippingCost,
+          taxAmount,
+          discountAmount,
+          netProfit,
+          settlementStatus: 'CALCULATED',
+        },
+      });
+    });
+  }
+
+  async getFinanceDetails(orderId: string) {
+    const order = await this.databaseService.client.order.findUnique({
+      where: { id: orderId },
+      select: {
+        id: true,
+        orderNumber: true,
+        totalAmount: true,
+        costPrice: true,
+        commissionAmount: true,
+        shippingCost: true,
+        taxAmount: true,
+        discountAmount: true,
+        netProfit: true,
+        settlementStatus: true,
+      }
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with id ${orderId} not found`);
+    }
+
+    return order;
   }
 }
