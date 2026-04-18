@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { OrderData } from "./columns";
+import { useChannel } from "../../contexts/ChannelContext";
 import { Input } from "@omnicore/ui/components/ui/input";
 import { Button } from "@omnicore/ui/components/ui/button";
 import { Label } from "@omnicore/ui/components/ui/label";
@@ -14,6 +15,7 @@ interface FinancialFormProps {
 }
 
 export function FinancialForm({ order, onUpdate }: FinancialFormProps) {
+  const { selectedChannelId } = useChannel();
   const [costPrice, setCostPrice] = React.useState(order.costPrice || "0");
   const [commissionAmount, setCommissionAmount] = React.useState(order.commissionAmount || "0");
   const [shippingCost, setShippingCost] = React.useState(order.shippingCost || "0");
@@ -36,6 +38,7 @@ export function FinancialForm({ order, onUpdate }: FinancialFormProps) {
       const response = await fetch(`/api/orders/${order.id}/finance/calculate`, {
         method: 'POST',
         headers: {
+          'x-channel-id': selectedChannelId || 'trendyol-mock',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),

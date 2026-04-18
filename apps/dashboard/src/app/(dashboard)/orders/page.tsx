@@ -41,7 +41,12 @@ function OrdersPageContent() {
       if (status && status !== 'ALL') queryParams.append('status', status);
 
       try {
-        const response = await fetch(`/api/orders?${queryParams.toString()}`);
+        const response = await fetch(`/api/orders?${queryParams.toString()}`, {
+          headers: {
+            'x-channel-id': selectedChannelId || 'trendyol-mock',
+            'Content-Type': 'application/json'
+          }
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch orders');
         }
