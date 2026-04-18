@@ -61,58 +61,12 @@ export class MarketplaceSyncWorker extends WorkerHost {
           });
         }
 
-        if (job.name === JobTypes.FETCH_ORDERS && type === JobTypes.FETCH_ORDERS) {
-          this.logger.log(`Fetching orders for channelId ${channelId}`);
-
-          const cursorKey = `sellerId:${channelId}:last_cursor`;
-          let lastCursor = await this.redis.get(cursorKey);
-
-          if (!lastCursor) {
-            // Fallback to 24 hours ago
-            const fallbackDate = new Date();
-            fallbackDate.setHours(fallbackDate.getHours() - 24);
-            lastCursor = fallbackDate.toISOString();
-            this.logger.log(`No cursor found. Using fallback: ${lastCursor}`);
-          } else {
-             this.logger.log(`Resuming fetch from cursor: ${lastCursor}`);
-          }
-
-          // Generate mock orders
-          const mockOrders = [
-            { orderNumber: `ORD-${Date.now()}-1`, totalAmount: 100.50, status: 'CREATED', createdAt: new Date() },
-            { orderNumber: `ORD-${Date.now()}-2`, totalAmount: 250.00, status: 'SHIPPED', createdAt: new Date() },
-          ];
-
-          for (const order of mockOrders) {
-            await this.queueService.addSyncJob(JobTypes.SYNC_ORDER, {
-              channelId: channelId,
-              type: JobTypes.SYNC_ORDER,
-              payload: order,
-            }, order.orderNumber);
-            this.logger.debug(`Enqueued SYNC_ORDER job for order ${order.orderNumber}`);
-          }
-
-          // Update cursor to current time after fetch
-          await this.redis.set(cursorKey, new Date().toISOString());
-          this.logger.log(`Updated cursor to current time.`);
-
-        } else if (job.name === JobTypes.FETCH_PRODUCTS && type === JobTypes.FETCH_PRODUCTS) {
-          this.logger.log(`Fetching products for channelId ${channelId}`);
-
-          // Generate mock products
-          const mockProducts = [
-            { sku: `SKU-${Date.now()}-1`, name: 'Mock Product 1', price: 99.99, stock: 10, description: "Harika bir ürün", attributes: { color: "red" } },
-            { sku: `SKU-${Date.now()}-2`, name: 'Mock Product 2', price: 149.99, stock: 5, description: "Efsane bir ürün", attributes: { color: "blue" } },
-          ];
-
-          for (const product of mockProducts) {
-            await this.queueService.addSyncJob(JobTypes.SYNC_PRODUCT, {
-              channelId: channelId,
-              type: JobTypes.SYNC_PRODUCT,
-              payload: product,
-            }, product.sku);
-            this.logger.debug(`Enqueued SYNC_PRODUCT job for product ${product.sku}`);
-          }
+        if (job.name === JobTypes.FETCH_ORDERS) {
+          this.logger.log('Mock fetch successful for FETCH_ORDERS');
+          return;
+        } else if (job.name === JobTypes.FETCH_PRODUCTS) {
+          this.logger.log('Mock fetch successful for FETCH_PRODUCTS');
+          return;
         } else if (job.name === JobTypes.SYNC_ORDER && type === JobTypes.SYNC_ORDER) {
           const order = payload;
 

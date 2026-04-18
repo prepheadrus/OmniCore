@@ -43,7 +43,7 @@ function OrdersPageContent() {
       try {
         const response = await fetch(`/api/orders?${queryParams.toString()}`, {
           headers: {
-            'x-channel-id': selectedChannelId || 'trendyol-mock',
+            'x-channel-id': queryParams.get('channelId') || 'trendyol',
             'Content-Type': 'application/json'
           }
         });
