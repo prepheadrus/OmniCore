@@ -1,7 +1,6 @@
 import {
   Injectable,
   NestMiddleware,
-  BadRequestException,
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { ClsService } from 'nestjs-cls';
@@ -11,10 +10,10 @@ export class ChannelMiddleware implements NestMiddleware {
   constructor(private readonly cls: ClsService) {}
 
   use(req: Request, res: Response, next: NextFunction) {
-    const channelId = req.headers['x-sales-channel-id'];
-    if (!channelId || typeof channelId !== 'string') {
-      throw new BadRequestException('x-sales-channel-id header is required');
-    }
+    const channelId = req.headers['x-channel-id'] ||
+                      req.headers['x-sales-channel-id'] ||
+                      req.query.channelId ||
+                      req.query.channel_id;
 
     this.cls.set('app.channel_id', channelId);
     next();
