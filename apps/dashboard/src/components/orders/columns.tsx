@@ -142,7 +142,6 @@ export const columns: ColumnDef<OrderData>[] = [
     id: "actions",
     cell: ({ row, table }) => {
       const order = row.original;
-      // Define handleUpdateOrder type implicitly via the function call
       const meta = table.options.meta as { handleUpdateOrder?: (id: string) => void } | undefined;
 
       return (

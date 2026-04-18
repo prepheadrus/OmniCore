@@ -8,9 +8,6 @@ import {
   VisibilityState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   getExpandedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
@@ -35,16 +32,19 @@ import {
 import { Search, SlidersHorizontal, ChevronDown, PackageCheck, PackageX } from "lucide-react"
 import { toast } from "sonner"
 import { ProductData } from "./columns"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  meta?: { total: number; page: number; limit: number; totalPages: number }
   setData?: React.Dispatch<React.SetStateAction<TData[]>>
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  meta,
   setData,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -53,20 +53,26 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = React.useState({})
   const [expanded, setExpanded] = React.useState({})
 
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const [searchTerm, setSearchTerm] = React.useState(searchParams.get("q") || "")
+
   const table = useReactTable({
     data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onExpandedChange: setExpanded,
     getExpandedRowModel: getExpandedRowModel(),
     getSubRows: (row) => (row as ProductData).subRows as TData[],
+    manualPagination: true,
+    manualFiltering: true,
+    pageCount: meta?.totalPages ?? -1,
     state: {
       sorting,
       columnFilters,
@@ -92,12 +98,47 @@ export function DataTable<TData, TValue>({
     },
   })
 
+  // Debounced search
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (searchTerm) {
+         params.set("q", searchTerm);
+      } else {
+         params.delete("q");
+      }
+
+      if (searchTerm !== (searchParams.get("q") || "")) {
+         params.set("page", "1");
+         router.push(`${pathname}?${params.toString()}`, { scroll: false });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, pathname, router, searchParams]);
+
   const selectedRowsCount = table.getFilteredSelectedRowModel().rows.length
 
   const handleBulkAction = (action: "active" | "inactive") => {
     const isActivating = action === "active";
     toast.success(`${selectedRowsCount} ürün başarıyla toplu olarak ${isActivating ? 'satışa açıldı' : 'kapatıldı'}.`)
     table.toggleAllRowsSelected(false);
+  }
+
+  const handleNextPage = () => {
+    if (meta && meta.page < meta.totalPages) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("page", (meta.page + 1).toString());
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    }
+  }
+
+  const handlePreviousPage = () => {
+    if (meta && meta.page > 1) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("page", (meta.page - 1).toString());
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    }
   }
 
   return (
@@ -109,10 +150,8 @@ export function DataTable<TData, TValue>({
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
             <Input
               placeholder="Ürün adı veya SKU ara..."
-              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("name")?.setFilterValue(event.target.value)
-              }
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
               className="pl-9 bg-white"
             />
           </div>
@@ -257,14 +296,18 @@ export function DataTable<TData, TValue>({
       {/* Pagination */}
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex-1 text-sm text-slate-500">
-          Toplam {table.getFilteredRowModel().rows.length} ürün
+          {meta ? (
+            <>Sayfa {meta.page} / {meta.totalPages} (Toplam {meta.total} ürün)</>
+          ) : (
+            <>Sayfa 1 / 1</>
+          )}
         </div>
         <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={handlePreviousPage}
+            disabled={!meta || meta.page <= 1}
             className="bg-white"
           >
             Önceki
@@ -272,8 +315,8 @@ export function DataTable<TData, TValue>({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={handleNextPage}
+            disabled={!meta || meta.page >= meta.totalPages}
             className="bg-white"
           >
             Sonraki
