@@ -10,6 +10,11 @@ export enum PurchaseOrderStatus {
 }
 
 export class CreatePurchaseOrderItemDto {
+  constructor() {
+    this.productVariantId = "";
+    this.quantity = 0;
+    this.unitCost = 0;
+  }
   @IsString()
   productVariantId: string;
 
@@ -21,6 +26,11 @@ export class CreatePurchaseOrderItemDto {
 }
 
 export class CreatePurchaseOrderDto {
+  constructor() {
+    this.supplierId = "";
+    this.channelId = "";
+    this.items = [];
+  }
   @IsString()
   supplierId: string;
 
@@ -34,6 +44,9 @@ export class CreatePurchaseOrderDto {
 }
 
 export class UpdatePurchaseOrderStatusDto {
+  constructor() {
+    this.status = PurchaseOrderStatus.DRAFT;
+  }
   @IsEnum(PurchaseOrderStatus)
   status: PurchaseOrderStatus;
 }

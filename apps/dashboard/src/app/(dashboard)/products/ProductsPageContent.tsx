@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useChannel } from '../../../contexts/ChannelContext';
 import { ProductData, ProductStatus, columns } from '../../../components/products/columns';
 import { DataTable } from '../../../components/products/data-table';
-import { DataTableSkeleton } from '../../../components/products/data-table-skeleton';
+import { DataTableSkeleton } from '../../../components/shared/data-table-skeleton';
 import { BundleForm } from '../../../components/products/bundle-form';
 import { Button } from '@omnicore/ui/components/ui/button';
 import { PackagePlus } from 'lucide-react';

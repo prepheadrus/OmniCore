@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { columns } from '../../../components/returns/columns';
 import { DataTable } from '../../../components/returns/data-table';
-import { DataTableSkeleton } from '../../../components/returns/data-table-skeleton';
+import { DataTableSkeleton } from '../../../components/shared/data-table-skeleton';
 import { mockReturns, ReturnOrder } from '../../../components/returns/mock-data';
 
 export default function ReturnsPage() {
