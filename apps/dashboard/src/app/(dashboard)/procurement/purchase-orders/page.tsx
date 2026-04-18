@@ -6,12 +6,22 @@ import { PurchaseOrderFormSheet } from "../../../../components/procurement/purch
 
 // Simulate an API call, we will make this server component fetch the actual API in a real scenario
 // or we can just render the client component which fetches the data
-import { headers } from "next/headers"
+import { cookies } from "next/headers"
 
 async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
+  const cookieStore = await cookies()
+  const channelId = cookieStore.get("channel-id")?.value
+
+  if (!channelId) {
+    return []
+  }
+
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/purchase-orders`, {
       cache: "no-store",
+      headers: {
+        "x-channel-id": channelId,
+      },
     })
     if (!res.ok) {
       return []

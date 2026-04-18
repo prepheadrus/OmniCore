@@ -88,13 +88,15 @@ export function PurchaseOrderFormSheet() {
 
   // Fetch suppliers
   useEffect(() => {
-    if (open) {
-      fetch("/api/suppliers")
+    if (open && selectedChannelId) {
+      fetch("/api/suppliers", {
+        headers: { "x-channel-id": selectedChannelId }
+      })
         .then(res => res.json())
         .then(data => setSuppliers(Array.isArray(data) ? data : []))
         .catch(console.error)
     }
-  }, [open])
+  }, [open, selectedChannelId])
 
   // Fetch variants using debounced search
   useEffect(() => {
