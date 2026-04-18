@@ -46,3 +46,12 @@ Thumbs.db
 # Next.js
 .next
 out
+
+# Patch and diff files
+*.orig
+*.rej
+*.patch
+
+# Logs and Process IDs
+*.log
+*.pid
