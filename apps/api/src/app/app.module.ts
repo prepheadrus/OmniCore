@@ -35,9 +35,9 @@ import { OrderModule } from './order/order.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    //consumer
-      //.apply(ChannelMiddleware)
-      //.exclude({ path: 'chat', method: RequestMethod.POST })
-      //.forRoutes('*');
+    consumer
+      .apply(ChannelMiddleware)
+      .exclude({ path: 'chat', method: RequestMethod.POST })
+      .forRoutes('*');
   }
 }
