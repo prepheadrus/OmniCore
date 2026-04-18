@@ -6,7 +6,6 @@ import { OrderData, OrderStatus, columns } from '../../../components/orders/colu
 import { DataTable } from '../../../components/orders/data-table';
 import { DataTableSkeleton } from '../../../components/orders/data-table-skeleton';
 import { toast } from "sonner";
-import { GetOrdersFilterDto } from '../../../../../../libs/core-domain/src/lib/dto';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Tabs, TabsList, TabsTrigger } from "@omnicore/ui/components/ui/tabs";
 
@@ -22,62 +21,6 @@ function OrdersPageContent() {
 
   const currentTab = searchParams.get('status') || 'ALL';
 
-  // Dummy data generator with pagination simulation
-  const fetchMockData = (dto: GetOrdersFilterDto, channelName: string) => {
-    return new Promise<{ data: OrderData[], meta: { total: number, page: number, limit: number, totalPages: number } }>((resolve) => {
-      setTimeout(() => {
-        const page = dto.page || 1;
-        const limit = dto.limit || 10;
-        const query = dto.q?.toLowerCase() || "";
-        const statusFilter = dto.status;
-
-        let allData = Array.from({ length: 55 }).map((_, i) => {
-          const statuses: OrderStatus[] = ["Bekliyor", "Kargolandı", "Teslim Edildi"];
-          const status = statuses[i % statuses.length];
-          return {
-            id: `ORD-${(i + 1).toString().padStart(4, '0')}`,
-            customer: `Müşteri ${i + 1}`,
-            date: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toLocaleDateString('tr-TR'),
-            status,
-            amount: `₺${((i+1) * 10).toFixed(2)}`,
-            channel: channelName,
-            invoiceStatus: status === "Teslim Edildi" ? "SIGNED" : "PENDING",
-            invoicePdfUrl: status === "Teslim Edildi" ? "https://example.com/invoice.pdf" : undefined,
-            shippingLabelUrl: status !== "Bekliyor" ? "https://example.com/label.pdf" : undefined,
-          };
-        });
-
-        // Apply filters
-        if (query) {
-          allData = allData.filter(item =>
-            item.customer.toLowerCase().includes(query) ||
-            item.id.toLowerCase().includes(query)
-          );
-        }
-
-        if (statusFilter && statusFilter !== 'ALL') {
-          const statusMap: Record<string, string> = {
-            'PENDING': 'Bekliyor',
-            'SHIPPED': 'Kargolandı'
-          };
-          const mappedStatus = statusMap[statusFilter];
-          if (mappedStatus) {
-             allData = allData.filter(item => item.status === mappedStatus);
-          }
-        }
-
-        const total = allData.length;
-        const totalPages = Math.ceil(total / limit);
-        const paginatedData = allData.slice((page - 1) * limit, page * limit);
-
-        resolve({
-          data: paginatedData,
-          meta: { total, page, limit, totalPages }
-        });
-      }, 500); // 500ms mock delay
-    });
-  };
-
   useEffect(() => {
     const currentChannel = availableChannels.find((c: { id: string; name: string }) => c.id === selectedChannelId);
     const channelName = currentChannel ? currentChannel.name : selectedChannelId;
@@ -90,17 +33,47 @@ function OrdersPageContent() {
       const q = searchParams.get('q') || undefined;
       const status = searchParams.get('status') || undefined;
 
-      const dto: GetOrdersFilterDto = {
-        channelId: selectedChannelId,
-        page,
-        limit,
-        q,
-        status,
-      };
+      const queryParams = new URLSearchParams();
+      if (selectedChannelId) queryParams.append('channelId', selectedChannelId);
+      queryParams.append('page', page.toString());
+      queryParams.append('limit', limit.toString());
+      if (q) queryParams.append('q', q);
+      if (status && status !== 'ALL') queryParams.append('status', status);
 
       try {
-        const result = await fetchMockData(dto, channelName);
-        setData(result.data);
+        const response = await fetch(`/api/orders?${queryParams.toString()}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch orders');
+        }
+
+        const result = await response.json();
+
+        // Map backend order data to frontend OrderData format
+        const mappedData: OrderData[] = result.data.map((order: any) => {
+          let mappedStatus: OrderStatus = "Bekliyor";
+          if (order.status === "SHIPPED") mappedStatus = "Kargolandı";
+          if (order.status === "DELIVERED") mappedStatus = "Teslim Edildi";
+
+          return {
+            id: order.id,
+            customer: order.customerName || "Bilinmiyor",
+            date: new Date(order.createdAt).toLocaleDateString('tr-TR'),
+            status: mappedStatus,
+            amount: `₺${Number(order.totalAmount).toFixed(2)}`,
+            channel: channelName,
+            invoiceStatus: order.invoiceStatus,
+            invoicePdfUrl: order.invoicePdfUrl,
+            shippingLabelUrl: order.shippingLabelUrl,
+            netProfit: order.netProfit,
+            costPrice: order.costPrice,
+            commissionAmount: order.commissionAmount,
+            shippingCost: order.shippingCost,
+            taxAmount: order.taxAmount,
+            discountAmount: order.discountAmount,
+          };
+        });
+
+        setData(mappedData);
         setMeta(result.meta);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -124,17 +97,35 @@ function OrdersPageContent() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  const handleUpdateOrder = (id: string) => {
+  const handleUpdateOrder = (updatedOrder: any) => {
+    if (typeof updatedOrder === 'string') {
+      // Legacy "test action"
+      const id = updatedOrder;
+      setData((prev) =>
+        prev.map((order) => {
+          if (order.id === id) {
+            toast.success(`Sipariş ${id} kargoya verildi!`);
+            return {
+              ...order,
+              status: "Kargolandı",
+              invoiceStatus: "SIGNED",
+              invoicePdfUrl: "https://example.com/mock-invoice.pdf",
+              shippingLabelUrl: "https://example.com/mock-label.pdf",
+            };
+          }
+          return order;
+        })
+      );
+      return;
+    }
+
+    // Financial Form update
     setData((prev) =>
       prev.map((order) => {
-        if (order.id === id) {
-          toast.success(`Sipariş ${id} kargoya verildi!`);
+        if (order.id === updatedOrder.id) {
           return {
             ...order,
-            status: "Kargolandı",
-            invoiceStatus: "SIGNED",
-            invoicePdfUrl: "https://example.com/mock-invoice.pdf",
-            shippingLabelUrl: "https://example.com/mock-label.pdf",
+            ...updatedOrder
           };
         }
         return order;
