@@ -29,7 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Product } from "./columns"
 import { updateProductInlineAction } from "../../app/(dashboard)/products/actions";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 interface DataTableProps {
   columns: ColumnDef<Product>[]
@@ -45,6 +45,8 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
 
   const { selectedChannelId } = useChannel()
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   // Filter data based on selected channel (if we were filtering locally)
   // Or in a real scenario, this would trigger a refetch. For now, we mock a channel reload
@@ -122,6 +124,16 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
           className="max-w-sm h-8 text-[13px]"
         />
         <div className="flex items-center gap-2">
+            <Button
+              className="bg-indigo-600 hover:bg-indigo-700 text-white h-8 text-[13px] px-4 mr-2"
+              onClick={() => {
+                const params = new URLSearchParams(searchParams.toString())
+                params.set("productId", "new")
+                router.push(`${pathname}?${params.toString()}`, { scroll: false })
+              }}
+            >
+              Yeni Ürün Ekle
+            </Button>
             <Select
                 value={(table.getColumn("status")?.getFilterValue() as string) ?? "ALL"}
                 onValueChange={(value) => {

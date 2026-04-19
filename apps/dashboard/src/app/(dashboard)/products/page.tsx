@@ -5,7 +5,7 @@ import { columns, Product } from "../../../components/products/columns"
 import { DataTableSkeleton } from "../../../components/products/data-table-skeleton"
 import { ProductDetailSheet } from "../../../components/products/product-detail-sheet"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000/api';
 
 async function getProducts(channelId: string): Promise<Product[]> {
   try {
@@ -70,8 +70,8 @@ function ProductsPageContent({ products }: { products: Product[] }) {
   )
 }
 
-async function ProductsPage({ searchParams }: { searchParams: { channelId?: string } }) {
-  const channelId = searchParams.channelId || 'trendyol';
+async function ProductsPage({ searchParams }: { searchParams: Promise<{ channelId?: string }> }) {
+  const { channelId = 'trendyol' } = await searchParams;
   const products = await getProducts(channelId)
 
   return (
@@ -81,7 +81,7 @@ async function ProductsPage({ searchParams }: { searchParams: { channelId?: stri
   )
 }
 
-export default function ProductsPageWrapper({ searchParams }: { searchParams: { channelId?: string } }) {
+export default function ProductsPageWrapper({ searchParams }: { searchParams: Promise<{ channelId?: string }> }) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <ProductsPage searchParams={searchParams} />
