@@ -8,10 +8,12 @@ import {
   VisibilityState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
   getExpandedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-
 import {
   Table,
   TableBody,
@@ -20,44 +22,32 @@ import {
   TableHeader,
   TableRow,
 } from "@omnicore/ui/components/ui/table"
-
 import { Button } from "@omnicore/ui/components/ui/button"
 import { Input } from "@omnicore/ui/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger
-} from "@omnicore/ui/components/ui/dropdown-menu"
-import { Search, SlidersHorizontal, ChevronDown, PackageCheck, PackageX } from "lucide-react"
-import { toast } from "sonner"
-import { ProductData } from "./columns"
-import { useRouter, usePathname, useSearchParams } from "next/navigation"
+import { useChannel } from "../../../src/contexts/ChannelContext"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@omnicore/ui/components/ui/select"
+import { Product } from "./columns"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  meta?: { total: number; page: number; limit: number; totalPages: number }
-  setData?: React.Dispatch<React.SetStateAction<TData[]>>
+interface DataTableProps {
+  columns: ColumnDef<Product>[]
+  data: Product[]
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  meta,
-  setData,
-}: DataTableProps<TData, TValue>) {
+export function DataTable({ columns, data: initialData }: DataTableProps) {
+  const [data, setData] = React.useState(initialData)
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
-  const [expanded, setExpanded] = React.useState({})
 
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const { selectedChannelId } = useChannel()
 
-  const [searchTerm, setSearchTerm] = React.useState(searchParams.get("q") || "")
+  // Filter data based on selected channel (if we were filtering locally)
+  // Or in a real scenario, this would trigger a refetch. For now, we mock a channel reload
+  React.useEffect(() => {
+    // We just reset selection on channel change as a simulation
+    setRowSelection({})
+  }, [selectedChannelId])
 
   const table = useReactTable({
     data,
@@ -65,30 +55,31 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getExpandedRowModel: getExpandedRowModel(), // Required for nested rows
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    onExpandedChange: setExpanded,
-    getExpandedRowModel: getExpandedRowModel(),
-    getSubRows: (row) => (row as ProductData).subRows as TData[],
-    manualPagination: true,
-    manualFiltering: true,
-    pageCount: meta?.totalPages ?? -1,
+    getSubRows: (row) => row.subRows, // Required for nested rows
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
-      expanded,
     },
     meta: {
       updateData: (rowIndex: number, columnId: string, value: unknown) => {
-        if (!setData) return;
+        // Skip updating data when nested rows are involved for this simple mock
         setData(old =>
           old.map((row, index) => {
             if (index === rowIndex) {
-              return {
-                ...old[rowIndex],
-                [columnId]: value,
+              const rowToUpdate = old[rowIndex]
+              if (rowToUpdate) {
+                return {
+                  ...rowToUpdate,
+                  [columnId]: value,
+                }
               }
             }
             return row
@@ -98,154 +89,53 @@ export function DataTable<TData, TValue>({
     },
   })
 
-  // Debounced search
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (searchTerm) {
-         params.set("q", searchTerm);
-      } else {
-         params.delete("q");
-      }
-
-      if (searchTerm !== (searchParams.get("q") || "")) {
-         params.set("page", "1");
-         router.push(`${pathname}?${params.toString()}`, { scroll: false });
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm, pathname, router, searchParams]);
-
   const selectedRowsCount = table.getFilteredSelectedRowModel().rows.length
 
-  const handleBulkAction = (action: "active" | "inactive") => {
-    const isActivating = action === "active";
-    toast.success(`${selectedRowsCount} ürün başarıyla toplu olarak ${isActivating ? 'satışa açıldı' : 'kapatıldı'}.`)
-    table.toggleAllRowsSelected(false);
-  }
-
-  const handleNextPage = () => {
-    if (meta && meta.page < meta.totalPages) {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set("page", (meta.page + 1).toString());
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
-    }
-  }
-
-  const handlePreviousPage = () => {
-    if (meta && meta.page > 1) {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set("page", (meta.page - 1).toString());
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
-    }
-  }
-
   return (
-    <div className="w-full space-y-4">
-      {/* Filters and Search Bar */}
+    <div className="space-y-4 relative">
+      {/* Header Toolbar */}
       <div className="flex items-center justify-between">
-        <div className="flex flex-1 items-center space-x-2">
-          <div className="relative w-full max-w-sm">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
-            <Input
-              placeholder="Ürün adı veya SKU ara..."
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-              className="pl-9 bg-white"
-            />
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="border-dashed bg-white">
-                <SlidersHorizontal className="mr-2 h-4 w-4" />
-                Durum
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[150px]">
-              {["Satışta", "Tükendi", "Pasif"].map((status) => {
-                 const column = table.getColumn("status");
-                 const isSelected = (column?.getFilterValue() as string[])?.includes(status) ?? false;
-
-                 return (
-                  <DropdownMenuCheckboxItem
-                    key={status}
-                    checked={isSelected}
-                    onCheckedChange={(checked) => {
-                      const currentFilters = (column?.getFilterValue() as string[]) || [];
-                      let newFilters;
-                      if (checked) {
-                        newFilters = [...currentFilters, status];
-                      } else {
-                        newFilters = currentFilters.filter(f => f !== status);
-                      }
-                      column?.setFilterValue(newFilters.length ? newFilters : undefined);
-                    }}
-                  >
-                    {status}
-                  </DropdownMenuCheckboxItem>
-                 )
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto bg-white">
-              Sütunlar <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
+        <Input
+          placeholder="Ürün adı veya SKU ara..."
+          value={(table.getColumn("nameAndSku")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("nameAndSku")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm h-8 text-[13px]"
+        />
+        <div className="flex items-center gap-2">
+            <Select
+                value={(table.getColumn("status")?.getFilterValue() as string) ?? "ALL"}
+                onValueChange={(value) => {
+                    if (value === "ALL") {
+                        table.getColumn("status")?.setFilterValue(undefined)
+                    } else {
+                        table.getColumn("status")?.setFilterValue(value)
                     }
-                  >
-                    {column.id === 'name' ? 'Ürün Adı' : column.id}
-                  </DropdownMenuCheckboxItem>
-                )
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                }}
+            >
+                <SelectTrigger className="w-[130px] h-8 text-[13px]">
+                    <SelectValue placeholder="Durum Seç" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="ALL">Tümü</SelectItem>
+                    <SelectItem value="IN_STOCK">Satışta</SelectItem>
+                    <SelectItem value="OUT_OF_STOCK">Tükendi</SelectItem>
+                    <SelectItem value="INACTIVE">Pasif</SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
       </div>
 
-      {/* Sticky Action Bar for Bulk Actions */}
-      {selectedRowsCount > 0 && (
-        <div className="sticky top-4 z-10 flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm animate-in fade-in slide-in-from-top-4">
-            <span className="text-sm font-medium text-slate-700">
-                {selectedRowsCount} ürün seçildi
-            </span>
-            <div className="flex gap-2">
-                <Button size="sm" variant="outline" className="text-emerald-700 border-emerald-200 hover:bg-emerald-50" onClick={() => handleBulkAction("active")}>
-                    <PackageCheck className="mr-2 w-4 h-4" />
-                    Toplu Satışa Aç
-                </Button>
-                <Button size="sm" variant="outline" className="text-rose-700 border-rose-200 hover:bg-rose-50" onClick={() => handleBulkAction("inactive")}>
-                    <PackageX className="mr-2 w-4 h-4" />
-                    Toplu Kapat
-                </Button>
-            </div>
-        </div>
-      )}
-
-      {/* Main Table */}
-      <div className="rounded-md border bg-white overflow-hidden">
+      {/* Table */}
+      <div className="rounded-md border border-slate-200 bg-white overflow-hidden">
         <Table>
-          <TableHeader className="bg-slate-50/50">
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="font-semibold text-slate-700">
+                    <TableHead key={header.id} className="h-8 py-1 px-2 text-[12px] text-slate-500 font-medium">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -264,27 +154,18 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={`
-                    transition-colors hover:bg-slate-50/80
-                    ${row.depth > 0 ? 'bg-slate-50/30' : ''}
-                  `}
+                  className="hover:bg-slate-50 transition-colors border-b-slate-100"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-2.5">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                    <TableCell key={cell.id} className="py-2 px-2 text-[13px]">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-slate-500"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center text-slate-500">
                   Ürün bulunamadı.
                 </TableCell>
               </TableRow>
@@ -293,35 +174,46 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="flex-1 text-sm text-slate-500">
-          {meta ? (
-            <>Sayfa {meta.page} / {meta.totalPages} (Toplam {meta.total} ürün)</>
-          ) : (
-            <>Sayfa 1 / 1</>
-          )}
+      {/* Sticky Action Bar */}
+      {selectedRowsCount > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-6 z-50 animate-in slide-in-from-bottom-5">
+          <span className="text-[13px] font-medium">
+            {selectedRowsCount} ürün seçildi
+          </span>
+          <div className="flex items-center gap-2 border-l border-slate-700 pl-6">
+            <Button size="sm" variant="ghost" className="h-7 text-[12px] hover:bg-slate-800 hover:text-white">
+              Satışa Aç
+            </Button>
+            <Button size="sm" variant="ghost" className="h-7 text-[12px] hover:bg-slate-800 hover:text-white">
+              Satışa Kapat
+            </Button>
+            <Button size="sm" variant="ghost" className="h-7 text-[12px] text-red-400 hover:bg-slate-800 hover:text-red-300">
+              Sil
+            </Button>
+          </div>
         </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePreviousPage}
-            disabled={!meta || meta.page <= 1}
-            className="bg-white"
-          >
-            Önceki
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleNextPage}
-            disabled={!meta || meta.page >= meta.totalPages}
-            className="bg-white"
-          >
-            Sonraki
-          </Button>
-        </div>
+      )}
+
+      {/* Footer Pagination */}
+      <div className="flex items-center justify-end space-x-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+          className="h-8 text-[12px]"
+        >
+          Önceki
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+          className="h-8 text-[12px]"
+        >
+          Sonraki
+        </Button>
       </div>
     </div>
   )

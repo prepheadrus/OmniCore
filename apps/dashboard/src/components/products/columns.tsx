@@ -3,72 +3,88 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@omnicore/ui/components/ui/checkbox"
 import { Badge } from "@omnicore/ui/components/ui/badge"
+import { Button } from "@omnicore/ui/components/ui/button"
 import { Input } from "@omnicore/ui/components/ui/input"
-import { Image as ImageIcon, CornerDownRight } from "lucide-react"
-import { toast } from "sonner"
+import { ChevronRight, ChevronDown, ImageIcon } from "lucide-react"
 import { useState, useEffect } from "react"
-import { Row, Column, Table } from "@tanstack/react-table"
+import Image from "next/image"
+import { toast } from "sonner"
 
-export type ProductStatus = "Satışta" | "Tükendi" | "Pasif"
+// Types for Product Data
+export type ProductStatus = "IN_STOCK" | "OUT_OF_STOCK" | "INACTIVE"
 
-export type ProductData = {
+export type Product = {
   id: string
-  image: string
   name: string
   sku: string
-  price: string
+  price: number
+  cost: number // Maliyet
+  margin: number // Kâr Marjı (Yüzde)
   stock: number
   status: ProductStatus
-  channel: string
-  subRows?: ProductData[]
+  imageUrl?: string
+  channels: string[] // Satış Kanalları
+  subRows?: Product[]
 }
 
-interface TableMetaWithUpdateData {
-  updateData: (rowIndex: number, columnId: string, value: unknown) => void;
-}
-
-// Hücre içi düzenleme (inline editing) için bileşen
-const EditableCell = ({
-  value: initialValue,
-  row,
-  column,
+// Inline Edit Cell Component
+const InlineEditCell = ({
+  getValue,
+  row: { index, original },
+  column: { id },
   table,
   type = "text"
 }: {
-  value: string | number
-  row: Row<ProductData>
-  column: Column<ProductData, unknown>
-  table: Table<ProductData>
-  type?: string
+  getValue: () => unknown
+  row: { index: number; original: Product }
+  column: { id: string }
+  table: any
+  type?: "text" | "number"
 }) => {
+  const initialValue = getValue()
   const [value, setValue] = useState(initialValue)
+  const [isEditing, setIsEditing] = useState(false)
 
-  // Tablo verisi değiştiğinde yerel state'i güncelle
+  // Sync state if initialValue changes
   useEffect(() => {
     setValue(initialValue)
   }, [initialValue])
 
   const onBlur = () => {
-    if (value !== initialValue) {
-      (table.options.meta as TableMetaWithUpdateData)?.updateData(row.index, column.id, value)
-      toast.success(`${column.id === 'price' ? 'Fiyat' : 'Stok'} başarıyla güncellendi`, {
-        description: `${row.original.name}: ${initialValue} ➔ ${value}`,
+    setIsEditing(false)
+    const newValue = type === "number" ? Number(value) : value
+    if (initialValue !== newValue) {
+      table.options.meta?.updateData(index, id, newValue)
+      toast.success(`${original.name} ürünü güncellendi`, {
+        description: `${id === 'price' ? 'Fiyat' : 'Stok'} başarıyla ${newValue} olarak değiştirildi.`,
       })
     }
   }
 
+  if (isEditing) {
+    return (
+      <Input
+        type={type}
+        value={value as string | number}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={onBlur}
+        autoFocus
+        className="h-7 text-[13px] px-2 py-1 w-20 border-slate-200 bg-white"
+      />
+    )
+  }
+
   return (
-    <Input
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      onBlur={onBlur}
-      type={type}
-      className="h-8 w-full min-w-[80px] bg-transparent border-transparent hover:border-input focus:border-input focus:bg-background px-2 py-1 text-right"
-    />
+    <div
+      onClick={() => setIsEditing(true)}
+      className="cursor-pointer hover:bg-slate-100 px-2 py-1 rounded transition-colors"
+    >
+      {type === "number" && id === "price" ? `₺${Number(value).toFixed(2)}` : String(value)}
+    </div>
   )
 }
 
-export const columns: ColumnDef<ProductData>[] = [
+export const columns: ColumnDef<Product>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -83,119 +99,117 @@ export const columns: ColumnDef<ProductData>[] = [
       />
     ),
     cell: ({ row }) => (
-      <div className="pl-1">
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-            className="translate-y-[2px]"
-          />
+      <div className="flex items-center gap-2">
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          className="translate-y-[2px]"
+        />
+        {row.getCanExpand() && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 p-0 hover:bg-slate-100"
+            onClick={row.getToggleExpandedHandler()}
+          >
+            {row.getIsExpanded() ? (
+              <ChevronDown className="h-3 w-3 text-slate-500" />
+            ) : (
+              <ChevronRight className="h-3 w-3 text-slate-500" />
+            )}
+          </Button>
+        )}
       </div>
     ),
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "image",
-    header: () => <div className="w-10"></div>,
+    accessorKey: "imageUrl",
+    header: "Görsel",
     cell: ({ row }) => {
-      const isVariant = row.depth > 0;
-      if (isVariant) return <div className="w-10 flex justify-end pr-2 text-slate-300"><CornerDownRight className="h-4 w-4" /></div>;
+      const imageUrl = row.getValue("imageUrl") as string | undefined
+      // Varyantlarda görsel yoksa boş gösterilebilir, ama opsiyonel
+      if (row.depth > 0 && !imageUrl) return <div className="h-8 w-8 ml-4"></div>
 
       return (
-        <div className="h-10 w-10 rounded-md bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
-          <ImageIcon className="h-5 w-5" />
+        <div className="h-8 w-8 rounded-md bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
+          {imageUrl ? (
+            <Image src={imageUrl} alt="Product" width={32} height={32} className="h-full w-full object-cover" />
+          ) : (
+            <ImageIcon className="h-4 w-4 text-slate-400" />
+          )}
         </div>
       )
     },
   },
   {
-    accessorKey: "name",
-    header: "Ürün Adı",
-    cell: ({ row, getValue }) => {
-      const isVariant = row.depth > 0;
-      return (
-        <div className={`font-medium ${isVariant ? 'text-slate-600' : 'text-slate-900'} flex items-center`}>
-            {row.getCanExpand() && (
-               <button
-                {...{
-                  onClick: row.getToggleExpandedHandler(),
-                  style: { cursor: 'pointer' },
-                  className: "mr-2 h-4 w-4 border rounded-sm flex items-center justify-center text-xs"
-                }}
-              >
-                {row.getIsExpanded() ? '-' : '+'}
-              </button>
-            )}
-            {getValue<string>()}
-        </div>
-      )
-    },
-  },
-  {
-    accessorKey: "sku",
-    header: "SKU",
+    id: "nameAndSku",
+    header: "Ürün / SKU",
+    accessorFn: (row) => `${row.name} ${row.sku}`,
     cell: ({ row }) => {
-        const isVariant = row.depth > 0;
-        return <div className={`text-sm ${isVariant ? 'text-slate-400' : 'text-slate-500'}`}>{row.getValue("sku")}</div>
-    }
-  },
-  {
-    accessorKey: "price",
-    header: () => <div className="text-right">Fiyat</div>,
-    cell: ({ getValue, row, column, table }) => {
+      const isVariant = row.depth > 0
       return (
-        <EditableCell
-            value={getValue<string>()}
-            row={row}
-            column={column}
-            table={table}
-        />
+        <div className={`flex flex-col ${isVariant ? "pl-4" : ""}`}>
+          <span className="font-medium text-slate-700 text-[13px]">{row.original.name}</span>
+          <span className="text-slate-500 font-mono text-[11px]">{row.original.sku}</span>
+        </div>
       )
     },
   },
   {
     accessorKey: "stock",
-    header: () => <div className="text-right">Stok</div>,
-    cell: ({ getValue, row, column, table }) => {
+    header: "Stok",
+    cell: (props) => <InlineEditCell {...props} type="number" />,
+  },
+  {
+    accessorKey: "price",
+    header: "Satış Fiyatı",
+    cell: (props) => <InlineEditCell {...props} type="number" />,
+  },
+  {
+    accessorKey: "cost",
+    header: "Maliyet",
+    cell: ({ row }) => (
+      <div className="px-2 py-1 text-[13px] text-slate-600">
+        ₺{Number(row.getValue("cost")).toFixed(2)}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "margin",
+    header: "Kâr Marjı",
+    cell: ({ row }) => {
+      const margin = Number(row.getValue("margin"))
+      const isProfitable = margin > 0
+      // OKLCH pastel green or pastel red using inline style or specific tailwind
+      const colorClass = isProfitable
+        ? "bg-[#f0fdf4] text-[#166534] border-[#bbf7d0]" // equivalent to emerald 50, 800, 200
+        : "bg-[#fef2f2] text-[#991b1b] border-[#fecaca]" // equivalent to red 50, 800, 200
+
       return (
-         <EditableCell
-            value={getValue<number>()}
-            row={row}
-            column={column}
-            table={table}
-            type="number"
-        />
+        <Badge variant="outline" className={`${colorClass} font-medium border text-[11px] px-1.5 py-0`}>
+          {margin > 0 ? "+" : ""}{margin}%
+        </Badge>
       )
     },
   },
   {
-    accessorKey: "status",
-    header: "Durum",
+    accessorKey: "channels",
+    header: "Kanallar",
     cell: ({ row }) => {
-      const status = row.getValue("status") as ProductStatus
-
-      let badgeClass = ""
-      switch (status) {
-        case "Satışta":
-          badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
-          break
-        case "Tükendi":
-          badgeClass = "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100"
-          break
-        case "Pasif":
-          badgeClass = "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200"
-          break
-      }
-
+      const channels = row.getValue("channels") as string[]
+      if (!channels || channels.length === 0) return <span className="text-slate-400 text-[11px]">-</span>
       return (
-        <Badge variant="outline" className={badgeClass}>
-          {status}
-        </Badge>
+        <div className="flex gap-1">
+          {channels.map((ch) => (
+             <Badge key={ch} variant="secondary" className="bg-slate-100 text-slate-600 text-[10px] px-1 py-0 border-0 h-4">
+               {ch.charAt(0).toUpperCase()}
+             </Badge>
+          ))}
+        </div>
       )
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
-  },
+    }
+  }
 ]

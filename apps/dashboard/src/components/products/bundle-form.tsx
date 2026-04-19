@@ -4,7 +4,7 @@ import * as React from "react"
 import { Plus, Trash2, Search, ChevronsUpDown, Package, AlertCircle } from "lucide-react"
 import { toast } from "sonner"
 import { useChannel } from "../../contexts/ChannelContext"
-import { ProductData } from "./columns"
+import { Product } from "./columns"
 
 import {
   Sheet,
@@ -46,8 +46,8 @@ interface BundleComponent {
 interface BundleFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  existingProducts: ProductData[]
-  onSuccess: (newBundle: ProductData) => void
+  existingProducts: Product[]
+  onSuccess: (newBundle: Product) => void
 }
 
 export function BundleForm({ open, onOpenChange, existingProducts, onSuccess }: BundleFormProps) {
@@ -108,24 +108,26 @@ export function BundleForm({ open, onOpenChange, existingProducts, onSuccess }: 
     const currentChannel = availableChannels.find(c => c.id === selectedChannelId)
     const channelName = currentChannel ? currentChannel.name : selectedChannelId
 
-    const newBundle: ProductData = {
+    const newBundle: Product = {
       id: `BND-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
-      image: "IMG",
       name,
       sku,
-      price: `₺${parseFloat(price).toFixed(2)}`,
+      price: parseFloat(price) || 0,
+      cost: 0,
+      margin: 0,
       stock: virtualStock,
-      status: "Satışta",
-      channel: channelName,
+      status: "IN_STOCK",
+      channels: [channelName],
       subRows: components.map((c, i) => ({
         id: `${sku}-ITEM-${i}`,
-        image: "",
         name: c.name,
         sku: c.sku,
-        price: "Paket İçi",
+        price: 0,
+        cost: 0,
+        margin: 0,
         stock: c.quantity,
-        status: "Satışta",
-        channel: channelName,
+        status: "IN_STOCK",
+        channels: [channelName],
       }))
     }
 
