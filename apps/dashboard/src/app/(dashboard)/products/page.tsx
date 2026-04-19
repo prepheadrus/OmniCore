@@ -5,7 +5,7 @@ import { columns, Product } from "../../../components/products/columns"
 import { DataTableSkeleton } from "../../../components/products/data-table-skeleton"
 import { ProductDetailSheet } from "../../../components/products/product-detail-sheet"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000/api';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000/api').replace('localhost', '127.0.0.1');
 
 async function getProducts(channelId: string): Promise<Product[]> {
   try {
@@ -71,7 +71,8 @@ function ProductsPageContent({ products }: { products: Product[] }) {
 }
 
 async function ProductsPage({ searchParams }: { searchParams: Promise<{ channelId?: string }> }) {
-  const { channelId = 'trendyol' } = await searchParams;
+  const params = await searchParams;
+  const channelId = params.channelId || 'trendyol';
   const products = await getProducts(channelId)
 
   return (

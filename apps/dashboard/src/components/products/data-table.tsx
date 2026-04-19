@@ -129,7 +129,7 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
               onClick={() => {
                 const params = new URLSearchParams(searchParams.toString())
                 params.set("productId", "new")
-                router.push(`${pathname}?${params.toString()}`, { scroll: false })
+                router.replace(`${pathname}?${params.toString()}`, { scroll: false })
               }}
             >
               Yeni Ürün Ekle
