@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import '../global.css';
 
 import AiChatInterface from '../../components/AiChatInterface';
@@ -13,7 +14,7 @@ export default function DashboardLayout({
 }) {
   return (
     <SettingsProvider>
-      <ChannelProvider>
+      <Suspense fallback={<div />}><ChannelProvider>
         {/* Sidebar Structure */}
       <Sidebar />
 
@@ -34,7 +35,7 @@ export default function DashboardLayout({
 
         {/* Floating Components */}
         <AiChatInterface />
-      </ChannelProvider>
+      </ChannelProvider></Suspense>
     </SettingsProvider>
   );
 }

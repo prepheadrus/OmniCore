@@ -27,6 +27,9 @@ import { Input } from "@omnicore/ui/components/ui/input"
 import { useChannel } from "../../../src/contexts/ChannelContext"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@omnicore/ui/components/ui/select"
 import { Product } from "./columns"
+import { updateProductInlineAction } from "../../app/(dashboard)/products/actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface DataTableProps {
   columns: ColumnDef<Product>[]
@@ -41,6 +44,7 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
   const [rowSelection, setRowSelection] = React.useState({})
 
   const { selectedChannelId } = useChannel()
+  const router = useRouter()
 
   // Filter data based on selected channel (if we were filtering locally)
   // Or in a real scenario, this would trigger a refetch. For now, we mock a channel reload
@@ -69,22 +73,36 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
       rowSelection,
     },
     meta: {
-      updateData: (rowIndex: number, columnId: string, value: unknown) => {
-        // Skip updating data when nested rows are involved for this simple mock
+      updateData: async (rowIndex: number, columnId: string, value: unknown) => {
+        const rowToUpdate = data[rowIndex];
+        if (!rowToUpdate) return;
+
+        // Optimistic update
         setData(old =>
           old.map((row, index) => {
             if (index === rowIndex) {
-              const rowToUpdate = old[rowIndex]
-              if (rowToUpdate) {
-                return {
-                  ...rowToUpdate,
-                  [columnId]: value,
-                }
+              return {
+                ...row,
+                [columnId]: value,
               }
             }
             return row
           })
         )
+
+        // Server Action call
+        try {
+          const result = await updateProductInlineAction(rowToUpdate.id, { [columnId]: value }, selectedChannelId);
+          if (result.success) {
+            toast.success("Hücre güncellendi.");
+            // router.refresh() will be called naturally if we want, or we rely on the optimistic update
+          } else {
+            toast.error(result.error || "Güncelleme başarısız.");
+            // Revert on failure (we could implement this, but keeping it simple for now)
+          }
+        } catch(error) {
+           toast.error("Güncelleme başarısız.");
+        }
       },
     },
   })

@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, Headers } from '@nestjs/common';
 import { ProductService } from '../services/product.service';
 import { Product, ProductVariant } from '@prisma/client';
-import { GetProductsFilterDto } from '@omnicore/core-domain';
+import { GetProductsFilterDto, UpsertProductDto } from '@omnicore/core-domain';
 
 @Controller('products')
 export class ProductController {
@@ -41,4 +41,13 @@ export class ProductController {
   async updateVariant(@Param('id') productId: string, @Param('variantId') variantId: string, @Body() data: any) {
     return this.productService.updateVariant(variantId, data);
   }
+
+  @Put('upsert/action')
+  async upsertProductAction(@Body() data: UpsertProductDto, @Headers('x-channel-id') channelId: string) {
+    if (!channelId) {
+      throw new Error('x-channel-id header is required');
+    }
+    return this.productService.upsertProduct(data, channelId);
+  }
+
 }
