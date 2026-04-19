@@ -41,7 +41,7 @@ function OrdersPageContent() {
       if (status && status !== 'ALL') queryParams.append('status', status);
 
       try {
-        const response = await fetch(`/api/orders?${queryParams.toString()}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000/api'}/orders?${queryParams.toString()}`, {
           headers: {
             'x-channel-id': queryParams.get('channelId') || 'trendyol',
             'Content-Type': 'application/json'

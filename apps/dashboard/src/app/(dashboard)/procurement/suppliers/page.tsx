@@ -17,7 +17,7 @@ async function getSuppliers(): Promise<Supplier[]> {
   }
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/suppliers`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000/api'}/suppliers`, {
       cache: "no-store",
       headers: {
         "x-channel-id": channelId,

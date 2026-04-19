@@ -17,7 +17,7 @@ async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
   }
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/purchase-orders`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000/api'}/purchase-orders`, {
       cache: "no-store",
       headers: {
         "x-channel-id": channelId,
