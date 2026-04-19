@@ -178,6 +178,44 @@ export const columns: ColumnDef<Product>[] = [
     ),
   },
   {
+    accessorKey: "status",
+    header: "Durum",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as ProductStatus
+
+      let label = ""
+      let colorClass = ""
+
+      switch (status) {
+        case "IN_STOCK":
+          label = "Aktif"
+          colorClass = "bg-[#f0fdf4] text-[#166534] border-[#bbf7d0]" // emerald-50
+          break
+        case "OUT_OF_STOCK":
+          label = "Tükendi"
+          colorClass = "bg-[#fef2f2] text-[#991b1b] border-[#fecaca]" // red-50
+          break
+        case "INACTIVE":
+          label = "Taslak"
+          colorClass = "bg-[#f8fafc] text-[#475569] border-[#e2e8f0]" // slate-50
+          break
+        default:
+          label = status
+          colorClass = "bg-slate-50 text-slate-500 border-slate-200"
+      }
+
+      return (
+        <Badge variant="outline" className={`${colorClass} font-medium border text-[11px] px-1.5 py-0`}>
+          {label}
+        </Badge>
+      )
+    },
+    filterFn: (row, id, value) => {
+      if (!value || value === "ALL") return true
+      return row.getValue(id) === value
+    },
+  },
+  {
     accessorKey: "margin",
     header: "Kâr Marjı",
     cell: ({ row }) => {
