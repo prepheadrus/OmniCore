@@ -9,6 +9,7 @@ import { ChevronRight, ChevronDown, ImageIcon } from "lucide-react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { toast } from "sonner"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
 // Types for Product Data
 export type ProductStatus = "IN_STOCK" | "OUT_OF_STOCK" | "INACTIVE"
@@ -38,7 +39,7 @@ const InlineEditCell = ({
   getValue: () => unknown
   row: { index: number; original: Product }
   column: { id: string }
-  table: any
+  table: any // eslint-disable-line @typescript-eslint/no-explicit-any
   type?: "text" | "number"
 }) => {
   const initialValue = getValue()
@@ -80,6 +81,32 @@ const InlineEditCell = ({
       className="cursor-pointer hover:bg-slate-100 px-2 py-1 rounded transition-colors"
     >
       {type === "number" && id === "price" ? `₺${Number(value).toFixed(2)}` : String(value)}
+    </div>
+  )
+}
+
+
+const NameCell = ({ row }: { row: { original: Product; depth: number } }) => {
+  const isVariant = row.depth > 0
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const onClickName = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("productId", row.original.id)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }
+
+  return (
+    <div className={`flex flex-col ${isVariant ? "pl-4" : ""}`}>
+      <button
+        onClick={onClickName}
+        className="text-left font-medium text-slate-700 text-[13px] hover:text-indigo-600 hover:underline decoration-indigo-200 transition-colors cursor-pointer"
+      >
+        {row.original.name}
+      </button>
+      <span className="text-slate-500 font-mono text-[11px]">{row.original.sku}</span>
     </div>
   )
 }
@@ -148,15 +175,8 @@ export const columns: ColumnDef<Product>[] = [
     id: "nameAndSku",
     header: "Ürün / SKU",
     accessorFn: (row) => `${row.name} ${row.sku}`,
-    cell: ({ row }) => {
-      const isVariant = row.depth > 0
-      return (
-        <div className={`flex flex-col ${isVariant ? "pl-4" : ""}`}>
-          <span className="font-medium text-slate-700 text-[13px]">{row.original.name}</span>
-          <span className="text-slate-500 font-mono text-[11px]">{row.original.sku}</span>
-        </div>
-      )
-    },
+    cell: ({ row }) => <NameCell row={row} />,
+
   },
   {
     accessorKey: "stock",

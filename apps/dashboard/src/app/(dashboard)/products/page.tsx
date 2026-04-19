@@ -2,6 +2,7 @@ import React, { Suspense } from "react"
 import { DataTable } from "../../../components/products/data-table"
 import { columns, Product } from "../../../components/products/columns"
 import { DataTableSkeleton } from "../../../components/products/data-table-skeleton"
+import { ProductDetailSheet } from "../../../components/products/product-detail-sheet"
 
 // Mock Data Generator
 async function getProducts(): Promise<Product[]> {
@@ -100,6 +101,7 @@ function ProductsPageContent({ products }: { products: Product[] }) {
         <h2 className="text-xl font-semibold tracking-tight text-slate-800">Ürünler</h2>
       </div>
       <DataTable columns={columns} data={products} />
+      <ProductDetailSheet />
     </div>
   )
 }
