@@ -30,6 +30,7 @@ import { Product } from "./columns"
 import { updateProductInlineAction } from "../../app/(dashboard)/products/actions";
 import { toast } from "sonner";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 interface DataTableProps {
   columns: ColumnDef<Product>[]
@@ -125,14 +126,12 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
         />
         <div className="flex items-center gap-2">
             <Button
+              asChild
               className="bg-indigo-600 hover:bg-indigo-700 text-white h-8 text-[13px] px-4 mr-2"
-              onClick={() => {
-                const params = new URLSearchParams(searchParams.toString())
-                params.set("productId", "new")
-                router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-              }}
             >
-              Yeni Ürün Ekle
+              <Link href="?productId=new">
+                Yeni Ürün Ekle
+              </Link>
             </Button>
             <Select
                 value={(table.getColumn("status")?.getFilterValue() as string) ?? "ALL"}

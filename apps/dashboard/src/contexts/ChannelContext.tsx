@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 export interface Channel {
@@ -55,19 +55,6 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
     // Replace URL without scrolling
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }, [pathname, router, searchParams]);
-
-  // Sync from URL if it changes (e.g. back button)
-  useEffect(() => {
-    const channelFromUrl = searchParams.get('channelId');
-    if (channelFromUrl && channelFromUrl !== selectedChannelId && availableChannels.some(c => c.id === channelFromUrl)) {
-      setLocalSelectedChannelId(channelFromUrl);
-    } else if (!channelFromUrl) {
-      // Ensure the URL always has the channelId if not present
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('channelId', selectedChannelId);
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    }
-  }, [searchParams, selectedChannelId, availableChannels, pathname, router]);
 
   return (
     <ChannelContext.Provider
