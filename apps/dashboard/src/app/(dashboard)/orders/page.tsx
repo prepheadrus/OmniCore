@@ -171,10 +171,18 @@ function OrdersPageContent() {
   );
 }
 
-export default function OrdersPage() {
+function OrdersPage() {
   return (
     <Suspense fallback={<DataTableSkeleton />}>
       <OrdersPageContent />
+    </Suspense>
+  )
+}
+
+export default function OrdersPageWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <OrdersPage />
     </Suspense>
   )
 }

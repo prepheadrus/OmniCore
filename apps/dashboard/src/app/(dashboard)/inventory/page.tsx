@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 
 const mockData = [
   {
@@ -53,7 +53,7 @@ const mockData = [
   },
 ];
 
-export default function InventoryPage() {
+function InventoryPageContent() {
   return (
     <div className="p-6">
       {/* Top Header Section */}
@@ -134,4 +134,12 @@ export default function InventoryPage() {
       </div>
     </div>
   );
+}
+
+export default function InventoryPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <InventoryPageContent />
+    </Suspense>
+  )
 }

@@ -3,3 +3,4 @@ export * from './get-products-filter.dto';
 export * from './calculate-finance-request.dto';
 export * from './procurement/supplier.dto';
 export * from './procurement/purchase-order.dto';
+export * from './upsert-product.dto';

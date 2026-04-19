@@ -1,97 +1,61 @@
+export const dynamic = 'force-dynamic';
 import React, { Suspense } from "react"
 import { DataTable } from "../../../components/products/data-table"
 import { columns, Product } from "../../../components/products/columns"
 import { DataTableSkeleton } from "../../../components/products/data-table-skeleton"
 import { ProductDetailSheet } from "../../../components/products/product-detail-sheet"
 
-// Mock Data Generator
-async function getProducts(): Promise<Product[]> {
-  // Simulate 1.5s network delay
-  await new Promise((resolve) => setTimeout(resolve, 1500))
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333/api';
 
-  return [
-    {
-      id: "PROD-001",
-      name: "Profesyonel Oto Yıkama Şampuanı",
-      sku: "PAK-SHMP-01",
-      price: 245.0,
-      cost: 122.5,
-      margin: 100,
-      stock: 150,
-      status: "IN_STOCK",
-      imageUrl: "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=100&q=80",
-      channels: ["trendyol", "hepsiburada"],
-      subRows: [
-        {
-          id: "PROD-001-V1",
-          name: "1 Litre",
-          sku: "PAK-SHMP-01-1L",
-          price: 245.0,
-          cost: 122.5,
-          margin: 100,
-          stock: 100,
-          status: "IN_STOCK",
-          channels: ["trendyol"],
-        },
-        {
-          id: "PROD-001-V2",
-          name: "5 Litre",
-          sku: "PAK-SHMP-01-5L",
-          price: 850.0,
-          cost: 400.0,
-          margin: 112.5,
-          stock: 50,
-          status: "IN_STOCK",
-          channels: ["trendyol", "hepsiburada"],
-        },
-      ],
-    },
-    {
-      id: "PROD-002",
-      name: "Seramik Kaplama Kiti",
-      sku: "PAK-CRM-01",
-      price: 1200.0,
-      cost: 800.0,
-      margin: 50,
-      stock: 0,
-      status: "OUT_OF_STOCK",
-      channels: ["amazon"],
-    },
-    {
-      id: "PROD-003",
-      name: "5'li Fırça Seti",
-      sku: "PAK-BRSH-SET",
-      price: 166.0,
-      cost: 83.0,
-      margin: 100,
-      stock: 35,
-      status: "IN_STOCK",
-      imageUrl: "https://images.unsplash.com/photo-1595152452543-e5fc28ebc2b8?w=100&q=80",
-      channels: ["trendyol", "hepsiburada", "amazon"],
-    },
-    {
-      id: "PROD-004",
-      name: "Lastik Parlatıcı Sprey",
-      sku: "PAK-TIRE-01",
-      price: 190.0,
-      cost: 195.0,
-      margin: -2.5, // Zarar
-      stock: 200,
-      status: "IN_STOCK",
-      channels: ["trendyol"],
-    },
-    {
-      id: "PROD-005",
-      name: "Deri Koltuk Temizleyici",
-      sku: "PAK-LTHR-01",
-      price: 150.0,
-      cost: 60.0,
-      margin: 150,
-      stock: 0,
-      status: "INACTIVE",
-      channels: [],
-    },
-  ]
+async function getProducts(channelId: string): Promise<Product[]> {
+  try {
+    const res = await fetch(`${API_URL}/products?channelId=${channelId}`, {
+      cache: 'no-store', // Always fetch fresh data since we are bypassing complex caching for now
+      headers: {
+        'x-channel-id': channelId,
+      }
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch products:", res.status);
+      return [];
+    }
+
+    const json = await res.json();
+
+    // Transform backend data to frontend Product interface expected by columns.tsx
+    // The backend returns an array in data and meta information.
+    // Ensure we handle the mapping properly.
+    if (!json.data || !Array.isArray(json.data)) return [];
+
+    return json.data.map((p: any) => {
+      // Find the main variant or the first one
+      const variant = p.variants && p.variants.length > 0 ? p.variants[0] : null;
+
+      const price = variant ? parseFloat(variant.price) : 0;
+      const cost = variant ? parseFloat(variant.movingAverageCost || p.costPrice || 0) : 0;
+      const margin = cost > 0 ? ((price - cost) / cost) * 100 : 100;
+      const stock = variant ? variant.stock : 0;
+
+      return {
+        id: p.id,
+        name: p.name,
+        sku: variant ? variant.sku : 'N/A',
+        price,
+        cost,
+        margin,
+        stock,
+        status: stock > 0 ? "IN_STOCK" : "OUT_OF_STOCK", // Simplified
+        imageUrl: "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=100&q=80", // Placeholder
+        channels: [p.channelId], // It's isolated by channel due to RLS
+        // subRows: p.variants.map(...) could be added here if handling variations
+      } as Product;
+    });
+
+  } catch(error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
 }
 
 function ProductsPageContent({ products }: { products: Product[] }) {
@@ -106,12 +70,21 @@ function ProductsPageContent({ products }: { products: Product[] }) {
   )
 }
 
-export default async function ProductsPage() {
-  const products = await getProducts()
+async function ProductsPage({ searchParams }: { searchParams: { channelId?: string } }) {
+  const channelId = searchParams.channelId || 'trendyol';
+  const products = await getProducts(channelId)
 
   return (
-    <Suspense fallback={<div className="p-4 md:p-6 pt-6 bg-slate-50 min-h-[calc(100vh-64px)]"><DataTableSkeleton /></div>}>
+    <Suspense fallback={<div className="p-4 md:p-6 pt-6 bg-slate-50 min-h-[calc(100vh-64px)]"><DataTableSkeleton /></div>} key={channelId}>
       <ProductsPageContent products={products} />
+    </Suspense>
+  )
+}
+
+export default function ProductsPageWrapper({ searchParams }: { searchParams: { channelId?: string } }) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProductsPage searchParams={searchParams} />
     </Suspense>
   )
 }

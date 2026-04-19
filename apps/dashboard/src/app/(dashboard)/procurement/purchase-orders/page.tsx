@@ -34,7 +34,7 @@ async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
   }
 }
 
-export default async function PurchaseOrdersPage() {
+async function PurchaseOrdersContent() {
   const data = await getPurchaseOrders()
 
   return (
@@ -51,5 +51,13 @@ export default async function PurchaseOrdersPage() {
         </Suspense>
       </div>
     </div>
+  )
+}
+
+export default function PurchaseOrdersPageWrapper() {
+  return (
+    <Suspense fallback={<div className="p-8 pt-6">Yükleniyor...</div>}>
+      <PurchaseOrdersContent />
+    </Suspense>
   )
 }
