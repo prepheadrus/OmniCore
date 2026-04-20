@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -88,13 +87,15 @@ const getMockProduct = (id: string): ProductFormValues => {
   }
 }
 
-export function ProductDetailSheet() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+export function ProductDetailSheet({
+  productId,
+  onClose
+}: {
+  productId: string | null
+  onClose: () => void
+}) {
   const { selectedChannelId, availableChannels } = useChannel()
 
-  const productId = searchParams.get("productId")
   const isOpen = !!productId
 
   const form = useForm<ProductFormValues>({
@@ -129,15 +130,14 @@ export function ProductDetailSheet() {
   }, [productId, form])
 
   const handleClose = () => {
-    const params = new URLSearchParams(searchParams)
-    params.delete("productId")
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    onClose()
   }
 
   const onSubmit = (data: ProductFormValues) => {
     console.log("Saving product:", data)
     toast.success("Değişiklikler kaydedildi (Simülasyon)", {
-      description: `${data.name} başarıyla güncellendi.`
+      description: `${data.name} başarıyla güncellendi.`,
+      className: "bg-[#eef2ff] text-[#4f46e5] border-[#c7d2fe]"
     })
     handleClose()
   }
@@ -229,11 +229,11 @@ export function ProductDetailSheet() {
                         </Select>
                       </div>
                       <div className="flex flex-col gap-1.5 min-w-[200px]">
-                        <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 border border-indigo-100 text-[10px] py-0.5 flex gap-1 items-center justify-center">
+                        <Badge variant="secondary" className="bg-[#eef2ff] text-[#4f46e5] hover:bg-[#eef2ff] border border-[#c7d2fe] text-[10px] py-0.5 flex gap-1 items-center justify-center">
                           <Sparkles className="h-3 w-3" />
                           Jules bu ürünü &apos;Otomotiv Bakım&apos; ile eşleştirdi
                         </Badge>
-                        <Button type="button" variant="outline" size="sm" className="h-6 text-[11px] border-indigo-200 text-indigo-700 hover:bg-indigo-50" onClick={() => form.setValue("categoryId", "cat-1")}>
+                        <Button type="button" variant="outline" size="sm" className="h-6 text-[11px] border-[#c7d2fe] text-[#4f46e5] hover:bg-[#eef2ff]" onClick={() => form.setValue("categoryId", "cat-1")}>
                           Öneriyi Onayla
                         </Button>
                       </div>
