@@ -1,42 +1,50 @@
-"use client"
+'use client';
 
-import { ColumnDef } from "@tanstack/react-table"
-import { Badge } from "@omnicore/ui/components/ui/badge"
+import { ColumnDef } from '@tanstack/react-table';
+import { Badge } from '@omnicore/ui/components/ui/badge';
 
 export type Supplier = {
-  id: string
-  name: string
-  taxNumber?: string
-  email?: string
-  phone?: string
-  address?: string
-  createdAt: string
-}
+  id: string;
+  name: string;
+  taxNumber?: string;
+  taxOffice?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  address?: string;
+  supplierGroup?: string;
+  createdAt: string;
+};
 
 export const columns: ColumnDef<Supplier>[] = [
   {
-    accessorKey: "name",
-    header: "Tedarikçi Adı",
-    cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
+    accessorKey: 'name',
+    header: 'Tedarikçi Adı',
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue('name')}</div>
+    ),
   },
   {
-    accessorKey: "taxNumber",
-    header: "Vergi No",
+    accessorKey: 'taxNumber',
+    header: 'Vergi No',
   },
   {
-    accessorKey: "email",
-    header: "E-Posta",
+    accessorKey: 'contactEmail',
+    header: 'E-Posta',
   },
   {
-    accessorKey: "phone",
-    header: "Telefon",
+    accessorKey: 'contactPhone',
+    header: 'Telefon',
   },
   {
-    accessorKey: "createdAt",
-    header: "Kayıt Tarihi",
+    accessorKey: 'supplierGroup',
+    header: 'Grup',
+  },
+  {
+    accessorKey: 'createdAt',
+    header: 'Kayıt Tarihi',
     cell: ({ row }) => {
-      const date = new Date(row.getValue("createdAt"))
-      return date.toLocaleDateString("tr-TR")
+      const date = new Date(row.getValue('createdAt'));
+      return date.toLocaleDateString('tr-TR');
     },
   },
-]
+];
