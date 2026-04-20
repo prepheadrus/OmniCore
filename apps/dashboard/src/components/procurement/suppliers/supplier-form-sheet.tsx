@@ -147,10 +147,10 @@ export function SupplierFormSheet() {
         </SheetHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-6">
           <Tabs defaultValue="general" className="w-full">
-            <TabsList className="w-full grid grid-cols-3 bg-slate-200/50 p-1 rounded-md mb-6">
-              <TabsTrigger value="general" className="text-[12px] h-7 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">Genel</TabsTrigger>
-              <TabsTrigger value="finance" className="text-[12px] h-7 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">Finans & UBL</TabsTrigger>
-              <TabsTrigger value="logistics" className="text-[12px] h-7 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">Lojistik & Operasyon</TabsTrigger>
+            <TabsList className="flex w-full bg-slate-200/50 p-1 rounded-md mb-6 h-auto">
+              <TabsTrigger value="general" className="flex-1 text-[12px] h-auto py-1.5 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-normal text-center leading-tight">Genel</TabsTrigger>
+              <TabsTrigger value="finance" className="flex-1 text-[12px] h-auto py-1.5 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-normal text-center leading-tight">Finans & UBL</TabsTrigger>
+              <TabsTrigger value="logistics" className="flex-1 text-[12px] h-auto py-1.5 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-normal text-center leading-tight">Lojistik & Operasyon</TabsTrigger>
             </TabsList>
 
             <TabsContent value="general" className="space-y-4 focus-visible:outline-none focus-visible:ring-0 mt-0">
