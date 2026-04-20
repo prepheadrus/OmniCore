@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 export interface Channel {
   id: string;
@@ -29,9 +29,29 @@ const ChannelContext = createContext<ChannelState>(defaultState);
 
 export function ChannelProvider({ children }: { children: ReactNode }) {
   const [availableChannels] = useState<Channel[]>(defaultChannels);
-  const [selectedChannelId, setSelectedChannelId] = useState<string>(
-    defaultChannels[0]?.id || ''
-  );
+
+  // Try to get initial channel from document.cookie on the client, otherwise fallback to default
+  const [selectedChannelId, setSelectedChannelIdState] = useState<string>('trendyol');
+
+  useEffect(() => {
+    // Only run on client side
+    const cookies = document.cookie.split(';');
+    const channelCookie = cookies.find(c => c.trim().startsWith('channel-id='));
+    if (channelCookie) {
+      const channelId = channelCookie.split('=')[1];
+      if (channelId) {
+        setSelectedChannelIdState(channelId);
+        return;
+      }
+    }
+    // If no cookie, set default
+    setSelectedChannelIdState(defaultChannels[0]?.id || '');
+  }, []);
+
+  const setSelectedChannelId = (id: string) => {
+    setSelectedChannelIdState(id);
+    document.cookie = `channel-id=${id}; path=/; max-age=31536000`; // Save for 1 year
+  };
 
   return (
     <ChannelContext.Provider
