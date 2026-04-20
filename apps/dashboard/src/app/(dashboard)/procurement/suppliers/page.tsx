@@ -3,9 +3,6 @@ import { DataTableSkeleton } from "../../../../components/shared/data-table-skel
 import { DataTable } from "../../../../components/procurement/suppliers/data-table"
 import { columns, Supplier } from "../../../../components/procurement/suppliers/columns"
 import { SupplierFormSheet } from "../../../../components/procurement/suppliers/supplier-form-sheet"
-
-// Simulate an API call, we will make this server component fetch the actual API in a real scenario
-// or we can just render the client component which fetches the data
 import { cookies } from "next/headers"
 
 async function getSuppliers(): Promise<Supplier[]> {

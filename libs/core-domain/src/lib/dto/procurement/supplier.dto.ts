@@ -2,8 +2,8 @@ import { IsString, IsOptional, IsEmail } from 'class-validator';
 
 export class CreateSupplierDto {
   constructor() {
-    this.name = "";
-    this.channelId = "";
+    this.name = '';
+    this.channelId = '';
   }
   @IsString()
   name: string;
@@ -12,17 +12,25 @@ export class CreateSupplierDto {
   @IsOptional()
   taxNumber?: string;
 
+  @IsString()
+  @IsOptional()
+  taxOffice?: string;
+
   @IsEmail()
   @IsOptional()
-  email?: string;
+  contactEmail?: string;
 
   @IsString()
   @IsOptional()
-  phone?: string;
+  contactPhone?: string;
 
   @IsString()
   @IsOptional()
   address?: string;
+
+  @IsString()
+  @IsOptional()
+  supplierGroup?: string;
 
   @IsString()
   channelId: string;
@@ -37,15 +45,23 @@ export class UpdateSupplierDto {
   @IsOptional()
   taxNumber?: string;
 
+  @IsString()
+  @IsOptional()
+  taxOffice?: string;
+
   @IsEmail()
   @IsOptional()
-  email?: string;
+  contactEmail?: string;
 
   @IsString()
   @IsOptional()
-  phone?: string;
+  contactPhone?: string;
 
   @IsString()
   @IsOptional()
   address?: string;
+
+  @IsString()
+  @IsOptional()
+  supplierGroup?: string;
 }

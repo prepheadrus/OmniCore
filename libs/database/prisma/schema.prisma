@@ -147,9 +147,11 @@ model Supplier {
   id             String          @id @default(uuid())
   name           String
   taxNumber      String?
-  email          String?
-  phone          String?
+  taxOffice      String?
+  contactEmail   String?
+  contactPhone   String?
   address        String?
+  supplierGroup  String?
   channelId      String
   channel        SalesChannel    @relation(fields: [channelId], references: [id])
   purchaseOrders PurchaseOrder[]

@@ -1,47 +1,97 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '@omnicore/database';
 import { CreateSupplierDto, UpdateSupplierDto } from '@omnicore/core-domain';
+import { ClsService } from 'nestjs-cls';
 
 @Injectable()
 export class SupplierService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly cls: ClsService,
+  ) {}
 
   async create(createSupplierDto: CreateSupplierDto) {
-    return this.databaseService.client.supplier.create({
-      data: createSupplierDto,
+    return this.databaseService.client.$transaction(async (tx) => {
+      const channelId = this.cls.get('app.channel_id');
+      if (channelId) {
+        await tx.$executeRaw`SELECT set_config('app.tenant_id', ${channelId}, TRUE)`;
+      }
+      return tx.supplier.create({
+        data: createSupplierDto,
+      });
     });
   }
 
   async findAll() {
-    return this.databaseService.client.supplier.findMany();
+    return this.databaseService.client.$transaction(async (tx) => {
+      const channelId = this.cls.get('app.channel_id');
+      if (channelId) {
+        await tx.$executeRaw`SELECT set_config('app.tenant_id', ${channelId}, TRUE)`;
+      }
+      return tx.supplier.findMany({
+        orderBy: { createdAt: 'desc' },
+      });
+    });
   }
 
   async findOne(id: string) {
-    const supplier = await this.databaseService.client.supplier.findUnique({
-      where: { id },
+    return this.databaseService.client.$transaction(async (tx) => {
+      const channelId = this.cls.get('app.channel_id');
+      if (channelId) {
+        await tx.$executeRaw`SELECT set_config('app.tenant_id', ${channelId}, TRUE)`;
+      }
+      const supplier = await tx.supplier.findUnique({
+        where: { id },
+      });
+
+      if (!supplier) {
+        throw new NotFoundException(`Supplier with ID ${id} not found`);
+      }
+
+      return supplier;
     });
-
-    if (!supplier) {
-      throw new NotFoundException(`Supplier with ID ${id} not found`);
-    }
-
-    return supplier;
   }
 
   async update(id: string, updateSupplierDto: UpdateSupplierDto) {
-    await this.findOne(id); // Ensure exists
+    return this.databaseService.client.$transaction(async (tx) => {
+      const channelId = this.cls.get('app.channel_id');
+      if (channelId) {
+        await tx.$executeRaw`SELECT set_config('app.tenant_id', ${channelId}, TRUE)`;
+      }
 
-    return this.databaseService.client.supplier.update({
-      where: { id },
-      data: updateSupplierDto,
+      const supplier = await tx.supplier.findUnique({
+        where: { id },
+      });
+
+      if (!supplier) {
+        throw new NotFoundException(`Supplier with ID ${id} not found`);
+      }
+
+      return tx.supplier.update({
+        where: { id },
+        data: updateSupplierDto,
+      });
     });
   }
 
   async remove(id: string) {
-    await this.findOne(id); // Ensure exists
+    return this.databaseService.client.$transaction(async (tx) => {
+      const channelId = this.cls.get('app.channel_id');
+      if (channelId) {
+        await tx.$executeRaw`SELECT set_config('app.tenant_id', ${channelId}, TRUE)`;
+      }
 
-    return this.databaseService.client.supplier.delete({
-      where: { id },
+      const supplier = await tx.supplier.findUnique({
+        where: { id },
+      });
+
+      if (!supplier) {
+        throw new NotFoundException(`Supplier with ID ${id} not found`);
+      }
+
+      return tx.supplier.delete({
+        where: { id },
+      });
     });
   }
 }
