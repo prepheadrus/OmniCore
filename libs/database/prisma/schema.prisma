@@ -144,19 +144,50 @@ model Order {
 }
 
 model Supplier {
-  id             String          @id @default(uuid())
-  name           String
-  taxNumber      String?
-  taxOffice      String?
-  contactEmail   String?
-  contactPhone   String?
-  address        String?
-  supplierGroup  String?
-  channelId      String
-  channel        SalesChannel    @relation(fields: [channelId], references: [id])
-  purchaseOrders PurchaseOrder[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id                   String          @id @default(uuid())
+  name                 String
+  supplierGroup        String?
+  channelId            String
+  channel              SalesChannel    @relation(fields: [channelId], references: [id])
+  purchaseOrders       PurchaseOrder[]
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  // General & Contact
+  contactName          String?
+  contactEmail         String?
+  contactPhone         String?
+  website              String?
+
+  // Address (UBL-TR)
+  streetAddress        String?
+  city                 String?
+  district             String?
+  postalCode           String?
+  country              String?         @default("Türkiye")
+
+  // Finance & E-Transformation
+  taxNumber            String?
+  taxOffice            String?
+  currency             String          @default("TRY")
+  iban                 String?
+  bankName             String?
+  paymentTerms         Int?
+  eInvoiceAlias        String?
+  naceCode             String?
+  mersisNo             String?
+  tradeRegistryNo      String?
+
+  // Logistics & Operation
+  leadTimeInDays       Int             @default(1)
+  minimumOrderQuantity Int             @default(1)
+  isActive             Boolean         @default(true)
+  isDropshipper        Boolean         @default(false)
+  returnAddress        String?
+
+  // External System & Performance
+  externalSellerId     String?
+  performanceScore     Int?
 }
 
 enum PurchaseOrderStatus {
