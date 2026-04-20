@@ -14,10 +14,13 @@ export class SupplierService {
     return this.databaseService.client.$transaction(async (tx) => {
       const channelId = this.cls.get('app.channel_id');
       if (channelId) {
-        await tx.$executeRaw`SELECT set_config('app.tenant_id', ${channelId}, TRUE)`;
+        await tx.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`;
       }
       return tx.supplier.create({
-        data: createSupplierDto,
+        data: {
+          ...createSupplierDto,
+          channelId: channelId || createSupplierDto.channelId, // Override DTO with Context
+        },
       });
     });
   }
@@ -26,7 +29,7 @@ export class SupplierService {
     return this.databaseService.client.$transaction(async (tx) => {
       const channelId = this.cls.get('app.channel_id');
       if (channelId) {
-        await tx.$executeRaw`SELECT set_config('app.tenant_id', ${channelId}, TRUE)`;
+        await tx.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`;
       }
       return tx.supplier.findMany({
         orderBy: { createdAt: 'desc' },
@@ -38,7 +41,7 @@ export class SupplierService {
     return this.databaseService.client.$transaction(async (tx) => {
       const channelId = this.cls.get('app.channel_id');
       if (channelId) {
-        await tx.$executeRaw`SELECT set_config('app.tenant_id', ${channelId}, TRUE)`;
+        await tx.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`;
       }
       const supplier = await tx.supplier.findUnique({
         where: { id },
@@ -56,7 +59,7 @@ export class SupplierService {
     return this.databaseService.client.$transaction(async (tx) => {
       const channelId = this.cls.get('app.channel_id');
       if (channelId) {
-        await tx.$executeRaw`SELECT set_config('app.tenant_id', ${channelId}, TRUE)`;
+        await tx.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`;
       }
 
       const supplier = await tx.supplier.findUnique({
@@ -78,7 +81,7 @@ export class SupplierService {
     return this.databaseService.client.$transaction(async (tx) => {
       const channelId = this.cls.get('app.channel_id');
       if (channelId) {
-        await tx.$executeRaw`SELECT set_config('app.tenant_id', ${channelId}, TRUE)`;
+        await tx.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`;
       }
 
       const supplier = await tx.supplier.findUnique({
