@@ -31,9 +31,10 @@ import { Product } from "./columns"
 interface DataTableProps {
   columns: ColumnDef<Product>[]
   data: Product[]
+  onOpenProductDetail: (productId: string) => void
 }
 
-export function DataTable({ columns, data: initialData }: DataTableProps) {
+export function DataTable({ columns, data: initialData, onOpenProductDetail }: DataTableProps) {
   const [data, setData] = React.useState(initialData)
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -86,6 +87,7 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
           })
         )
       },
+      openProductDetail: onOpenProductDetail,
     },
   })
 

@@ -9,7 +9,6 @@ import { ChevronRight, ChevronDown, ImageIcon } from "lucide-react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { toast } from "sonner"
-import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
 // Types for Product Data
 export type ProductStatus = "IN_STOCK" | "OUT_OF_STOCK" | "INACTIVE"
@@ -86,16 +85,11 @@ const InlineEditCell = ({
 }
 
 
-const NameCell = ({ row }: { row: { original: Product; depth: number } }) => {
+const NameCell = ({ row, table }: { row: { original: Product; depth: number }; table: any }) => {
   const isVariant = row.depth > 0
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
 
   const onClickName = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set("productId", row.original.id)
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    table.options.meta?.openProductDetail(row.original.id)
   }
 
   return (
@@ -175,7 +169,7 @@ export const columns: ColumnDef<Product>[] = [
     id: "nameAndSku",
     header: "Ürün / SKU",
     accessorFn: (row) => `${row.name} ${row.sku}`,
-    cell: ({ row }) => <NameCell row={row} />,
+    cell: ({ row, table }) => <NameCell row={row} table={table} />,
 
   },
   {

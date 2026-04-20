@@ -51,11 +51,8 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
               );
             }
 
-            // executeRaw ile SQL Injection'a karşı daha güvenli şablon dizisi kullanıyoruz
-            const [, result] = await prisma.$transaction([
-              prisma.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`,
-              query(args),
-            ]);
+            // Execute the query directly without a nested transaction to prevent deadlocks
+            const result = await query(args);
 
             // SEMANTIC CACHE INVALIDATION LOGIC FOR PRODUCT
             if (model === 'Product' && ['update', 'updateMany'].includes(operation)) {
