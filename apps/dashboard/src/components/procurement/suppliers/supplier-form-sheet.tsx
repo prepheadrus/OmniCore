@@ -145,8 +145,8 @@ export function SupplierFormSheet() {
             zorunludur.
           </SheetDescription>
         </SheetHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 flex flex-col h-full">
-          <Tabs defaultValue="general" className="w-full flex-grow">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-6">
+          <Tabs defaultValue="general" className="w-full">
             <TabsList className="w-full grid grid-cols-3 bg-slate-200/50 p-1 rounded-md mb-6">
               <TabsTrigger value="general" className="text-[12px] h-7 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">Genel</TabsTrigger>
               <TabsTrigger value="finance" className="text-[12px] h-7 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">Finans & UBL</TabsTrigger>
@@ -309,7 +309,7 @@ export function SupplierFormSheet() {
             </TabsContent>
           </Tabs>
 
-          <div className="pt-6 flex justify-end space-x-2 pb-4 mt-auto">
+          <div className="pt-6 flex justify-end space-x-2 pb-4 border-t">
             <Button
               variant="outline"
               type="button"
