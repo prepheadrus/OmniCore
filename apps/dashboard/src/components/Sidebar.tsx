@@ -1,98 +1,131 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   LayoutDashboard,
-  Package,
+  BarChart2,
   ShoppingCart,
   Undo,
+  Package,
+  Users,
+  Truck,
+  FileText,
   Radar,
   Tags,
   RefreshCcw,
   Settings,
-  ChevronLeft,
-  ChevronRight,
-  Truck,
-  FileText
+  HelpCircle,
+  LogOut,
+  Layers
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
 
-  const menuItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
-    { name: 'Ürün Kataloğu', icon: Package, href: '/products' },
-    { name: 'Siparişler', icon: ShoppingCart, href: '/orders' },
-    { name: 'İadeler', icon: Undo, href: '/returns' },
-    { name: 'Tedarikçiler', icon: Truck, href: '/procurement/suppliers' },
-    { name: 'Alım Faturaları', icon: FileText, href: '/procurement/purchase-orders' },
-    { name: 'Rekabet Radarı', icon: Radar, href: '/radar' },
-    { name: 'Otonom Fiyatlandırma', icon: Tags, href: '/pricing' },
-    { name: 'Senkronizasyon', icon: RefreshCcw, href: '/sync' },
-    { name: 'Ayarlar', icon: Settings, href: '/settings' },
+  const menuGroups = [
+    {
+      title: 'GÖRÜNÜM',
+      items: [
+        { name: 'Panel', icon: LayoutDashboard, href: '/' },
+        { name: 'Analizler', icon: BarChart2, href: '/analytics' },
+      ],
+    },
+    {
+      title: 'OPERASYON',
+      items: [
+        { name: 'Siparişler', icon: ShoppingCart, href: '/orders' },
+        { name: 'İadeler', icon: Undo, href: '/returns' },
+        { name: 'Envanter', icon: Package, href: '/inventory' },
+        { name: 'Müşteriler', icon: Users, href: '/customers' },
+      ],
+    },
+    {
+      title: 'EKONOMİ',
+      items: [
+        { name: 'Tedarikçiler', icon: Truck, href: '/procurement/suppliers' },
+        { name: 'Alım Faturaları', icon: FileText, href: '/procurement/purchase-orders' },
+      ],
+    },
+    {
+      title: 'ZEKA & SİSTEM',
+      items: [
+        { name: 'Rekabet Radarı', icon: Radar, href: '/radar' },
+        { name: 'Otonom Fiyatlandırma', icon: Tags, href: '/pricing' },
+        { name: 'Senkronizasyon', icon: RefreshCcw, href: '/sync' },
+      ],
+    },
   ];
 
   return (
-    <aside
-      className={`bg-slate-900 text-white transition-all duration-300 flex flex-col relative ${
-        isCollapsed ? 'w-16' : 'w-56'
-      }`}
-    >
-      {/* Sidebar Header / Logo Area */}
-      <div className="h-14 flex items-center justify-center border-b border-slate-800">
-        {!isCollapsed && (
-          <span className="text-lg font-bold tracking-wider text-indigo-400">OmniCore</span>
-        )}
-        {isCollapsed && (
-          <span className="text-lg font-bold text-indigo-400">OC</span>
-        )}
+    <aside className="flex flex-col py-4 px-3 space-y-1 h-screen w-64 fixed left-0 top-0 bg-[#f2f4f4] border-r border-[#dde4e5] z-30 text-[13px] tracking-tight">
+      {/* Logo Area */}
+      <div className="px-3 mb-6 flex items-center space-x-3">
+        <div className="w-8 h-8 rounded-md bg-[#5f5e61] flex items-center justify-center text-white shadow-sm">
+          <Layers size={18} />
+        </div>
+        <div>
+          <h1 className="text-[14px] font-bold text-[#2d3435]">OmniCore Ops</h1>
+          <p className="text-[11px] text-[#5a6061]">B2B Yönetimi</p>
+        </div>
       </div>
 
-      {/* Collapse Toggle Button */}
-      <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-16 bg-slate-800 rounded-full p-1 border border-slate-700 hover:bg-slate-700 transition-colors z-10 text-white"
-        title={isCollapsed ? 'Genişlet' : 'Daralt'}
-      >
-        {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-      </button>
-
       {/* Navigation Links */}
-      <nav className="flex-1 overflow-y-auto py-3">
-        <ul className="space-y-1 px-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
+      <nav className="flex-1 space-y-0.5 overflow-y-auto pr-2 custom-scrollbar">
+        {menuGroups.map((group, groupIdx) => (
+          <div key={groupIdx} className="mb-4">
+            <p className="px-3 text-[10px] font-semibold text-[#5a6061] uppercase tracking-wider mb-1.5">
+              {group.title}
+            </p>
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href;
 
-            return (
-              <li key={item.name}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center rounded-md p-2 text-[13px] transition-colors ${
-                    isActive
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-slate-400 hover:bg-slate-800 hover:text-slate-50'
-                  } ${isCollapsed ? 'justify-center' : 'justify-start'}`}
-                  title={isCollapsed ? item.name : undefined}
-                >
-                  <Icon size={18} className={isCollapsed ? '' : 'mr-2.5'} />
-                  {!isCollapsed && <span>{item.name}</span>}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`flex items-center space-x-3 px-3 py-2 rounded-sm duration-200 ease-in-out font-medium ${
+                      isActive
+                        ? 'bg-white text-[#2d3435] shadow-sm'
+                        : 'text-[#5a6061] hover:text-[#2d3435] hover:bg-[#ebeeef]/50'
+                    }`}
+                  >
+                    <Icon size={18} className={isActive ? 'text-[#2d3435]' : 'text-[#5a6061]'} />
+                    <span>{item.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
-      {/* Sidebar Footer Area (Optional) */}
-      {!isCollapsed && (
-        <div className="p-3 border-t border-slate-800 text-[11px] text-slate-500 text-center">
-          OmniCore v1.0
-        </div>
-      )}
+      {/* Bottom Actions */}
+      <div className="mt-auto space-y-0.5 pt-4 border-t border-[#dde4e5]">
+        <Link
+          href="/settings"
+          className="flex items-center space-x-3 px-3 py-2 text-[#5a6061] hover:text-[#2d3435] hover:bg-[#ebeeef]/50 duration-200 ease-in-out rounded-sm font-medium"
+        >
+          <Settings size={18} />
+          <span>Ayarlar</span>
+        </Link>
+        <Link
+          href="/support"
+          className="flex items-center space-x-3 px-3 py-2 text-[#5a6061] hover:text-[#2d3435] hover:bg-[#ebeeef]/50 duration-200 ease-in-out rounded-sm font-medium"
+        >
+          <HelpCircle size={18} />
+          <span>Destek</span>
+        </Link>
+        <button
+          className="w-full flex items-center space-x-3 px-3 py-2 text-[#5a6061] hover:text-[#2d3435] hover:bg-[#ebeeef]/50 duration-200 ease-in-out rounded-sm font-medium"
+        >
+          <LogOut size={18} />
+          <span>Çıkış</span>
+        </button>
+      </div>
     </aside>
   );
 }
