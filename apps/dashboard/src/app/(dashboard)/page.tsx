@@ -1,38 +1,45 @@
-import TopMetrics from '../../components/TopMetrics';
-import WeeklySalesChart from '../../components/WeeklySalesChart';
-import RecentActivityTimeline from '../../components/RecentActivityTimeline';
+import TopMetrics from '../../components/dashboard/TopMetrics';
+import SalesTrendsChart from '../../components/dashboard/SalesTrendsChart';
+import MarketplaceDistribution from '../../components/dashboard/MarketplaceDistribution';
+import StockHealth from '../../components/dashboard/StockHealth';
+import SystemRecommendations from '../../components/dashboard/SystemRecommendations';
+import RecentOrdersTable from '../../components/dashboard/RecentOrdersTable';
+import { Calendar, ChevronDown } from 'lucide-react';
 
 export default function Index() {
-  // Format the current date elegantly (e.g., "12 Nisan 2026, Pazar")
-  const today = new Date();
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    weekday: 'long'
-  };
-  const formattedDate = today.toLocaleDateString('tr-TR', dateOptions);
-
   return (
-    <div className="flex flex-col gap-4 w-full max-w-7xl mx-auto">
-      {/* 1. Karşılama Alanı */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-0">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 tracking-tight">Hoş Geldiniz, Demo User</h1>
-          <p className="text-slate-500 mt-1 font-medium">{formattedDate}</p>
+    <div className="flex flex-col gap-6 w-full max-w-[1400px] mx-auto pb-8">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-[1.5rem] font-semibold text-slate-800 tracking-tight">Genel Bakış</h2>
+        <div className="flex items-center space-x-2 text-[12px] text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 cursor-pointer hover:bg-slate-200 transition-colors">
+          <Calendar className="w-4 h-4 text-slate-500" />
+          <span>Son 30 Gün</span>
+          <ChevronDown className="w-4 h-4 text-slate-500" />
         </div>
       </div>
 
-      {/* 2. Özet Metrik Kartları (Top Cards) */}
+      {/* Metric Cards */}
       <TopMetrics />
 
-      {/* 3 & 4. Ana Grafik Alanı & Son Aktiviteler */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Middle Section: Charts & Operational Health */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <WeeklySalesChart />
+          <SalesTrendsChart />
         </div>
+        <div className="flex flex-col space-y-6">
+          <MarketplaceDistribution />
+          <StockHealth />
+        </div>
+      </div>
+
+      {/* Bottom Section: AI Insights & Data Table */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-1">
-          <RecentActivityTimeline />
+          <SystemRecommendations />
+        </div>
+        <div className="lg:col-span-3">
+          <RecentOrdersTable />
         </div>
       </div>
     </div>

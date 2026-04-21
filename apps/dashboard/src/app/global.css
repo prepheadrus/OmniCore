@@ -71,6 +71,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-slate-50 text-slate-800 text-[13px] font-sans antialiased;
+    @apply bg-[#f9f9f9] text-[#2d3435] text-[13px] font-sans antialiased;
   }
 }
