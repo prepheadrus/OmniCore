@@ -10,8 +10,12 @@ export async function saveSupplierAction(data: any, channelId: string) {
     throw new Error('Lütfen önce bir satış kanalı seçin.');
   }
 
-  const response = await fetch(`${API_URL}/suppliers`, {
-    method: 'POST',
+  const isUpdate = !!data.id;
+  const url = isUpdate ? `${API_URL}/suppliers/${data.id}` : `${API_URL}/suppliers`;
+  const method = isUpdate ? 'PUT' : 'POST';
+
+  const response = await fetch(url, {
+    method,
     headers: {
       'Content-Type': 'application/json',
       'x-channel-id': channelId,
@@ -24,7 +28,7 @@ export async function saveSupplierAction(data: any, channelId: string) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Tedarikçi oluşturulamadı');
+    throw new Error(errorData.message || 'Tedarikçi kaydedilemedi');
   }
 
   revalidatePath('/procurement/suppliers');
@@ -44,7 +48,8 @@ export async function deleteSupplierAction(id: string, channelId: string) {
   });
 
   if (!response.ok) {
-    throw new Error('Tedarikçi silinemedi');
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Tedarikçi silinemedi');
   }
 
   revalidatePath('/procurement/suppliers');

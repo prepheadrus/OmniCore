@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { SupplierService } from './supplier.service';
 import { CreateSupplierDto, UpdateSupplierDto } from '@omnicore/core-domain';
 
@@ -12,8 +12,12 @@ export class SupplierController {
   }
 
   @Get()
-  findAll() {
-    return this.supplierService.findAll();
+  findAll(
+    @Query('search') search?: string,
+    @Query('isActive') isActive?: boolean,
+    @Query('isDropshipper') isDropshipper?: boolean
+  ) {
+    return this.supplierService.findAll({ search, isActive, isDropshipper });
   }
 
   @Get(':id')

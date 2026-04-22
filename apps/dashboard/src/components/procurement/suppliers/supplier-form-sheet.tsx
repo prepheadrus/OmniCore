@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -12,7 +12,6 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from '@omnicore/ui/components/ui/sheet';
 import { Button } from '@omnicore/ui/components/ui/button';
 import { Input } from '@omnicore/ui/components/ui/input';
@@ -22,107 +21,105 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@omnicore/ui/component
 import { useChannel } from '../../../contexts/ChannelContext';
 import { toast } from 'sonner';
 import { saveSupplierAction } from '../../../app/(dashboard)/procurement/suppliers/actions';
+import { Supplier } from './columns';
 
 const supplierSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, 'Tedarikçi adı zorunludur'),
   supplierGroup: z.string().optional(),
 
   // General & Contact
   contactName: z.string().optional(),
-  contactEmail: z
-    .string()
-    .email('Geçerli bir e-posta adresi girin')
-    .optional()
-    .or(z.literal('')),
+  contactEmail: z.union([z.string().email('Geçerli bir e-posta girin'), z.literal('')]).optional(),
   contactPhone: z.string().optional(),
   website: z.string().optional(),
 
-  // Address (UBL-TR)
+  // Address
   streetAddress: z.string().optional(),
   city: z.string().optional(),
   district: z.string().optional(),
   postalCode: z.string().optional(),
-  country: z.string().optional(),
+  country: z.string().default('Türkiye').optional(),
 
-  // Finance & E-Transformation
+  // Finance
   taxNumber: z.string().optional(),
   taxOffice: z.string().optional(),
-  currency: z.string().optional(),
+  currency: z.string().default('TRY').optional(),
   iban: z.string().optional(),
   bankName: z.string().optional(),
-  paymentTerms: z.number().optional(),
+  paymentTerms: z.coerce.number().optional(),
   eInvoiceAlias: z.string().optional(),
   naceCode: z.string().optional(),
   mersisNo: z.string().optional(),
   tradeRegistryNo: z.string().optional(),
 
   // Logistics & Operation
-  leadTimeInDays: z.number().optional(),
-  minimumOrderQuantity: z.number().optional(),
-  isActive: z.boolean().optional(),
-  isDropshipper: z.boolean().optional(),
+  leadTimeInDays: z.coerce.number().default(1).optional(),
+  minimumOrderQuantity: z.coerce.number().default(1).optional(),
+  isActive: z.boolean().default(true).optional(),
+  isDropshipper: z.boolean().default(false).optional(),
   returnAddress: z.string().optional(),
 
-  // External System & Performance
+  // External
   externalSellerId: z.string().optional(),
-  performanceScore: z.number().optional(),
+  performanceScore: z.coerce.number().optional(),
 });
 
 type SupplierFormValues = z.infer<typeof supplierSchema>;
 
-export function SupplierFormSheet() {
-  const [open, setOpen] = useState(false);
+interface SupplierFormSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  initialData?: Supplier;
+}
+
+export function SupplierFormSheet({ open, onOpenChange, initialData }: SupplierFormSheetProps) {
+  const { selectedChannelId: channelId } = useChannel();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { selectedChannelId } = useChannel();
 
-  const form = useForm<z.infer<typeof supplierSchema>>({
+  const form = useForm<SupplierFormValues>({
     resolver: zodResolver(supplierSchema),
     defaultValues: {
       name: '',
-      supplierGroup: '',
-      contactName: '',
-      contactEmail: '',
-      contactPhone: '',
-      website: '',
-      streetAddress: '',
-      city: '',
-      district: '',
-      postalCode: '',
-      country: 'Türkiye',
-      taxNumber: '',
-      taxOffice: '',
       currency: 'TRY',
-      iban: '',
-      bankName: '',
-      paymentTerms: 0,
-      eInvoiceAlias: '',
-      naceCode: '',
-      mersisNo: '',
-      tradeRegistryNo: '',
-      leadTimeInDays: 1,
-      minimumOrderQuantity: 1,
+      country: 'Türkiye',
       isActive: true,
       isDropshipper: false,
-      returnAddress: '',
-      externalSellerId: '',
-      performanceScore: 0,
+      leadTimeInDays: 1,
+      minimumOrderQuantity: 1,
     },
   });
 
+  useEffect(() => {
+    if (initialData && open) {
+      form.reset(initialData);
+    } else if (!open) {
+      form.reset({
+        name: '',
+        currency: 'TRY',
+        country: 'Türkiye',
+        isActive: true,
+        isDropshipper: false,
+        leadTimeInDays: 1,
+        minimumOrderQuantity: 1,
+      });
+    }
+  }, [initialData, open, form]);
+
   async function onSubmit(data: SupplierFormValues) {
-    if (!selectedChannelId) {
+    if (!channelId) {
       toast.error('Lütfen önce bir satış kanalı seçin.');
       return;
     }
 
     try {
       setIsLoading(true);
-      await saveSupplierAction(data, selectedChannelId);
-
-      toast.success('Tedarikçi başarıyla oluşturuldu');
-      setOpen(false);
+      await saveSupplierAction(data, channelId);
+      toast.success(`Tedarikçi başarıyla ${data.id ? 'güncellendi' : 'oluşturuldu'}.`);
+      onOpenChange(false);
       form.reset();
+      router.refresh();
     } catch (error: any) {
       toast.error(error.message || 'Bir hata oluştu');
     } finally {
@@ -131,18 +128,14 @@ export function SupplierFormSheet() {
   }
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
-          Yeni Tedarikçi Ekle
-        </Button>
-      </SheetTrigger>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-[600px] overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Yeni Tedarikçi</SheetTitle>
+          <SheetTitle>{initialData ? 'Tedarikçiyi Düzenle' : 'Yeni Tedarikçi'}</SheetTitle>
           <SheetDescription>
-            Sisteme yeni bir tedarikçi ekleyin. Kırmızı işaretli alanlar
-            zorunludur.
+            {initialData
+              ? 'Tedarikçi bilgilerini güncelleyin.'
+              : 'Sisteme yeni bir tedarikçi ekleyin. Kırmızı işaretli alanlar zorunludur.'}
           </SheetDescription>
         </SheetHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-6">
@@ -313,7 +306,7 @@ export function SupplierFormSheet() {
             <Button
               variant="outline"
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={() => onOpenChange(false)}
             >
               İptal
             </Button>
