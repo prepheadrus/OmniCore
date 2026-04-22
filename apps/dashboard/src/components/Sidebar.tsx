@@ -45,7 +45,7 @@ export default function Sidebar() {
       title: 'EKONOMİ',
       items: [
         { name: 'Tedarikçiler', icon: Truck, href: '/procurement/suppliers' },
-        { name: 'Alım Faturaları', icon: FileText, href: '/procurement/purchase-orders' },
+        { name: 'Alım Faturaları', icon: FileText, href: '/procurement/invoices' },
       ],
     },
     {

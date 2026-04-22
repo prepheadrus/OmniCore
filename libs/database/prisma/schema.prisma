@@ -8,6 +8,7 @@ datasource db {
 }
 
 model SalesChannel {
+  purchaseInvoices PurchaseInvoice[]
   id             String          @id @default(uuid())
   name           String
   createdAt      DateTime        @default(now())
@@ -144,6 +145,7 @@ model Order {
 }
 
 model Supplier {
+  purchaseInvoices PurchaseInvoice[]
   id                   String          @id @default(uuid())
   name                 String
   supplierGroup        String?
@@ -223,4 +225,56 @@ model PurchaseOrderItem {
   totalCost        Decimal
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
+}
+
+enum PurchaseInvoiceStatus {
+  DRAFT
+  COMPLETED
+}
+
+model PurchaseInvoice {
+  id                     String                @id @default(uuid())
+  documentNo             String
+  supplierId             String
+  supplier               Supplier              @relation(fields: [supplierId], references: [id])
+  date                   DateTime
+  dueDate                DateTime?
+  currency               String                @default("TRY")
+  exchangeRate           Decimal               @default(1)
+
+  // Financial Summary
+  subTotal               Decimal               @default(0)
+  generalDiscountPercent Decimal               @default(0)
+  generalDiscountAmount  Decimal               @default(0)
+  taxAmount              Decimal               @default(0)
+  roundingDifference     Decimal               @default(0)
+  grandTotal             Decimal               @default(0)
+
+  status                 PurchaseInvoiceStatus @default(DRAFT)
+  channelId              String
+  channel                SalesChannel          @relation(fields: [channelId], references: [id])
+
+  items                  PurchaseInvoiceItem[]
+
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+}
+
+model PurchaseInvoiceItem {
+  id                String          @id @default(uuid())
+  purchaseInvoiceId String
+  purchaseInvoice   PurchaseInvoice @relation(fields: [purchaseInvoiceId], references: [id], onDelete: Cascade)
+
+  name              String
+  quantity          Decimal
+  unit              String          @default("Adet")
+  unitPrice         Decimal
+  discountPercent   Decimal         @default(0)
+  totalAmount       Decimal
+
+  isMatched         Boolean         @default(false)
+  matchedSku        String?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 }
