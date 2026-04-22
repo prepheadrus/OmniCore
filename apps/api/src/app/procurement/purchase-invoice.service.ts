@@ -1,0 +1,100 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { DatabaseService } from '@omnicore/database';
+import { ClsService } from 'nestjs-cls';
+import { CreatePurchaseInvoiceDto, GetPurchaseInvoicesFilterDto, PurchaseInvoiceStatusDto } from '@omnicore/core-domain/dto';
+
+@Injectable()
+export class PurchaseInvoiceService {
+  constructor(
+    private readonly db: DatabaseService,
+    private readonly cls: ClsService
+  ) {}
+
+  async create(createDto: CreatePurchaseInvoiceDto) {
+    const channelId = this.cls.get('app.channel_id');
+    const { items, status, ...invoiceData } = createDto;
+
+    return this.db.client.purchaseInvoice.create({
+      data: {
+        ...invoiceData,
+        channelId,
+        status: status === PurchaseInvoiceStatusDto.COMPLETED ? 'COMPLETED' : 'DRAFT',
+        items: {
+          create: items.map((item: any) => ({
+            ...item
+          }))
+        }
+      },
+      include: {
+        items: true,
+        supplier: true
+      }
+    });
+  }
+
+  async findMany(filterDto: GetPurchaseInvoicesFilterDto) {
+    const channelId = this.cls.get('app.channel_id');
+    const { page = 1, limit = 10, supplierId, documentNo, status } = filterDto;
+    const skip = (page - 1) * limit;
+
+    const where: any = { channelId };
+
+    if (supplierId) {
+      where.supplierId = supplierId;
+    }
+
+    if (documentNo) {
+      where.documentNo = {
+        contains: documentNo,
+        mode: 'insensitive'
+      };
+    }
+
+    if (status) {
+      where.status = status;
+    }
+
+    const [data, total] = await Promise.all([
+      this.db.client.purchaseInvoice.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          supplier: true
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }),
+      this.db.client.purchaseInvoice.count({ where })
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
+  }
+
+  async findOne(id: string) {
+    const channelId = this.cls.get('app.channel_id');
+
+    const invoice = await this.db.client.purchaseInvoice.findFirst({
+      where: { id, channelId },
+      include: {
+        items: true,
+        supplier: true
+      }
+    });
+
+    if (!invoice) {
+      throw new NotFoundException(`Purchase invoice with id ${id} not found`);
+    }
+
+    return invoice;
+  }
+}

@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@omnicore/database": ["libs/database/src/index.ts"],
+      "@omnicore/core-domain/dto": ["libs/core-domain/src/lib/dto/index.ts"],
       "@omnicore/marketplace-adapters": [
         "libs/marketplace-adapters/src/index.ts"
       ],
