@@ -238,7 +238,7 @@ MATCHING_PENDING
 
 enum PurchaseInvoiceType {
   E_INVOICE
-  PRINTED
+  E_ARCHIVE
 }
 
 model PurchaseInvoice {
