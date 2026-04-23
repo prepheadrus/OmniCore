@@ -47,22 +47,22 @@ const supplierSchema = z.object({
   currency: z.string().default('TRY').optional(),
   iban: z.string().optional(),
   bankName: z.string().optional(),
-  paymentTerms: z.coerce.number().optional(),
+  paymentTerms: z.union([z.string(), z.number()]).transform(val => val === '' || Number.isNaN(Number(val)) ? undefined : Number(val)).optional(),
   eInvoiceAlias: z.string().optional(),
   naceCode: z.string().optional(),
   mersisNo: z.string().optional(),
   tradeRegistryNo: z.string().optional(),
 
   // Logistics & Operation
-  leadTimeInDays: z.coerce.number().default(1).optional(),
-  minimumOrderQuantity: z.coerce.number().default(1).optional(),
-  isActive: z.boolean().default(true).optional(),
-  isDropshipper: z.boolean().default(false).optional(),
+  leadTimeInDays: z.union([z.string(), z.number()]).transform(val => val === '' || Number.isNaN(Number(val)) ? undefined : Number(val)).optional(),
+  minimumOrderQuantity: z.union([z.string(), z.number()]).transform(val => val === '' || Number.isNaN(Number(val)) ? undefined : Number(val)).optional(),
+  isActive: z.boolean().default(true),
+  isDropshipper: z.boolean().default(false),
   returnAddress: z.string().optional(),
 
   // External
   externalSellerId: z.string().optional(),
-  performanceScore: z.coerce.number().optional(),
+  performanceScore: z.union([z.string(), z.number()]).transform(val => val === '' || Number.isNaN(Number(val)) ? undefined : Number(val)).optional(),
 });
 
 type SupplierFormValues = z.infer<typeof supplierSchema>;
@@ -236,7 +236,7 @@ export function SupplierFormSheet({ open, onOpenChange, initialData }: SupplierF
               </div>
               <div className="space-y-2">
                 <Label htmlFor="paymentTerms">Ödeme Vadesi (Gün)</Label>
-                <Input id="paymentTerms" type="number" {...form.register('paymentTerms', { valueAsNumber: true })} />
+                <Input id="paymentTerms" type="number" {...form.register('paymentTerms')} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="eInvoiceAlias">E-Fatura Posta Kutusu</Label>
@@ -262,11 +262,11 @@ export function SupplierFormSheet({ open, onOpenChange, initialData }: SupplierF
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="leadTimeInDays">Tedarik Süresi (Gün)</Label>
-                  <Input id="leadTimeInDays" type="number" {...form.register('leadTimeInDays', { valueAsNumber: true })} />
+                  <Input id="leadTimeInDays" type="number" {...form.register('leadTimeInDays')} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="minimumOrderQuantity">Minimum Sipariş Adedi</Label>
-                  <Input id="minimumOrderQuantity" type="number" {...form.register('minimumOrderQuantity', { valueAsNumber: true })} />
+                  <Input id="minimumOrderQuantity" type="number" {...form.register('minimumOrderQuantity')} />
                 </div>
               </div>
               <div className="space-y-2">
@@ -279,7 +279,7 @@ export function SupplierFormSheet({ open, onOpenChange, initialData }: SupplierF
               </div>
               <div className="space-y-2">
                 <Label htmlFor="performanceScore">Performans Puanı (1-100)</Label>
-                <Input id="performanceScore" type="number" {...form.register('performanceScore', { valueAsNumber: true })} />
+                <Input id="performanceScore" type="number" {...form.register('performanceScore')} />
               </div>
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <div className="flex items-center space-x-2">
