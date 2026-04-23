@@ -17,6 +17,7 @@ model SalesChannel {
   stockMovements StockMovement[]
   suppliers      Supplier[]
   purchaseOrders PurchaseOrder[]
+  purchaseInvoices PurchaseInvoice[]
 }
 
 model Category {
@@ -77,6 +78,7 @@ model ProductVariant {
   updatedAt      DateTime        @updatedAt
   stockMovements StockMovement[]
   purchaseOrderItems PurchaseOrderItem[]
+  purchaseInvoiceItems PurchaseInvoiceItem[]
 }
 
 model BundleComponent {
@@ -150,6 +152,7 @@ model Supplier {
   channelId            String
   channel              SalesChannel    @relation(fields: [channelId], references: [id])
   purchaseOrders       PurchaseOrder[]
+  purchaseInvoices     PurchaseInvoice[]
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
 
@@ -223,4 +226,55 @@ model PurchaseOrderItem {
   totalCost        Decimal
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
+}
+
+enum PurchaseInvoiceStatus {
+  DRAFT
+  MATCHING_PENDING
+  COMPLETED
+}
+
+enum PurchaseInvoiceType {
+  E_INVOICE
+  PRINTED
+}
+
+model PurchaseInvoice {
+  id                 String                @id @default(uuid())
+  invoiceNumber      String
+  supplierId         String
+  supplier           Supplier              @relation(fields: [supplierId], references: [id])
+  date               DateTime
+  dueDate            DateTime?
+  type               PurchaseInvoiceType
+  currency           String                @default("TRY")
+  exchangeRate       Decimal               @default(1)
+  subTotal           Decimal
+  discountTotal      Decimal
+  taxTotal           Decimal
+  roundingDifference Decimal               @default(0)
+  grandTotal         Decimal
+  status             PurchaseInvoiceStatus @default(DRAFT)
+  notes              String?
+  channelId          String
+  channel            SalesChannel          @relation(fields: [channelId], references: [id])
+  items              PurchaseInvoiceItem[]
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+}
+
+model PurchaseInvoiceItem {
+  id               String          @id @default(uuid())
+  invoiceId        String
+  invoice          PurchaseInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  name             String
+  quantity         Decimal
+  unit             String
+  unitPrice        Decimal
+  discountPercent  Decimal         @default(0)
+  lineTotal        Decimal
+  productId        String?
+  productVariant   ProductVariant? @relation(fields: [productId], references: [id])
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 }
