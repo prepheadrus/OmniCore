@@ -15,7 +15,6 @@ import {
 import { useState } from 'react';
 import { SupplierFormSheet } from './supplier-form-sheet';
 import { deleteSupplierAction } from '../../../app/(dashboard)/procurement/suppliers/actions';
-import { useChannel } from '../../../contexts/ChannelContext';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
@@ -56,20 +55,13 @@ export type Supplier = {
 
 const ActionCell = ({ supplier }: { supplier: Supplier }) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const { selectedChannelId: channelId } = useChannel();
-  const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);  const router = useRouter();
 
   const handleDelete = async () => {
-    if (!channelId) {
-      toast.error('Lütfen önce bir satış kanalı seçin.');
-      return;
-    }
-
     if (confirm('Bu tedarikçiyi silmek istediğinize emin misiniz?')) {
       setIsDeleting(true);
       try {
-        await deleteSupplierAction(supplier.id, channelId);
+        await deleteSupplierAction(supplier.id);
         toast.success('Tedarikçi başarıyla silindi.');
         router.refresh();
       } catch (error: any) {

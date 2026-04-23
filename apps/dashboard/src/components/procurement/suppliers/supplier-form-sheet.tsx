@@ -18,7 +18,6 @@ import { Input } from '@omnicore/ui/components/ui/input';
 import { Label } from '@omnicore/ui/components/ui/label';
 import { Switch } from '@omnicore/ui/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@omnicore/ui/components/ui/tabs';
-import { useChannel } from '../../../contexts/ChannelContext';
 import { toast } from 'sonner';
 import { saveSupplierAction } from '../../../app/(dashboard)/procurement/suppliers/actions';
 import { Supplier } from './columns';
@@ -73,9 +72,7 @@ interface SupplierFormSheetProps {
   initialData?: Supplier;
 }
 
-export function SupplierFormSheet({ open, onOpenChange, initialData }: SupplierFormSheetProps) {
-  const { selectedChannelId: channelId } = useChannel();
-  const [isLoading, setIsLoading] = useState(false);
+export function SupplierFormSheet({ open, onOpenChange, initialData }: SupplierFormSheetProps) {  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const form = useForm<SupplierFormValues>({
@@ -108,14 +105,9 @@ export function SupplierFormSheet({ open, onOpenChange, initialData }: SupplierF
   }, [initialData, open, form]);
 
   async function onSubmit(data: SupplierFormValues) {
-    if (!channelId) {
-      toast.error('Lütfen önce bir satış kanalı seçin.');
-      return;
-    }
-
     try {
       setIsLoading(true);
-      await saveSupplierAction(data, channelId);
+      await saveSupplierAction(data);
       toast.success(`Tedarikçi başarıyla ${data.id ? 'güncellendi' : 'oluşturuldu'}.`);
       onOpenChange(false);
       form.reset();

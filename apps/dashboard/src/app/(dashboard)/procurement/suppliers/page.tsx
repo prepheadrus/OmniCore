@@ -2,16 +2,8 @@ import { Suspense } from "react"
 import { DataTableSkeleton } from "../../../../components/shared/data-table-skeleton"
 import { DataTable } from "../../../../components/procurement/suppliers/data-table"
 import { columns, Supplier } from "../../../../components/procurement/suppliers/columns"
-import { cookies } from "next/headers"
 
 async function getSuppliers(searchParams: { [key: string]: string | string[] | undefined }): Promise<Supplier[]> {
-  const cookieStore = await cookies()
-  const channelId = cookieStore.get("channel-id")?.value
-
-  if (!channelId) {
-    return []
-  }
-
   const queryParams = new URLSearchParams();
   if (typeof searchParams?.search === 'string') {
     queryParams.set('search', searchParams.search);
@@ -29,9 +21,6 @@ async function getSuppliers(searchParams: { [key: string]: string | string[] | u
   try {
     const res = await fetch(url, {
       cache: "no-store",
-      headers: {
-        "x-channel-id": channelId,
-      },
     })
     if (!res.ok) {
       return []
