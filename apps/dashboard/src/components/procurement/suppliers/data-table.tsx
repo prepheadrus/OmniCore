@@ -51,9 +51,13 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
   })
 
+  const currentSearchParam = searchParams.get("search") || "";
+
   // Handle Search Input Change with Debounce
   React.useEffect(() => {
     const handler = setTimeout(() => {
+      if (searchQuery === currentSearchParam) return;
+
       const current = new URLSearchParams(Array.from(searchParams.entries()))
 
       if (searchQuery) {
@@ -69,9 +73,9 @@ export function DataTable<TData, TValue>({
     }, 500)
 
     return () => clearTimeout(handler)
-  }, [searchQuery, pathname, router, searchParams])
+  }, [searchQuery, currentSearchParam, pathname, router, searchParams])
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = React.useCallback((key: string, value: string) => {
     const current = new URLSearchParams(Array.from(searchParams.entries()))
     if (value === "all") {
       current.delete(key)
@@ -81,7 +85,7 @@ export function DataTable<TData, TValue>({
     const search = current.toString()
     const query = search ? `?${search}` : ""
     router.replace(`${pathname}${query}`, { scroll: false })
-  }
+  }, [pathname, router, searchParams])
 
   return (
     <div>
