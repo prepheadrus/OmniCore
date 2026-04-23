@@ -11,16 +11,12 @@ import { columns } from "../../../../components/procurement/invoices/columns";
 import { DataTable } from "../../../../components/procurement/invoices/data-table";
 import { InvoiceFormSheet } from "../../../../components/procurement/invoices/invoice-form-sheet";
 import { getInvoices } from "../../../../components/procurement/invoices/actions";
-import { useChannel } from "../../../../contexts/ChannelContext";
 import { toast } from "sonner";
 
 function InvoicesPageContent() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const { selectedChannelId } = useChannel();
-  const searchParams = useSearchParams();
+  const [loading, setLoading] = useState(true);  const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -29,8 +25,6 @@ function InvoicesPageContent() {
   const status = searchParams.get("status") || "all";
 
   const loadData = useCallback(async () => {
-    if (!selectedChannelId) return;
-
     setLoading(true);
     try {
       const response = await getInvoices({
@@ -52,7 +46,7 @@ function InvoicesPageContent() {
     } finally {
       setLoading(false);
     }
-  }, [selectedChannelId, page, search, status]);
+  }, [page, search, status]);
 
   useEffect(() => {
     loadData();

@@ -17,7 +17,6 @@ import {
 import { Button } from "@omnicore/ui/components/ui/button"
 import { Input } from "@omnicore/ui/components/ui/input"
 import { Label } from "@omnicore/ui/components/ui/label"
-import { useChannel } from "../../../contexts/ChannelContext"
 import { toast } from "sonner"
 import { Plus, Trash2 } from "lucide-react"
 import { DebouncedCombobox } from "../../../components/shared/debounced-combobox"
@@ -62,8 +61,6 @@ export function PurchaseOrderFormSheet() {
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
   const router = useRouter()
-  const { selectedChannelId } = useChannel()
-
   const form = useForm<PurchaseOrderFormValues>({
     resolver: zodResolver(purchaseOrderSchema),
     defaultValues: {
@@ -88,28 +85,23 @@ export function PurchaseOrderFormSheet() {
 
   // Fetch suppliers
   useEffect(() => {
-    if (open && selectedChannelId) {
-      fetch("/api/suppliers", {
-        headers: { "x-channel-id": selectedChannelId }
-      })
+    if (open) {
+      fetch("/api/suppliers")
         .then(res => res.json())
         .then(data => setSuppliers(Array.isArray(data) ? data : []))
         .catch(console.error)
     }
-  }, [open, selectedChannelId])
+  }, [open])
 
   // Fetch variants using debounced search
   useEffect(() => {
-    if (!selectedChannelId) return
-    const fetchVariants = async () => {
+        const fetchVariants = async () => {
       try {
         const url = debouncedSearchTerm
           ? `/api/products?q=${encodeURIComponent(debouncedSearchTerm)}`
           : `/api/products`
 
-        const res = await fetch(url, {
-          headers: { "x-channel-id": selectedChannelId }
-        })
+        const res = await fetch(url)
         const data = await res.json()
 
         if (data && data.data) {
@@ -128,25 +120,18 @@ export function PurchaseOrderFormSheet() {
     }
 
     fetchVariants()
-  }, [debouncedSearchTerm, selectedChannelId])
+  }, [debouncedSearchTerm])
 
   async function onSubmit(data: PurchaseOrderFormValues) {
-    if (!selectedChannelId) {
-      toast.error("Lütfen önce bir satış kanalı seçin.")
-      return
-    }
-
     try {
       setIsLoading(true)
       const response = await fetch("/api/purchase-orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-channel-id": selectedChannelId,
         },
         body: JSON.stringify({
           ...data,
-          channelId: selectedChannelId,
         }),
       })
 

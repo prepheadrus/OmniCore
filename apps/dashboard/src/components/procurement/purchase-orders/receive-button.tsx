@@ -4,31 +4,21 @@ import { useState } from "react"
 import { Button } from "@omnicore/ui/components/ui/button"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { useChannel } from "../../../contexts/ChannelContext"
 
 export function ReceiveButton({ purchaseOrderId }: { purchaseOrderId: string }) {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  const { selectedChannelId } = useChannel()
-
   const handleReceive = async (e: React.MouseEvent) => {
     e.stopPropagation() // prevent row expand
     if (!confirm("Bu fatura kalemlerini stoğa işlemek (Mal Kabul) istediğinize emin misiniz?")) {
       return
     }
-
-    if (!selectedChannelId) {
-      toast.error("Lütfen önce bir satış kanalı seçin.")
-      return
-    }
-
     setIsLoading(true)
     try {
       const res = await fetch(`/api/purchase-orders/${purchaseOrderId}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "x-channel-id": selectedChannelId,
         },
         body: JSON.stringify({ status: "RECEIVED" }),
       })

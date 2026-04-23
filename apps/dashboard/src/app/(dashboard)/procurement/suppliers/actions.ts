@@ -5,11 +5,7 @@ import { cookies } from 'next/headers';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
-export async function saveSupplierAction(data: any, channelId: string) {
-  if (!channelId) {
-    throw new Error('Lütfen önce bir satış kanalı seçin.');
-  }
-
+export async function saveSupplierAction(data: any) {
   const isUpdate = !!data.id;
   const url = isUpdate ? `${API_URL}/suppliers/${data.id}` : `${API_URL}/suppliers`;
   const method = isUpdate ? 'PUT' : 'POST';
@@ -18,11 +14,9 @@ export async function saveSupplierAction(data: any, channelId: string) {
     method,
     headers: {
       'Content-Type': 'application/json',
-      'x-channel-id': channelId,
     },
     body: JSON.stringify({
       ...data,
-      channelId,
     }),
   });
 
@@ -35,15 +29,10 @@ export async function saveSupplierAction(data: any, channelId: string) {
   return await response.json();
 }
 
-export async function deleteSupplierAction(id: string, channelId: string) {
-  if (!channelId) {
-    throw new Error('Lütfen önce bir satış kanalı seçin.');
-  }
-
+export async function deleteSupplierAction(id: string) {
   const response = await fetch(`${API_URL}/suppliers/${id}`, {
     method: 'DELETE',
     headers: {
-      'x-channel-id': channelId,
     },
   });
 
