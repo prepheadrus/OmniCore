@@ -8,7 +8,7 @@ datasource db {
 }
 
 model SalesChannel {
-  purchaseInvoices PurchaseInvoice[]
+
   id             String          @id @default(uuid())
   name           String
   createdAt      DateTime        @default(now())
@@ -18,6 +18,7 @@ model SalesChannel {
   stockMovements StockMovement[]
   suppliers      Supplier[]
   purchaseOrders PurchaseOrder[]
+  purchaseInvoices     PurchaseInvoice[]
 }
 
 model Category {
@@ -78,6 +79,7 @@ model ProductVariant {
   updatedAt      DateTime        @updatedAt
   stockMovements StockMovement[]
   purchaseOrderItems PurchaseOrderItem[]
+  purchaseInvoiceItems PurchaseInvoiceItem[]
 }
 
 model BundleComponent {
@@ -145,13 +147,14 @@ model Order {
 }
 
 model Supplier {
-  purchaseInvoices PurchaseInvoice[]
+
   id                   String          @id @default(uuid())
   name                 String
   supplierGroup        String?
   channelId            String
   channel              SalesChannel    @relation(fields: [channelId], references: [id])
   purchaseOrders       PurchaseOrder[]
+  purchaseInvoices     PurchaseInvoice[]
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
 
@@ -229,7 +232,13 @@ model PurchaseOrderItem {
 
 enum PurchaseInvoiceStatus {
   DRAFT
+MATCHING_PENDING
   COMPLETED
+}
+
+enum PurchaseInvoiceType {
+  E_INVOICE
+  PRINTED
 }
 
 model PurchaseInvoice {
@@ -239,6 +248,7 @@ model PurchaseInvoice {
   supplier               Supplier              @relation(fields: [supplierId], references: [id])
   date                   DateTime
   dueDate                DateTime?
+  type                   PurchaseInvoiceType   @default(E_INVOICE)
   currency               String                @default("TRY")
   exchangeRate           Decimal               @default(1)
 
@@ -249,6 +259,8 @@ model PurchaseInvoice {
   taxAmount              Decimal               @default(0)
   roundingDifference     Decimal               @default(0)
   grandTotal             Decimal               @default(0)
+
+  notes                  String?
 
   status                 PurchaseInvoiceStatus @default(DRAFT)
   channelId              String
@@ -274,7 +286,9 @@ model PurchaseInvoiceItem {
 
   isMatched         Boolean         @default(false)
   matchedSku        String?
+  productId         String?
+  productVariant    ProductVariant? @relation(fields: [productId], references: [id])
 
   createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  updatedAt        DateTime        @updatedAt
 }
