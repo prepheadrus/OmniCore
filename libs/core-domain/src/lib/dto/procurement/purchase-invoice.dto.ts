@@ -9,12 +9,19 @@ import {
   IsArray,
   Min,
   Max,
-  IsDateString
+  IsDateString,
+  IsUUID
 } from 'class-validator';
 
 export enum PurchaseInvoiceStatusDto {
   DRAFT = 'DRAFT',
+  MATCHING_PENDING = 'MATCHING_PENDING',
   COMPLETED = 'COMPLETED',
+}
+
+export enum PurchaseInvoiceType {
+  E_INVOICE = 'E_INVOICE',
+  PRINTED = 'PRINTED',
 }
 
 export class PurchaseInvoiceItemDto {
@@ -49,6 +56,10 @@ export class PurchaseInvoiceItemDto {
   @IsString()
   @IsOptional()
   matchedSku?: string;
+
+  @IsOptional()
+  @IsUUID()
+  productId?: string;
 }
 
 export class CreatePurchaseInvoiceDto {
@@ -64,6 +75,9 @@ export class CreatePurchaseInvoiceDto {
   @IsDateString()
   @IsOptional()
   dueDate?: string;
+
+  @IsEnum(PurchaseInvoiceType)
+  type!: PurchaseInvoiceType;
 
   @IsString()
   @IsOptional()
@@ -97,6 +111,10 @@ export class CreatePurchaseInvoiceDto {
 
   @IsNumber()
   grandTotal!: number;
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
 
   @IsArray()
   @ValidateNested({ each: true })
