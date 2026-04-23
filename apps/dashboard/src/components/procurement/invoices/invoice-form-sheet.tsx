@@ -37,6 +37,7 @@ interface InvoiceFormSheetProps {
 
 const defaultValues: Partial<InvoiceFormValues> = {
   supplierId: "",
+  type: "E_INVOICE",
   documentNo: "",
   date: new Date().toISOString().split("T")[0],
   currency: "TRY",
@@ -261,6 +262,28 @@ export function InvoiceFormSheet({ isOpen, onClose, initialData }: InvoiceFormSh
                         <div>
                           <Label className="text-[11px] font-semibold text-slate-500 uppercase">Tarih</Label>
                           <Input type="date" className="h-9 bg-white text-sm mt-1" {...field} />
+                          {fieldState.error && <span className="text-[10px] text-rose-500">{fieldState.error.message}</span>}
+                        </div>
+                      )}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Controller
+                      control={form.control}
+                      name="type"
+                      render={({ field, fieldState }) => (
+                        <div>
+                          <Label className="text-[11px] font-semibold text-slate-500 uppercase">Fatura Tipi</Label>
+                          <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                            <SelectTrigger className="h-9 bg-white text-sm mt-1">
+                              <SelectValue placeholder="Seçiniz" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="E_INVOICE">e-Fatura</SelectItem>
+                              <SelectItem value="E_ARCHIVE">e-Arşiv Fatura</SelectItem>
+                            </SelectContent>
+                          </Select>
                           {fieldState.error && <span className="text-[10px] text-rose-500">{fieldState.error.message}</span>}
                         </div>
                       )}

@@ -21,7 +21,7 @@ export enum PurchaseInvoiceStatusDto {
 
 export enum PurchaseInvoiceType {
   E_INVOICE = 'E_INVOICE',
-  PRINTED = 'PRINTED',
+  E_ARCHIVE = 'E_ARCHIVE',
 }
 
 export class PurchaseInvoiceItemDto {

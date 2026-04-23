@@ -35,6 +35,7 @@ export const invoiceFormSchema = z.object({
   documentNo: z.string().min(1, "Belge no zorunludur"),
   date: z.string().min(1, "Tarih zorunludur"),
   dueDate: z.string().optional().or(z.literal('')),
+  type: z.enum(["E_INVOICE", "E_ARCHIVE"]).default("E_INVOICE"),
   currency: z.string().default("TRY"),
   exchangeRate: z.preprocess(
     emptyStringToUndefined,

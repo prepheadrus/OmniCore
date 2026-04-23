@@ -37,6 +37,15 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private createExtendedClient() {
     const cls = this.cls;
     const prisma = this.prisma; // Prisma istemcisini scope içine alıyoruz
+    const GLOBAL_MODELS = [
+      'Supplier',
+      'PurchaseOrder',
+      'PurchaseOrderItem',
+      'PurchaseInvoice',
+      'PurchaseInvoiceItem',
+      'Category',
+      'Brand'
+    ];
 
     return prisma.$extends({
       query: {
@@ -45,7 +54,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
           $allOperations: async ({ model, operation, args, query }: any) => {
             const channelId = cls.get('app.channel_id');
 
-            if (!channelId) {
+            if (!channelId && !GLOBAL_MODELS.includes(model)) {
               throw new UnauthorizedException(
                 'Database context error: channel_id is missing. Context-free database access is not allowed.',
               );
