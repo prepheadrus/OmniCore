@@ -1,23 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '@omnicore/database';
-import { ClsService } from 'nestjs-cls';
 import { CreatePurchaseInvoiceDto, GetPurchaseInvoicesFilterDto, PurchaseInvoiceStatusDto } from '@omnicore/core-domain/dto';
 
 @Injectable()
 export class PurchaseInvoiceService {
   constructor(
-    private readonly db: DatabaseService,
-    private readonly cls: ClsService
+    private readonly db: DatabaseService
   ) {}
 
   async create(createDto: CreatePurchaseInvoiceDto) {
-    const channelId = this.cls.get('app.channel_id');
     const { items, status, ...invoiceData } = createDto;
 
     return this.db.client.purchaseInvoice.create({
       data: {
         ...invoiceData,
-        channelId,
         status: status === PurchaseInvoiceStatusDto.COMPLETED ? 'COMPLETED' : 'DRAFT',
         items: {
           create: items.map((item: any) => ({
@@ -33,11 +29,10 @@ export class PurchaseInvoiceService {
   }
 
   async findMany(filterDto: GetPurchaseInvoicesFilterDto) {
-    const channelId = this.cls.get('app.channel_id');
     const { page = 1, limit = 10, supplierId, documentNo, status } = filterDto;
     const skip = (page - 1) * limit;
 
-    const where: any = { channelId };
+    const where: any = {};
 
     if (supplierId) {
       where.supplierId = supplierId;
@@ -81,10 +76,8 @@ export class PurchaseInvoiceService {
   }
 
   async findOne(id: string) {
-    const channelId = this.cls.get('app.channel_id');
-
     const invoice = await this.db.client.purchaseInvoice.findFirst({
-      where: { id, channelId },
+      where: { id },
       include: {
         items: true,
         supplier: true

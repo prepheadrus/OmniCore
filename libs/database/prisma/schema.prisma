@@ -8,17 +8,16 @@ datasource db {
 }
 
 model SalesChannel {
-
-  id             String          @id @default(uuid())
-  name           String
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  products       Product[]
-  orders         Order[]
-  stockMovements StockMovement[]
-  suppliers      Supplier[]
-  purchaseOrders PurchaseOrder[]
-  purchaseInvoices     PurchaseInvoice[]
+  id               String            @id @default(uuid())
+  name             String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  products         Product[]
+  orders           Order[]
+  stockMovements   StockMovement[]
+  suppliers        Supplier[]
+  purchaseOrders   PurchaseOrder[]
+  purchaseInvoices PurchaseInvoice[]
 }
 
 model Category {
@@ -57,42 +56,42 @@ model Product {
 }
 
 model ProductVariant {
-  id             String          @id @default(uuid())
-  productId      String
-  sku            String          @unique
-  barcode        String?         @unique
-  price          Float
-  stock          Int             @default(0)
-  movingAverageCost Decimal      @default(0)
-  attributes     Json? // e.g., {"color": "Red", "size": "M"} or {"volume": "400ml"}
-  technicalSpecs Json? // Variant specific specs
-  desi           Float?
-  weight         Float?
-  dimensions     Json? // e.g., {"width": 10, "height": 20, "depth": 5}
+  id                String  @id @default(uuid())
+  productId         String
+  sku               String  @unique
+  barcode           String? @unique
+  price             Float
+  stock             Int     @default(0)
+  movingAverageCost Decimal @default(0)
+  attributes        Json? // e.g., {"color": "Red", "size": "M"} or {"volume": "400ml"}
+  technicalSpecs    Json? // Variant specific specs
+  desi              Float?
+  weight            Float?
+  dimensions        Json? // e.g., {"width": 10, "height": 20, "depth": 5}
 
-  isBundle       Boolean         @default(false)
-  bundleItems    BundleComponent[] @relation("ParentVariant")
-  partOfBundles  BundleComponent[] @relation("ChildVariant")
+  isBundle      Boolean           @default(false)
+  bundleItems   BundleComponent[] @relation("ParentVariant")
+  partOfBundles BundleComponent[] @relation("ChildVariant")
 
-  product        Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  stockMovements StockMovement[]
-  purchaseOrderItems PurchaseOrderItem[]
+  product              Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  stockMovements       StockMovement[]
+  purchaseOrderItems   PurchaseOrderItem[]
   purchaseInvoiceItems PurchaseInvoiceItem[]
 }
 
 model BundleComponent {
-  id              String   @id @default(uuid())
+  id              String @id @default(uuid())
   parentVariantId String
   childVariantId  String
   quantity        Int
 
-  parentVariant   ProductVariant @relation("ParentVariant", fields: [parentVariantId], references: [id], onDelete: Cascade)
-  childVariant    ProductVariant @relation("ChildVariant", fields: [childVariantId], references: [id], onDelete: Restrict)
+  parentVariant ProductVariant @relation("ParentVariant", fields: [parentVariantId], references: [id], onDelete: Cascade)
+  childVariant  ProductVariant @relation("ChildVariant", fields: [childVariantId], references: [id], onDelete: Restrict)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([parentVariantId, childVariantId])
 }
@@ -114,7 +113,7 @@ enum StockMovementEventType {
 model StockMovement {
   id               String                 @id @default(uuid())
   productVariantId String
-  channelId        String
+  channelId        String?
   eventType        StockMovementEventType
   quantityChange   Int
   unitCost         Decimal?
@@ -122,77 +121,76 @@ model StockMovement {
   createdAt        DateTime               @default(now())
 
   productVariant ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
-  channel        SalesChannel   @relation(fields: [channelId], references: [id])
+  channel        SalesChannel?  @relation(fields: [channelId], references: [id])
 }
 
 model Order {
-  id               String       @id @default(uuid())
-  orderNumber      String       @unique
+  id               String           @id @default(uuid())
+  orderNumber      String           @unique
   totalAmount      Decimal
-  costPrice        Decimal      @default(0)
-  commissionAmount Decimal      @default(0)
-  shippingCost     Decimal      @default(0)
-  taxAmount        Decimal      @default(0)
-  discountAmount   Decimal      @default(0)
-  netProfit        Decimal      @default(0)
+  costPrice        Decimal          @default(0)
+  commissionAmount Decimal          @default(0)
+  shippingCost     Decimal          @default(0)
+  taxAmount        Decimal          @default(0)
+  discountAmount   Decimal          @default(0)
+  netProfit        Decimal          @default(0)
   settlementStatus SettlementStatus @default(PENDING)
   status           String
   invoiceStatus    String?
   invoicePdfUrl    String?
   shippingLabelUrl String?
-  channelId        String
-  channel          SalesChannel @relation(fields: [channelId], references: [id])
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  channelId        String?
+  channel          SalesChannel?    @relation(fields: [channelId], references: [id])
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 }
 
 model Supplier {
-
-  id                   String          @id @default(uuid())
-  name                 String
-  supplierGroup        String?
-  channelId            String
-  channel              SalesChannel    @relation(fields: [channelId], references: [id])
-  purchaseOrders       PurchaseOrder[]
-  purchaseInvoices     PurchaseInvoice[]
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @updatedAt
+  id               String            @id @default(uuid())
+  name             String
+  supplierGroup    String?
+  purchaseOrders   PurchaseOrder[]
+  purchaseInvoices PurchaseInvoice[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   // General & Contact
-  contactName          String?
-  contactEmail         String?
-  contactPhone         String?
-  website              String?
+  contactName  String?
+  contactEmail String?
+  contactPhone String?
+  website      String?
 
   // Address (UBL-TR)
-  streetAddress        String?
-  city                 String?
-  district             String?
-  postalCode           String?
-  country              String?         @default("Türkiye")
+  streetAddress String?
+  city          String?
+  district      String?
+  postalCode    String?
+  country       String? @default("Türkiye")
 
   // Finance & E-Transformation
-  taxNumber            String?
-  taxOffice            String?
-  currency             String          @default("TRY")
-  iban                 String?
-  bankName             String?
-  paymentTerms         Int?
-  eInvoiceAlias        String?
-  naceCode             String?
-  mersisNo             String?
-  tradeRegistryNo      String?
+  taxNumber       String?
+  taxOffice       String?
+  currency        String  @default("TRY")
+  iban            String?
+  bankName        String?
+  paymentTerms    Int?
+  eInvoiceAlias   String?
+  naceCode        String?
+  mersisNo        String?
+  tradeRegistryNo String?
 
   // Logistics & Operation
-  leadTimeInDays       Int             @default(1)
-  minimumOrderQuantity Int             @default(1)
-  isActive             Boolean         @default(true)
-  isDropshipper        Boolean         @default(false)
+  leadTimeInDays       Int     @default(1)
+  minimumOrderQuantity Int     @default(1)
+  isActive             Boolean @default(true)
+  isDropshipper        Boolean @default(false)
   returnAddress        String?
 
   // External System & Performance
-  externalSellerId     String?
-  performanceScore     Int?
+  externalSellerId String?
+  performanceScore Int?
+  salesChannel     SalesChannel? @relation(fields: [salesChannelId], references: [id])
+  salesChannelId   String?
 }
 
 enum PurchaseOrderStatus {
@@ -204,17 +202,17 @@ enum PurchaseOrderStatus {
 }
 
 model PurchaseOrder {
-  id          String              @id @default(uuid())
-  supplierId  String
-  supplier    Supplier            @relation(fields: [supplierId], references: [id])
-  status      PurchaseOrderStatus @default(DRAFT)
-  orderDate   DateTime            @default(now())
-  totalAmount Decimal
-  channelId   String
-  channel     SalesChannel        @relation(fields: [channelId], references: [id])
-  items       PurchaseOrderItem[]
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  id             String              @id @default(uuid())
+  supplierId     String
+  supplier       Supplier            @relation(fields: [supplierId], references: [id])
+  status         PurchaseOrderStatus @default(DRAFT)
+  orderDate      DateTime            @default(now())
+  totalAmount    Decimal
+  items          PurchaseOrderItem[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  salesChannel   SalesChannel?       @relation(fields: [salesChannelId], references: [id])
+  salesChannelId String?
 }
 
 model PurchaseOrderItem {
@@ -232,7 +230,7 @@ model PurchaseOrderItem {
 
 enum PurchaseInvoiceStatus {
   DRAFT
-MATCHING_PENDING
+  MATCHING_PENDING
   COMPLETED
 }
 
@@ -242,34 +240,34 @@ enum PurchaseInvoiceType {
 }
 
 model PurchaseInvoice {
-  id                     String                @id @default(uuid())
-  documentNo             String
-  supplierId             String
-  supplier               Supplier              @relation(fields: [supplierId], references: [id])
-  date                   DateTime
-  dueDate                DateTime?
-  type                   PurchaseInvoiceType   @default(E_INVOICE)
-  currency               String                @default("TRY")
-  exchangeRate           Decimal               @default(1)
+  id           String              @id @default(uuid())
+  documentNo   String
+  supplierId   String
+  supplier     Supplier            @relation(fields: [supplierId], references: [id])
+  date         DateTime
+  dueDate      DateTime?
+  type         PurchaseInvoiceType @default(E_INVOICE)
+  currency     String              @default("TRY")
+  exchangeRate Decimal             @default(1)
 
   // Financial Summary
-  subTotal               Decimal               @default(0)
-  generalDiscountPercent Decimal               @default(0)
-  generalDiscountAmount  Decimal               @default(0)
-  taxAmount              Decimal               @default(0)
-  roundingDifference     Decimal               @default(0)
-  grandTotal             Decimal               @default(0)
+  subTotal               Decimal @default(0)
+  generalDiscountPercent Decimal @default(0)
+  generalDiscountAmount  Decimal @default(0)
+  taxAmount              Decimal @default(0)
+  roundingDifference     Decimal @default(0)
+  grandTotal             Decimal @default(0)
 
-  notes                  String?
+  notes String?
 
-  status                 PurchaseInvoiceStatus @default(DRAFT)
-  channelId              String
-  channel                SalesChannel          @relation(fields: [channelId], references: [id])
+  status PurchaseInvoiceStatus @default(DRAFT)
 
-  items                  PurchaseInvoiceItem[]
+  items PurchaseInvoiceItem[]
 
-  createdAt              DateTime              @default(now())
-  updatedAt              DateTime              @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  salesChannel   SalesChannel? @relation(fields: [salesChannelId], references: [id])
+  salesChannelId String?
 }
 
 model PurchaseInvoiceItem {
@@ -277,18 +275,18 @@ model PurchaseInvoiceItem {
   purchaseInvoiceId String
   purchaseInvoice   PurchaseInvoice @relation(fields: [purchaseInvoiceId], references: [id], onDelete: Cascade)
 
-  name              String
-  quantity          Decimal
-  unit              String          @default("Adet")
-  unitPrice         Decimal
-  discountPercent   Decimal         @default(0)
-  totalAmount       Decimal
+  name            String
+  quantity        Decimal
+  unit            String  @default("Adet")
+  unitPrice       Decimal
+  discountPercent Decimal @default(0)
+  totalAmount     Decimal
 
-  isMatched         Boolean         @default(false)
-  matchedSku        String?
-  productId         String?
-  productVariant    ProductVariant? @relation(fields: [productId], references: [id])
+  isMatched      Boolean         @default(false)
+  matchedSku     String?
+  productId      String?
+  productVariant ProductVariant? @relation(fields: [productId], references: [id])
 
-  createdAt         DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

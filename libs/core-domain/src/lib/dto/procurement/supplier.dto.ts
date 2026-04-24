@@ -3,7 +3,6 @@ import { IsString, IsOptional, IsEmail, IsInt, IsBoolean } from 'class-validator
 export class CreateSupplierDto {
   constructor() {
     this.name = '';
-    this.channelId = '';
   }
   @IsString()
   name: string;
@@ -13,7 +12,6 @@ export class CreateSupplierDto {
   supplierGroup?: string;
 
   @IsString()
-  channelId: string;
 
   @IsString()
   @IsOptional()

@@ -44,7 +44,8 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       'PurchaseInvoice',
       'PurchaseInvoiceItem',
       'Category',
-      'Brand'
+      'Brand',
+      'StockMovement'
     ];
 
     return prisma.$extends({

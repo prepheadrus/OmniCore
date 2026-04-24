@@ -1,37 +1,23 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from '@omnicore/database';
 import { CreateSupplierDto, UpdateSupplierDto } from '@omnicore/core-domain';
-import { ClsService } from 'nestjs-cls';
 
 @Injectable()
 export class SupplierService {
   constructor(
     private readonly databaseService: DatabaseService,
-    private readonly cls: ClsService,
   ) {}
 
   async create(createSupplierDto: CreateSupplierDto) {
     return this.databaseService.client.$transaction(async (tx) => {
-      const channelId = this.cls.get('app.channel_id');
-      if (channelId) {
-        await tx.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`;
-      }
       return tx.supplier.create({
-        data: {
-          ...createSupplierDto,
-          channelId: channelId || createSupplierDto.channelId, // Override DTO with Context
-        },
+        data: createSupplierDto,
       });
     });
   }
 
   async findAll(query?: { search?: string; isActive?: boolean; isDropshipper?: boolean }) {
     return this.databaseService.client.$transaction(async (tx) => {
-      const channelId = this.cls.get('app.channel_id');
-      if (channelId) {
-        await tx.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`;
-      }
-
       const where: import("@prisma/client").Prisma.SupplierWhereInput = {};
       if (query?.search) {
         where.OR = [
@@ -56,10 +42,6 @@ export class SupplierService {
 
   async findOne(id: string) {
     return this.databaseService.client.$transaction(async (tx) => {
-      const channelId = this.cls.get('app.channel_id');
-      if (channelId) {
-        await tx.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`;
-      }
       const supplier = await tx.supplier.findUnique({
         where: { id },
       });
@@ -74,11 +56,6 @@ export class SupplierService {
 
   async update(id: string, updateSupplierDto: UpdateSupplierDto) {
     return this.databaseService.client.$transaction(async (tx) => {
-      const channelId = this.cls.get('app.channel_id');
-      if (channelId) {
-        await tx.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`;
-      }
-
       const supplier = await tx.supplier.findUnique({
         where: { id },
       });
@@ -96,11 +73,6 @@ export class SupplierService {
 
   async remove(id: string) {
     return this.databaseService.client.$transaction(async (tx) => {
-      const channelId = this.cls.get('app.channel_id');
-      if (channelId) {
-        await tx.$executeRaw`SELECT set_config('app.channel_id', ${channelId}, TRUE)`;
-      }
-
       const supplier = await tx.supplier.findUnique({
         where: { id },
         include: { purchaseOrders: true }

@@ -26,7 +26,6 @@ export class PurchaseOrderService {
     return this.databaseService.client.purchaseOrder.create({
       data: {
         supplierId: createPurchaseOrderDto.supplierId,
-        channelId: createPurchaseOrderDto.channelId,
         totalAmount: totalAmount,
         status: PurchaseOrderStatus.DRAFT,
         items: {
@@ -132,7 +131,7 @@ export class PurchaseOrderService {
         await tx.stockMovement.create({
           data: {
             productVariantId: variant.id,
-            channelId: variant.product.channelId,
+            channelId: null,
             eventType: 'RESTOCK',
             quantityChange: item.quantity,
             unitCost: newUnitCost,
