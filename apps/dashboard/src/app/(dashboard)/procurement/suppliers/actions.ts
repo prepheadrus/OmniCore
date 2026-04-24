@@ -22,7 +22,8 @@ export async function saveSupplierAction(data: any) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Tedarikçi kaydedilemedi');
+    const errorMessage = Array.isArray(errorData.message) ? errorData.message.join(', ') : errorData.message;
+    throw new Error(errorMessage || 'Tedarikçi kaydedilemedi');
   }
 
   revalidatePath('/procurement/suppliers');

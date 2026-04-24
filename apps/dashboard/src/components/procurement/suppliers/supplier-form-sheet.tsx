@@ -29,8 +29,8 @@ const supplierSchema = z.object({
 
   // General & Contact
   contactName: z.string().optional(),
-  contactEmail: z.union([z.string().email('Geçerli bir e-posta girin'), z.literal('')]).optional(),
-  contactPhone: z.string().optional(),
+  contactEmail: z.union([z.string().email('Geçerli bir e-posta girin'), z.literal('')]).optional().transform(e => e === "" ? null : e),
+  contactPhone: z.string().optional().transform(e => e === "" ? null : e),
   website: z.string().optional(),
 
   // Address
