@@ -28,14 +28,12 @@ export class CreatePurchaseOrderItemDto {
 export class CreatePurchaseOrderDto {
   constructor() {
     this.supplierId = "";
-    this.channelId = "";
     this.items = [];
   }
   @IsString()
   supplierId: string;
 
   @IsString()
-  channelId: string;
 
   @IsArray()
   @ValidateNested({ each: true })
