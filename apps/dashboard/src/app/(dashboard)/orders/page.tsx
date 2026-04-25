@@ -32,6 +32,10 @@ function OrdersPageContent() {
       const limit = parseInt(searchParams.get('limit') || '10', 10);
       const q = searchParams.get('q') || undefined;
       const status = searchParams.get('status') || undefined;
+      const marketplace = searchParams.get('marketplace') || undefined;
+      const dateFrom = searchParams.get('dateFrom') || undefined;
+      const dateTo = searchParams.get('dateTo') || undefined;
+      const carrier = searchParams.get('carrier') || undefined;
 
       const queryParams = new URLSearchParams();
       if (selectedChannelId) queryParams.append('channelId', selectedChannelId);
@@ -39,6 +43,10 @@ function OrdersPageContent() {
       queryParams.append('limit', limit.toString());
       if (q) queryParams.append('q', q);
       if (status && status !== 'ALL') queryParams.append('status', status);
+      if (marketplace && marketplace !== 'ALL') queryParams.append('marketplace', marketplace);
+      if (dateFrom) queryParams.append('dateFrom', dateFrom);
+      if (dateTo) queryParams.append('dateTo', dateTo);
+      if (carrier && carrier !== 'ALL') queryParams.append('carrier', carrier);
 
       try {
         const response = await fetch(`/api/orders?${queryParams.toString()}`, {
@@ -56,24 +64,75 @@ function OrdersPageContent() {
         // Map backend order data to frontend OrderData format
         const mappedData: OrderData[] = result.data.map((order: any) => {
           let mappedStatus: OrderStatus = "Bekliyor";
-          if (order.status === "SHIPPED") mappedStatus = "Kargolandı";
+          if (order.status === "PENDING") mappedStatus = "Bekliyor";
+          if (order.status === "PREPARING") mappedStatus = "Hazırlanıyor";
+          if (order.status === "SHIPPED") mappedStatus = "Kargoda";
           if (order.status === "DELIVERED") mappedStatus = "Teslim Edildi";
+          if (order.status === "CANCELLED" || order.status === "RETURNED") mappedStatus = "İptal/İade";
+
+          // Parse shipping address for city/district
+          let parsedAddress = "";
+          if (order.shippingAddr) {
+            const parts = order.shippingAddr.split(/[,/]/).map((p: string) => p.trim()).filter(Boolean);
+            if (parts.length >= 2) {
+              parsedAddress = `${parts[parts.length - 2]} / ${parts[parts.length - 1]}`;
+            } else if (order.shippingAddr.length > 30) {
+              parsedAddress = `${order.shippingAddr.substring(0, 30)}...`;
+            } else {
+              parsedAddress = order.shippingAddr;
+            }
+          }
+
+          // Parse items json
+          let itemsSummary = "";
+          let totalItemsCount = order.items || 1;
+          try {
+            if (order.itemsJson) {
+              const items = typeof order.itemsJson === 'string' ? JSON.parse(order.itemsJson) : order.itemsJson;
+              if (Array.isArray(items) && items.length > 0) {
+                const firstItem = items[0];
+                const itemName = firstItem.name || "Ürün";
+                const additionalCount = items.length - 1;
+                totalItemsCount = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+
+                if (additionalCount > 0) {
+                  itemsSummary = `${itemName.substring(0, 20)}... (+${additionalCount} ürün daha)`;
+                } else {
+                  itemsSummary = `${itemName.substring(0, 30)}${itemName.length > 30 ? '...' : ''} (${firstItem.quantity || 1} Adet)`;
+                }
+              }
+            }
+          } catch (e) {
+            // Fallback
+          }
+
+          if (!itemsSummary) {
+            itemsSummary = `Toplam: ${totalItemsCount} Adet`;
+          }
 
           return {
-            id: order.id,
-            customer: order.customerName || "Bilinmiyor",
+            id: order.orderNumber || order.id,
+            internalId: order.id,
+            marketplaceOrderNo: order.marketplaceOrderNo,
+            marketplace: order.marketplace || "Bilinmiyor",
+            customerName: order.customerName || "Bilinmiyor",
+            customerAddress: parsedAddress,
+            itemsSummary: itemsSummary,
             date: new Date(order.createdAt).toLocaleDateString('tr-TR'),
             status: mappedStatus,
-            amount: `₺${Number(order.totalAmount).toFixed(2)}`,
+            rawStatus: order.status,
+            amount: Number(order.totalAmount || 0),
+            taxAmountNum: Number(order.taxAmount || 0),
+            commissionAmountNum: Number(order.commissionAmount || 0),
             channel: channelName,
+            carrier: order.carrier || "Belirtilmedi",
+            trackingNo: order.trackingNo || "",
             invoiceStatus: order.invoiceStatus,
             invoicePdfUrl: order.invoicePdfUrl,
             shippingLabelUrl: order.shippingLabelUrl,
             netProfit: order.netProfit,
             costPrice: order.costPrice,
-            commissionAmount: order.commissionAmount,
             shippingCost: order.shippingCost,
-            taxAmount: order.taxAmount,
             discountAmount: order.discountAmount,
           };
         });
@@ -112,7 +171,7 @@ function OrdersPageContent() {
             toast.success(`Sipariş ${id} kargoya verildi!`);
             return {
               ...order,
-              status: "Kargolandı",
+              status: "Kargoda",
               invoiceStatus: "SIGNED",
               invoicePdfUrl: "https://example.com/mock-invoice.pdf",
               shippingLabelUrl: "https://example.com/mock-label.pdf",
@@ -124,7 +183,7 @@ function OrdersPageContent() {
       return;
     }
 
-    // Financial Form update
+    // Form/Sheet update
     setData((prev) =>
       prev.map((order) => {
         if (order.id === updatedOrder.id) {
@@ -150,10 +209,13 @@ function OrdersPageContent() {
       </div>
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="ALL">Tümü</TabsTrigger>
-          <TabsTrigger value="PENDING">Bekleyenler</TabsTrigger>
-          <TabsTrigger value="SHIPPED">Kargolananlar</TabsTrigger>
+        <TabsList className="mb-4 bg-slate-100/50">
+          <TabsTrigger value="ALL" className="data-[state=active]:bg-white data-[state=active]:shadow-none rounded-md">Tümü</TabsTrigger>
+          <TabsTrigger value="PENDING" className="data-[state=active]:bg-white data-[state=active]:shadow-none rounded-md">Beklemede</TabsTrigger>
+          <TabsTrigger value="PREPARING" className="data-[state=active]:bg-white data-[state=active]:shadow-none rounded-md">Hazırlanıyor</TabsTrigger>
+          <TabsTrigger value="SHIPPED" className="data-[state=active]:bg-white data-[state=active]:shadow-none rounded-md">Kargoda</TabsTrigger>
+          <TabsTrigger value="DELIVERED" className="data-[state=active]:bg-white data-[state=active]:shadow-none rounded-md">Teslim Edildi</TabsTrigger>
+          <TabsTrigger value="CANCELLED" className="data-[state=active]:bg-white data-[state=active]:shadow-none rounded-md">İptal/İade</TabsTrigger>
         </TabsList>
       </Tabs>
 

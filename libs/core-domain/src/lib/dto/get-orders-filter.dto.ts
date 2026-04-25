@@ -32,4 +32,20 @@ export class GetOrdersFilterDto {
   @IsIn(['asc', 'desc'])
   @IsString()
   sortOrder?: 'asc' | 'desc' = 'desc';
+
+  @IsOptional()
+  @IsString()
+  marketplace?: string;
+
+  @IsOptional()
+  @IsString()
+  dateFrom?: string;
+
+  @IsOptional()
+  @IsString()
+  dateTo?: string;
+
+  @IsOptional()
+  @IsString()
+  carrier?: string;
 }

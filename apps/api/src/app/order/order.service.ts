@@ -18,15 +18,43 @@ export class OrderService {
       where.channelId = filter.channelId;
     }
 
-    if (filter.status) {
+    if (filter.status && filter.status !== 'ALL') {
       where.status = filter.status;
     }
 
     if (filter.q) {
-      where.orderNumber = {
-        contains: filter.q,
-        mode: 'insensitive',
-      };
+      where.OR = [
+        {
+          orderNumber: {
+            contains: filter.q,
+            mode: 'insensitive',
+          },
+        },
+        {
+          customerName: {
+            contains: filter.q,
+            mode: 'insensitive',
+          },
+        },
+      ];
+    }
+
+    if (filter.marketplace && filter.marketplace !== 'ALL') {
+      where.marketplace = filter.marketplace;
+    }
+
+    if (filter.carrier && filter.carrier !== 'ALL') {
+      where.carrier = filter.carrier;
+    }
+
+    if (filter.dateFrom || filter.dateTo) {
+      where.createdAt = {};
+      if (filter.dateFrom) {
+        where.createdAt.gte = new Date(filter.dateFrom);
+      }
+      if (filter.dateTo) {
+        where.createdAt.lte = new Date(filter.dateTo);
+      }
     }
 
     const orderBy: Prisma.OrderOrderByWithRelationInput = {
