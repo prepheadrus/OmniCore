@@ -16,7 +16,8 @@ import {
   Settings,
   HelpCircle,
   LogOut,
-  Layers
+  Layers,
+  Rss
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -38,6 +39,7 @@ export default function Sidebar() {
         { name: 'Siparişler', icon: ShoppingCart, href: '/orders' },
         { name: 'İadeler', icon: Undo, href: '/returns' },
         { name: 'Ürünler', icon: Package, href: '/products' },
+        { name: 'Feed Yönetimi', icon: Rss, href: '/feeds' },
         { name: 'Müşteriler', icon: Users, href: '/customers' },
       ],
     },

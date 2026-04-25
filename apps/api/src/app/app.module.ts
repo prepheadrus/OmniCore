@@ -15,6 +15,8 @@ import { SyncCronService } from './cron/sync.cron';
 import { PimModule } from '@omnicore/pim';
 import { OrderModule } from './order/order.module';
 import { ProcurementModule } from './procurement/procurement.module';
+import { FeedsModule } from '../feeds/feeds.module';
+import { CategoryMappingsModule } from '../category-mappings/category-mappings.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { ProcurementModule } from './procurement/procurement.module';
     OrderModule,
     DashboardModule,
     ProcurementModule,
+    FeedsModule,
+    CategoryMappingsModule,
   ],
   controllers: [AppController, AiAgentController, QueueController, ],
   providers: [AppService, SyncCronService],
