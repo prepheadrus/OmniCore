@@ -17,6 +17,7 @@ import { OrderModule } from './order/order.module';
 import { ProcurementModule } from './procurement/procurement.module';
 import { FeedsModule } from './feeds/feeds.module';
 import { CategoryMappingsModule } from './category-mappings/category-mappings.module';
+import { FeedTemplatesModule } from './feed-templates/feed-templates.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { CategoryMappingsModule } from './category-mappings/category-mappings.mo
     ProcurementModule,
     FeedsModule,
     CategoryMappingsModule,
+    FeedTemplatesModule,
   ],
   controllers: [AppController, AiAgentController, QueueController, ],
   providers: [AppService, SyncCronService],
