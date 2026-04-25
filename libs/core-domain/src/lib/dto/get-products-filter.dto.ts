@@ -19,6 +19,20 @@ export class GetProductsFilterDto {
   q?: string;
 
   @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  minPrice?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  maxPrice?: number;
+
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   page?: number = 1;

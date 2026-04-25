@@ -27,17 +27,36 @@ export class ProductService {
 
     if (filter.stockStatus) {
       if (filter.stockStatus === 'in_stock') {
-        where.variants = {
-          some: {
-            stock: { gt: 0 }
-          }
-        };
+        where.stock = { gt: 0 };
       } else if (filter.stockStatus === 'out_of_stock') {
-        where.variants = {
-          every: {
-            stock: { equals: 0 }
-          }
-        };
+        where.stock = { equals: 0 };
+      }
+    }
+
+    if (filter.status) {
+      if (filter.status === 'INACTIVE') {
+        where.isActive = false;
+      } else {
+        where.isActive = true;
+        if (filter.status === 'IN_STOCK') {
+          where.stock = { gt: 0 };
+        } else if (filter.status === 'OUT_OF_STOCK') {
+          where.stock = { equals: 0 };
+        }
+      }
+    }
+
+    if (filter.categoryId && filter.categoryId !== 'ALL') {
+      where.categoryId = filter.categoryId;
+    }
+
+    if (filter.minPrice !== undefined || filter.maxPrice !== undefined) {
+      where.price = {};
+      if (filter.minPrice !== undefined) {
+        where.price.gte = filter.minPrice;
+      }
+      if (filter.maxPrice !== undefined) {
+        where.price.lte = filter.maxPrice;
       }
     }
 
@@ -85,6 +104,15 @@ export class ProductService {
   async createProduct(data: any) {
     return this.databaseService.client.product.create({
       data,
+    });
+  }
+
+  async updateProductInline(id: string, field: string, value: number | string) {
+    return this.databaseService.client.product.update({
+      where: { id },
+      data: {
+        [field]: value,
+      },
     });
   }
 

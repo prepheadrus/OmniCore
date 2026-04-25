@@ -166,11 +166,22 @@ export function ProductDetailSheet({
         <ScrollArea className="flex-1 p-6">
           <form id="product-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs defaultValue="general" className="w-full">
-              <TabsList className="w-full grid grid-cols-4 bg-slate-200/50 p-1 rounded-md mb-6">
-                <TabsTrigger value="general" className="text-[12px] h-7 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">Genel Bilgiler</TabsTrigger>
-                <TabsTrigger value="price" className="text-[12px] h-7 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">Fiyat & Stok</TabsTrigger>
-                <TabsTrigger value="bundle" className="text-[12px] h-7 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">Paket (BOM)</TabsTrigger>
-                <TabsTrigger value="channels" className="text-[12px] h-7 rounded-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">Kanallar</TabsTrigger>
+              <TabsList className="w-full justify-start border-b border-slate-200 rounded-none h-auto p-0 bg-transparent mb-6 space-x-6">
+                <TabsTrigger value="general" className="rounded-none border-b-2 border-transparent data-[state=active]:border-slate-800 data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 text-[13px] font-medium text-slate-500 data-[state=active]:text-slate-900">
+                  Genel Bilgiler
+                </TabsTrigger>
+                <TabsTrigger value="price" className="rounded-none border-b-2 border-transparent data-[state=active]:border-slate-800 data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 text-[13px] font-medium text-slate-500 data-[state=active]:text-slate-900">
+                  Fiyat & Stok
+                </TabsTrigger>
+                <TabsTrigger value="variants" className="rounded-none border-b-2 border-transparent data-[state=active]:border-slate-800 data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 text-[13px] font-medium text-slate-500 data-[state=active]:text-slate-900">
+                  Varyantlar
+                </TabsTrigger>
+                <TabsTrigger value="bundle" className="rounded-none border-b-2 border-transparent data-[state=active]:border-slate-800 data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 text-[13px] font-medium text-slate-500 data-[state=active]:text-slate-900">
+                  Paket (BOM)
+                </TabsTrigger>
+                <TabsTrigger value="channels" className="rounded-none border-b-2 border-transparent data-[state=active]:border-slate-800 data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 text-[13px] font-medium text-slate-500 data-[state=active]:text-slate-900">
+                  Kanallar
+                </TabsTrigger>
               </TabsList>
 
               {/* GENEL BİLGİLER */}
@@ -178,19 +189,19 @@ export function ProductDetailSheet({
                 <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-[13px] text-slate-700">Ürün Adı</Label>
-                    <Input id="name" {...form.register("name")} className="h-8 text-[13px]" />
+                    <Input id="name" {...form.register("name")} className="h-8 text-[13px] shadow-none border-slate-200 focus-visible:border-slate-400" />
                     {form.formState.errors.name && <p className="text-red-500 text-[11px]">{form.formState.errors.name.message}</p>}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="description" className="text-[13px] text-slate-700">Açıklama</Label>
-                    <Input id="description" {...form.register("description")} className="h-8 text-[13px]" />
+                    <Input id="description" {...form.register("description")} className="h-8 text-[13px] shadow-none border-slate-200 focus-visible:border-slate-400" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="brand" className="text-[13px] text-slate-700">Marka</Label>
-                      <Input id="brand" {...form.register("brand")} className="h-8 text-[13px]" />
+                      <Input id="brand" {...form.register("brand")} className="h-8 text-[13px] shadow-none border-slate-200 focus-visible:border-slate-400" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="taxRateId" className="text-[13px] text-slate-700">KDV Oranı</Label>
@@ -198,10 +209,10 @@ export function ProductDetailSheet({
                         value={form.watch("taxRateId")}
                         onValueChange={(val) => form.setValue("taxRateId", val)}
                       >
-                        <SelectTrigger className="h-8 text-[13px]">
+                        <SelectTrigger className="h-8 text-[13px] shadow-none border-slate-200 focus:ring-0 focus:border-slate-400">
                           <SelectValue placeholder="KDV Seçin" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="shadow-sm border-slate-200">
                           <SelectItem value="1">1%</SelectItem>
                           <SelectItem value="10">10%</SelectItem>
                           <SelectItem value="20">20%</SelectItem>
@@ -229,11 +240,11 @@ export function ProductDetailSheet({
                         </Select>
                       </div>
                       <div className="flex flex-col gap-1.5 min-w-[200px]">
-                        <Badge variant="secondary" className="bg-[#eef2ff] text-[#4f46e5] hover:bg-[#eef2ff] border border-[#c7d2fe] text-[10px] py-0.5 flex gap-1 items-center justify-center">
+                        <Badge variant="secondary" className="bg-slate-50 text-slate-700 hover:bg-slate-50 border border-slate-200 text-[10px] py-0.5 flex gap-1 items-center justify-center shadow-none">
                           <Sparkles className="h-3 w-3" />
                           Jules bu ürünü &apos;Otomotiv Bakım&apos; ile eşleştirdi
                         </Badge>
-                        <Button type="button" variant="outline" size="sm" className="h-6 text-[11px] border-[#c7d2fe] text-[#4f46e5] hover:bg-[#eef2ff]" onClick={() => form.setValue("categoryId", "cat-1")}>
+                        <Button type="button" variant="outline" size="sm" className="h-6 text-[11px] border-slate-200 text-slate-700 hover:bg-slate-100 shadow-none" onClick={() => form.setValue("categoryId", "cat-1")}>
                           Öneriyi Onayla
                         </Button>
                       </div>
@@ -253,7 +264,7 @@ export function ProductDetailSheet({
                          id="costPrice"
                          type="number"
                          step="0.01"
-                         className="h-8 pl-6 text-[13px] max-w-[200px]"
+                         className="h-8 pl-6 text-[13px] max-w-[200px] shadow-none border-slate-200 focus-visible:border-slate-400"
                          {...form.register("costPrice", { valueAsNumber: true })}
                        />
                      </div>
@@ -267,17 +278,17 @@ export function ProductDetailSheet({
                       const isSelected = field.channelId === selectedChannelId;
 
                       return (
-                        <div key={field.id} className={`grid grid-cols-12 gap-3 items-center p-3 rounded-md border ${isSelected ? 'border-indigo-200 bg-indigo-50/30' : 'border-slate-100 bg-slate-50'}`}>
+                        <div key={field.id} className={`grid grid-cols-12 gap-3 items-center p-3 rounded-md border ${isSelected ? 'border-slate-300 bg-slate-100/50' : 'border-slate-100 bg-slate-50'}`}>
                            <div className="col-span-4 flex items-center gap-2">
                              <span className="text-[13px] font-medium text-slate-700">{channelInfo?.name || field.channelId}</span>
-                             {isSelected && <Badge variant="secondary" className="bg-indigo-100 text-indigo-700 text-[9px] px-1 py-0 h-4 border-0">Aktif Seçim</Badge>}
+                             {isSelected && <Badge variant="secondary" className="bg-slate-200 text-slate-800 text-[9px] px-1 py-0 h-4 border-0">Aktif Seçim</Badge>}
                            </div>
                            <div className="col-span-4 space-y-1">
                              <Label className="text-[10px] text-slate-500 uppercase tracking-wider">Satış Fiyatı (₺)</Label>
                              <Input
                                type="number"
                                step="0.01"
-                               className="h-7 text-[13px] bg-white"
+                               className="h-7 text-[13px] bg-white border-slate-200 shadow-none focus-visible:border-slate-400"
                                {...form.register(`channels.${originalIdx}.price`, { valueAsNumber: true })}
                              />
                            </div>
@@ -285,13 +296,33 @@ export function ProductDetailSheet({
                              <Label className="text-[10px] text-slate-500 uppercase tracking-wider">Fiziksel Stok</Label>
                              <Input
                                type="number"
-                               className="h-7 text-[13px] bg-white"
+                               className="h-7 text-[13px] bg-white border-slate-200 shadow-none focus-visible:border-slate-400"
                                {...form.register(`channels.${originalIdx}.stock`, { valueAsNumber: true })}
                              />
                            </div>
                         </div>
                       )
                     })}
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* VARYANT AĞACI */}
+              <TabsContent value="variants" className="space-y-4 focus-visible:outline-none focus-visible:ring-0 mt-0">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                      <h3 className="text-[13px] font-medium text-slate-800">Ürün Varyantları</h3>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Alt ürün (SKU) varyasyonlarını (Örn: Beden, Renk) buradan yönetin.</p>
+                    </div>
+                  </div>
+
+                  <div className="text-center py-6 border-2 border-dashed border-slate-100 rounded-md">
+                      <p className="text-[12px] text-slate-500 mb-2">Varyant ağacı gösterimi (Mock)</p>
+                      <div className="flex justify-center space-x-2">
+                          <Badge variant="outline" className="text-[10px] bg-slate-50">Siyah / L (25 Stok)</Badge>
+                          <Badge variant="outline" className="text-[10px] bg-slate-50">Siyah / M (10 Stok)</Badge>
+                      </div>
                   </div>
                 </div>
               </TabsContent>
@@ -319,10 +350,10 @@ export function ProductDetailSheet({
                                 form.setValue(`bundleItems.${index}.name`, vName);
                               }}
                             >
-                              <SelectTrigger className="h-7 text-[12px] bg-white">
+                              <SelectTrigger className="h-7 text-[12px] bg-white shadow-none border-slate-200 focus:ring-0 focus:border-slate-400">
                                 <SelectValue placeholder="Varyant Seçin" />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent className="shadow-sm border-slate-200">
                                 {MOCK_VARIANTS.map(v => (
                                   <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
                                 ))}
@@ -332,7 +363,7 @@ export function ProductDetailSheet({
                           <div className="w-24">
                             <Input
                               type="number"
-                              className="h-7 text-[12px] bg-white"
+                              className="h-7 text-[12px] bg-white shadow-none border-slate-200 focus-visible:border-slate-400"
                               placeholder="Adet"
                               {...form.register(`bundleItems.${index}.quantity`, { valueAsNumber: true })}
                             />
@@ -359,7 +390,7 @@ export function ProductDetailSheet({
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="w-full h-8 text-[12px] border-dashed border-slate-300 text-slate-600"
+                    className="w-full h-8 text-[12px] border-dashed border-slate-300 text-slate-600 shadow-none"
                     onClick={() => appendBundle({ variantId: "", name: "", quantity: 1 })}
                   >
                     <Plus className="h-3.5 w-3.5 mr-1" />
@@ -401,10 +432,10 @@ export function ProductDetailSheet({
         </ScrollArea>
 
         <SheetFooter className="px-6 py-4 border-t border-slate-200 bg-white sm:justify-between">
-           <Button type="button" variant="outline" onClick={handleClose} className="h-8 text-[13px]">
+           <Button type="button" variant="outline" onClick={handleClose} className="h-8 text-[13px] border-slate-200 text-slate-700 shadow-none">
              İptal
            </Button>
-           <Button type="submit" form="product-form" className="h-8 text-[13px] bg-indigo-600 hover:bg-indigo-700 text-white">
+           <Button type="submit" form="product-form" className="h-8 text-[13px] bg-slate-900 hover:bg-slate-800 text-slate-50 shadow-none">
              Kaydet
            </Button>
         </SheetFooter>
