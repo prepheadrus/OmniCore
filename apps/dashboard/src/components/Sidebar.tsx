@@ -40,6 +40,8 @@ export default function Sidebar() {
         { name: 'İadeler', icon: Undo, href: '/returns' },
         { name: 'Ürünler', icon: Package, href: '/products' },
         { name: 'Feed Yönetimi', icon: Rss, href: '/feeds' },
+        { name: 'Feed Şablonları', icon: Layers, href: '/feed-templates' },
+        { name: 'Feed Optimizasyonu', icon: Wand2, href: '/feed-optimizer' },
         { name: 'Müşteriler', icon: Users, href: '/customers' },
       ],
     },
