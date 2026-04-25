@@ -1,26 +1,48 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFeedDto } from './dto/create-feed.dto';
-import { UpdateFeedDto } from './dto/update-feed.dto';
+import { CreateFeedDto, UpdateFeedDto } from '@omnicore/core-domain';
+import { DatabaseService } from '@omnicore/database';
+import { ClsService } from 'nestjs-cls';
 
 @Injectable()
 export class FeedsService {
-  create(createFeedDto: CreateFeedDto) {
-    return 'This action adds a new feed';
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly cls: ClsService
+  ) {}
+
+  async create(createFeedDto: CreateFeedDto) {
+    const channelId = this.cls.get('app.channel_id');
+    return this.databaseService.client.productFeed.create({
+      data: {
+        ...createFeedDto,
+        fieldMapping: createFeedDto.fieldMapping || {},
+        channel: {
+          connect: { id: channelId }
+        }
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all feeds`;
+  async findAll() {
+    return this.databaseService.client.productFeed.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} feed`;
+  async findOne(id: string) {
+    return this.databaseService.client.productFeed.findUnique({
+      where: { id },
+    });
   }
 
-  update(id: number, updateFeedDto: UpdateFeedDto) {
-    return `This action updates a #${id} feed`;
+  async update(id: string, updateFeedDto: UpdateFeedDto) {
+    return this.databaseService.client.productFeed.update({
+      where: { id },
+      data: updateFeedDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} feed`;
+  async remove(id: string) {
+    return this.databaseService.client.productFeed.delete({
+      where: { id },
+    });
   }
 }
