@@ -3,6 +3,7 @@ import { Product } from "../../../components/products/columns"
 import { DataTableSkeleton } from "../../../components/products/data-table-skeleton"
 import { ProductsClientPage } from "./client-page"
 import { env } from "process"
+import { cookies } from "next/headers"
 
 async function getProducts(searchParams?: { [key: string]: string | string[] | undefined }): Promise<Product[]> {
   const query = new URLSearchParams()
@@ -16,8 +17,12 @@ async function getProducts(searchParams?: { [key: string]: string | string[] | u
 
   const apiUrl = env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
   try {
+    const cookieStore = await cookies();
     const res = await fetch(`${apiUrl}/products?${query.toString()}`, {
       cache: 'no-store',
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
     })
     if (!res.ok) {
       console.error('Failed to fetch products', res.statusText)

@@ -186,7 +186,7 @@ export function ProductDetailSheet({
 
               {/* GENEL BİLGİLER */}
               <TabsContent value="general" className="space-y-4 focus-visible:outline-none focus-visible:ring-0 mt-0">
-                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-none space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-[13px] text-slate-700">Ürün Adı</Label>
                     <Input id="name" {...form.register("name")} className="h-8 text-[13px] shadow-none border-slate-200 focus-visible:border-slate-400" />
@@ -212,7 +212,7 @@ export function ProductDetailSheet({
                         <SelectTrigger className="h-8 text-[13px] shadow-none border-slate-200 focus:ring-0 focus:border-slate-400">
                           <SelectValue placeholder="KDV Seçin" />
                         </SelectTrigger>
-                        <SelectContent className="shadow-sm border-slate-200">
+                        <SelectContent className="shadow-none border-slate-200">
                           <SelectItem value="1">1%</SelectItem>
                           <SelectItem value="10">10%</SelectItem>
                           <SelectItem value="20">20%</SelectItem>
@@ -255,7 +255,7 @@ export function ProductDetailSheet({
 
               {/* FİYAT & STOK */}
               <TabsContent value="price" className="space-y-4 focus-visible:outline-none focus-visible:ring-0 mt-0">
-                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-none space-y-4">
                   <div className="space-y-2 mb-6 border-b border-slate-100 pb-4">
                      <Label htmlFor="costPrice" className="text-[13px] text-slate-700">Maliyet (Alış Fiyatı)</Label>
                      <div className="relative">
@@ -309,7 +309,7 @@ export function ProductDetailSheet({
 
               {/* VARYANT AĞACI */}
               <TabsContent value="variants" className="space-y-4 focus-visible:outline-none focus-visible:ring-0 mt-0">
-                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-none space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <div>
                       <h3 className="text-[13px] font-medium text-slate-800">Ürün Varyantları</h3>
@@ -329,7 +329,7 @@ export function ProductDetailSheet({
 
               {/* PAKET (BUNDLE) */}
               <TabsContent value="bundle" className="space-y-4 focus-visible:outline-none focus-visible:ring-0 mt-0">
-                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-none space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <div>
                       <h3 className="text-[13px] font-medium text-slate-800">Paket İçeriği (BOM)</h3>
@@ -353,7 +353,7 @@ export function ProductDetailSheet({
                               <SelectTrigger className="h-7 text-[12px] bg-white shadow-none border-slate-200 focus:ring-0 focus:border-slate-400">
                                 <SelectValue placeholder="Varyant Seçin" />
                               </SelectTrigger>
-                              <SelectContent className="shadow-sm border-slate-200">
+                              <SelectContent className="shadow-none border-slate-200">
                                 {MOCK_VARIANTS.map(v => (
                                   <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
                                 ))}
@@ -401,7 +401,7 @@ export function ProductDetailSheet({
 
               {/* KANALLAR */}
               <TabsContent value="channels" className="space-y-4 focus-visible:outline-none focus-visible:ring-0 mt-0">
-                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-none space-y-4">
                   <h3 className="text-[13px] font-medium text-slate-800 border-b border-slate-100 pb-2">Yayınlanma Durumları</h3>
 
                   <div className="space-y-3">

@@ -329,7 +329,7 @@ export function BundleForm({ open, onOpenChange, existingProducts, onSuccess }: 
                       </div>
                   ) : (
                       components.map((item) => (
-                        <div key={item.productId} className="group p-4 bg-white border rounded-xl shadow-sm hover:border-indigo-200 transition-all">
+                        <div key={item.productId} className="group p-4 bg-white border rounded-xl shadow-none hover:border-indigo-200 transition-all">
                             <div className="flex items-start justify-between gap-4">
                                 <div className="space-y-1">
                                     <p className="text-sm font-bold text-slate-900 leading-none">{item.name}</p>
@@ -376,7 +376,7 @@ export function BundleForm({ open, onOpenChange, existingProducts, onSuccess }: 
           <Button
             type="submit"
             form="bundle-form"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 font-bold px-8"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-none font-bold px-8"
           >
             Paketi Kaydet
           </Button>
