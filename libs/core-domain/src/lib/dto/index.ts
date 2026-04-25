@@ -4,3 +4,5 @@ export * from './calculate-finance-request.dto';
 export * from './procurement/supplier.dto';
 export * from './procurement/purchase-order.dto';
 export * from './procurement/purchase-invoice.dto';
+export * from './feed.dto';
+export * from './category-mapping.dto';

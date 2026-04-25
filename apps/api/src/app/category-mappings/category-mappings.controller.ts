@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { CategoryMappingsService } from './category-mappings.service';
-import { CreateCategoryMappingDto } from './dto/create-category-mapping.dto';
-import { UpdateCategoryMappingDto } from './dto/update-category-mapping.dto';
+import { CreateCategoryMappingDto, UpdateCategoryMappingDto } from '@omnicore/core-domain';
 
 @Controller('category-mappings')
 export class CategoryMappingsController {
@@ -19,16 +18,16 @@ export class CategoryMappingsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.categoryMappingsService.findOne(+id);
+    return this.categoryMappingsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCategoryMappingDto: UpdateCategoryMappingDto) {
-    return this.categoryMappingsService.update(+id, updateCategoryMappingDto);
+    return this.categoryMappingsService.update(id, updateCategoryMappingDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.categoryMappingsService.remove(+id);
+    return this.categoryMappingsService.remove(id);
   }
 }

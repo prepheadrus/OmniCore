@@ -1,26 +1,47 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCategoryMappingDto } from './dto/create-category-mapping.dto';
-import { UpdateCategoryMappingDto } from './dto/update-category-mapping.dto';
+import { CreateCategoryMappingDto, UpdateCategoryMappingDto } from '@omnicore/core-domain';
+import { DatabaseService } from '@omnicore/database';
+import { ClsService } from 'nestjs-cls';
 
 @Injectable()
 export class CategoryMappingsService {
-  create(createCategoryMappingDto: CreateCategoryMappingDto) {
-    return 'This action adds a new categoryMapping';
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly cls: ClsService
+  ) {}
+
+  async create(createCategoryMappingDto: CreateCategoryMappingDto) {
+    const channelId = this.cls.get('app.channel_id');
+    return this.databaseService.client.categoryMapping.create({
+      data: {
+        ...createCategoryMappingDto,
+        channel: {
+          connect: { id: channelId }
+        }
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all categoryMappings`;
+  async findAll() {
+    return this.databaseService.client.categoryMapping.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} categoryMapping`;
+  async findOne(id: string) {
+    return this.databaseService.client.categoryMapping.findUnique({
+      where: { id },
+    });
   }
 
-  update(id: number, updateCategoryMappingDto: UpdateCategoryMappingDto) {
-    return `This action updates a #${id} categoryMapping`;
+  async update(id: string, updateCategoryMappingDto: UpdateCategoryMappingDto) {
+    return this.databaseService.client.categoryMapping.update({
+      where: { id },
+      data: updateCategoryMappingDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} categoryMapping`;
+  async remove(id: string) {
+    return this.databaseService.client.categoryMapping.delete({
+      where: { id },
+    });
   }
 }
