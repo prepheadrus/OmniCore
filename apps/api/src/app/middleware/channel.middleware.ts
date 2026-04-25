@@ -12,6 +12,8 @@ export class ChannelMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const channelId = req.headers['x-channel-id'] ||
                       req.headers['x-sales-channel-id'] ||
+                      req.cookies?.['channel-id'] ||
+                      req.cookies?.['channelId'] ||
                       req.query.channelId ||
                       req.query.channel_id;
 

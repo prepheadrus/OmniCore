@@ -8,11 +8,15 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
 import { AllExceptionsFilter } from './app/filters/all-exceptions.filter';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+
+  // Enable cookie parser
+  app.use(cookieParser());
 
   // Enable global exception filter
   app.useGlobalFilters(new AllExceptionsFilter());
