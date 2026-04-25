@@ -1,0 +1,1135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ========== 1. AUTH & RBAC ==========
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String
+  name          String
+  role          String   @default("viewer")
+  avatar        String   @default("")
+  phone         String   @default("")
+  isActive      Boolean  @default(true)
+  twoFactor     Boolean  @default(false)
+  twoFactorCode String   @default("")
+  lastLogin     DateTime?
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 2. MULTI-TENANT ==========
+model Store {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  domain    String   @default("")
+  logo      String   @default("")
+  plan      String   @default("basic")
+  isActive  Boolean  @default(true)
+  ownerId   String   @default("")
+  settings  String   @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ========== LICENSE ==========
+model License {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  status      String   @default("inactive")
+  licenseType String   @default("trial")
+  ownerName   String   @default("")
+  ownerEmail  String   @default("")
+  company     String   @default("")
+  activatedAt DateTime?
+  expiresAt   DateTime?
+  machineId   String   @default("")
+  features    String   @default("all")
+  storeId     String   @default("default")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ========== 3. NOTIFICATIONS ==========
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String   @default("default")
+  storeId     String   @default("default")
+  type        String   @default("info")
+  title       String
+  message     String
+  link        String   @default("")
+  isRead      Boolean  @default(false)
+  category    String   @default("system")
+  createdAt   DateTime @default(now())
+}
+
+// ========== 4. AUTOMATION RULES ==========
+model AutomationRule {
+  id          String   @id @default(cuid())
+  storeId     String   @default("default")
+  name        String
+  description String   @default("")
+  trigger     String   @default("")
+  condition   String   @default("{}")
+  action      String   @default("")
+  actionData  String   @default("{}")
+  isActive    Boolean  @default(true)
+  runCount    Int      @default(0)
+  lastRun     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ========== 5. PRODUCTS (GELİŞMİŞ) ==========
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  sku           String   @unique
+  barcode       String
+  price         Float
+  stock         Int
+  cost          Float
+  category      String
+  subCategory   String   @default("")
+  brand         String   @default("")
+  marketplace   String   @default("")
+  storeId       String   @default("default")
+  description   String   @default("")
+  shortDesc     String   @default("")
+  images        String   @default("[]")
+  variants      String   @default("[]")
+  attributes    String   @default("{}")
+  seoTitle      String   @default("")
+  seoDesc       String   @default("")
+  supplierId    String   @default("")
+  minStock      Int      @default(0)
+  weight        Float    @default(0)
+  dimensions    String   @default("{}")
+  vatRate       Float    @default(20)
+  cargoTemplate String   @default("standart")
+  isActive      Boolean  @default(true)
+  isListed      Boolean  @default(false)
+  listings      String   @default("{}")
+  stockReserve  Int      @default(0)
+  gtin          String   @default("")
+  mpn           String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 6. ORDERS (GELİŞMİŞ) ==========
+model Order {
+  id              String   @id @default(cuid())
+  orderNumber     String   @unique
+  marketplace     String   @default("")
+  marketplaceOrderNo String @default("")
+  customerName    String
+  customerEmail   String   @default("")
+  customerPhone   String   @default("")
+  status          String   @default("pending")
+  totalAmount     Float
+  discount        Float    @default(0)
+  taxAmount       Float    @default(0)
+  netAmount       Float    @default(0)
+  commission      Float    @default(0)
+  cargoCost       Float    @default(0)
+  items           Int      @default(1)
+  itemsJson       String   @default("[]")
+  storeId         String   @default("default")
+  notes           String   @default("")
+  shippingAddr    String   @default("")
+  billingAddr     String   @default("")
+  invoiceNo       String   @default("")
+  trackingNo      String   @default("")
+  carrier         String   @default("")
+  cancelReason    String   @default("")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 7. RETURNS ==========
+model Return {
+  id            String   @id @default(cuid())
+  returnNumber  String   @unique
+  orderNumber   String
+  customerName  String
+  reason        String   @default("")
+  status        String   @default("pending")
+  totalAmount   Float
+  refundAmount  Float    @default(0)
+  type          String   @default("full")
+  items         Int      @default(1)
+  storeId       String   @default("default")
+  resolvedAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 8. CUSTOMERS (CRM) ==========
+model Customer {
+  id              String   @id @default(cuid())
+  name            String
+  email           String   @default("")
+  phone           String   @default("")
+  city            String   @default("")
+  district        String   @default("")
+  segment         String   @default("new")
+  loyaltyScore    Int      @default(0)
+  totalOrders     Int      @default(0)
+  totalSpent      Float    @default(0)
+  avgOrderValue   Float    @default(0)
+  lastOrderAt     DateTime?
+  storeId         String   @default("default")
+  notes           String   @default("")
+  tags            String   @default("[]")
+  taxNo           String   @default("")
+  taxOffice       String   @default("")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 9. INTEGRATIONS ==========
+model Integration {
+  id            String   @id @default(cuid())
+  name          String
+  type          String   @default("marketplace")
+  platform      String   @default("")
+  status        String   @default("disconnected")
+  apiKey        String   @default("")
+  apiSecret     String   @default("")
+  shopUrl       String   @default("")
+  storeId       String   @default("default")
+  config        String   @default("{}")
+  lastSync      DateTime?
+  syncStats     String   @default("{}")
+  errorCount    Int      @default(0)
+  lastError     String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 10. INVOICES ==========
+model Invoice {
+  id            String   @id @default(cuid())
+  invoiceNumber String   @unique
+  customerName  String
+  type          String   @default("sales")
+  amount        Float
+  tax           Float    @default(0)
+  status        String   @default("draft")
+  date          DateTime @default(now())
+  storeId       String   @default("default")
+  xmlUrl        String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 11. SHIPMENTS ==========
+model Shipment {
+  id             String   @id @default(cuid())
+  trackingNumber String   @default("")
+  orderNumber    String
+  carrier        String
+  status         String   @default("pending")
+  customerName   String
+  address        String   @default("")
+  storeId        String   @default("default")
+  labelUrl       String   @default("")
+  cargoCost      Float    @default(0)
+  weight         Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// ========== 12. WAREHOUSE ==========
+model Warehouse {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @default("")
+  address   String   @default("")
+  capacity  Int      @default(0)
+  usedSpace Int      @default(0)
+  type      String   @default("standard")
+  status    String   @default("active")
+  storeId   String   @default("default")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ========== 13. SUPPLIERS ==========
+model Supplier {
+  id            String   @id @default(cuid())
+  name          String
+  contact       String   @default("")
+  phone         String   @default("")
+  email         String   @default("")
+  address       String   @default("")
+  rating        Int      @default(0)
+  leadTime      Int      @default(0)
+  storeId       String   @default("default")
+  totalOrders   Int      @default(0)
+  totalSpent    Float    @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 14. CAMPAIGNS ==========
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   @default("discount")
+  marketplace String   @default("")
+  discount    Float    @default(0)
+  startDate   DateTime
+  endDate     DateTime
+  status      String   @default("draft")
+  productIds  String   @default("[]")
+  storeId     String   @default("default")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ========== 15. AUDIT LOG ==========
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String   @default("")
+  userName  String   @default("")
+  action    String
+  entity    String   @default("")
+  entityId  String   @default("")
+  details   String   @default("")
+  storeId   String   @default("default")
+  createdAt DateTime @default(now())
+}
+
+// ========== 16. BACKGROUND JOBS ==========
+model BackgroundJob {
+  id        String   @id @default(cuid())
+  type      String
+  status    String   @default("pending")
+  payload   String   @default("{}")
+  result    String   @default("")
+  progress  Int      @default(0)
+  storeId   String   @default("default")
+  startedAt DateTime?
+  endedAt   DateTime?
+  createdAt DateTime @default(now())
+}
+
+// ========== 17. PRODUCT FEEDS (Channable-tarzı) ==========
+model ProductFeed {
+  id          String   @id @default(cuid())
+  name        String
+  source      String   @default("upload")
+  sourceUrl   String   @default("")
+  format      String   @default("xml")
+  status      String   @default("active")
+  schedule    String   @default("manual")
+  lastImport  DateTime?
+  lastError   String   @default("")
+  totalProducts  Int   @default(0)
+  validProducts  Int   @default(0)
+  errorProducts  Int   @default(0)
+  fieldMapping    String @default("{}")
+  storeId         String @default("default")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ========== 18. PRICE RULES (Akıllı Fiyatlandırma) ==========
+model PriceRule {
+  id            String   @id @default(cuid())
+  name          String
+  description   String   @default("")
+  type          String   @default("markup")
+  baseField     String   @default("cost")
+  value         Float    @default(0)
+  valueType     String   @default("percentage")
+  minMargin     Float    @default(0)
+  maxPrice      Float    @default(0)
+  roundTo       Float    @default(0)
+  marketplace   String   @default("")
+  categoryId    String   @default("")
+  isActive      Boolean  @default(true)
+  priority      Int      @default(0)
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 19. CATEGORY MAPPINGS ==========
+model CategoryMapping {
+  id            String   @id @default(cuid())
+  source        String   @default("")
+  sourceCat     String   @default("")
+  target        String   @default("")
+  targetCat     String   @default("")
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 20. CONTENT RULES (İçerik Optimizasyonu) ==========
+model ContentRule {
+  id            String   @id @default(cuid())
+  name          String
+  type          String   @default("title_template")
+  channel       String   @default("all")
+  category      String   @default("")
+  description   String   @default("")
+  template      String   @default("")
+  variables     String   @default("{}")
+  isActive      Boolean  @default(true)
+  priority      Int      @default(0)
+  applyCount    Int      @default(0)
+  lastApplied   DateTime?
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 21. FEED TEMPLATES (Şablon Kütüphanesi) ==========
+model FeedTemplate {
+  id            String   @id @default(cuid())
+  name          String
+  description   String   @default("")
+  platform      String   @default("")
+  format        String   @default("xml")
+  category      String   @default("")
+  fields        String   @default("[]")
+  requirements  String   @default("{}")
+  sampleUrl     String   @default("")
+  isPopular     Boolean  @default(false)
+  downloadCount Int      @default(0)
+  rating        Float    @default(0)
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 22. STOCK SYNC LOG ==========
+model StockSyncLog {
+  id            String   @id @default(cuid())
+  productId     String   @default("")
+  productName   String   @default("")
+  sku           String   @default("")
+  channel       String   @default("")
+  oldStock      Int      @default(0)
+  newStock      Int      @default(0)
+  status        String   @default("success")
+  error         String   @default("")
+  triggeredBy   String   @default("manual")
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+}
+
+// ========== 23. FEED QUALITY RULE ==========
+model FeedQualityRule {
+  id            String   @id @default(cuid())
+  name          String
+  type          String   @default("required_field")
+  field         String   @default("")
+  condition     String   @default("")
+  severity      String   @default("error")
+  channel       String   @default("all")
+  category      String   @default("")
+  isActive      Boolean  @default(true)
+  errorCount    Int      @default(0)
+  lastCheck     DateTime?
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 24. PRICE HISTORY ==========
+model PriceHistory {
+  id            String   @id @default(cuid())
+  productId     String   @default("")
+  productName   String   @default("")
+  sku           String   @default("")
+  oldPrice      Float    @default(0)
+  newPrice      Float    @default(0)
+  ruleApplied   String   @default("")
+  marketplace   String   @default("")
+  changedBy     String   @default("auto")
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+}
+
+// ========== 25. WEBHOOK ENDPOINTS ==========
+model WebhookEndpoint {
+  id            String   @id @default(cuid())
+  name          String
+  url           String
+  secret        String   @default("")
+  events        String   @default("[]")
+  isActive      Boolean  @default(true)
+  successCount  Int      @default(0)
+  failCount     Int      @default(0)
+  lastTriggered DateTime?
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 26. CHAT CONVERSATIONS (Canli Chat) ==========
+model ChatConversation {
+  id            String   @id @default(cuid())
+  customerName  String   @default("")
+  customerEmail String   @default("")
+  subject       String   @default("")
+  status        String   @default("active")
+  assignedTo    String   @default("")
+  priority      String   @default("normal")
+  channel       String   @default("widget")
+  tags          String   @default("[]")
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  messages      ChatMessage[]
+}
+
+// ========== 27. CHAT MESSAGES ==========
+model ChatMessage {
+  id              String   @id @default(cuid())
+  conversationId  String
+  sender          String   @default("customer")
+  senderName      String   @default("")
+  content         String
+  type            String   @default("text")
+  isRead          Boolean  @default(false)
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  conversation    ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+// ========== 28. COMPETITOR PRICES (Rakip Fiyat Analizi) ==========
+model CompetitorPrice {
+  id            String   @id @default(cuid())
+  productId     String   @default("")
+  productName   String   @default("")
+  sku           String   @default("")
+  competitor    String   @default("")
+  marketplace   String   @default("")
+  price         Float    @default(0)
+  ourPrice      Float    @default(0)
+  priceDiff     Float    @default(0)
+  priceDiffPct  Float    @default(0)
+  stockStatus   String   @default("")
+  rating        Float    @default(0)
+  reviewCount   Int      @default(0)
+  url           String   @default("")
+  lastChecked   DateTime @default(now())
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 29. AD CAMPAIGNS (Reklam Verme) ==========
+model AdCampaign {
+  id            String   @id @default(cuid())
+  name          String
+  marketplace   String   @default("")
+  type          String   @default("sponsored")
+  budget        Float    @default(0)
+  dailyBudget   Float    @default(0)
+  spent         Float    @default(0)
+  impressions   Int      @default(0)
+  clicks        Int      @default(0)
+  conversions   Int      @default(0)
+  ctr           Float    @default(0)
+  roas          Float    @default(0)
+  cpc           Float    @default(0)
+  status        String   @default("draft")
+  startDate     DateTime?
+  endDate       DateTime?
+  productIds    String   @default("[]")
+  targeting     String   @default("{}")
+  creative      String   @default("{}")
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 30. SEO ANALYSIS (Yapay Zeka SEO) ==========
+model SeoAnalysis {
+  id            String   @id @default(cuid())
+  type          String   @default("keyword")
+  query         String   @default("")
+  targetUrl     String   @default("")
+  result        String   @default("{}")
+  score         Int      @default(0)
+  status        String   @default("completed")
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+}
+
+// ========== 31. EXCHANGE RATES (Coklu Doviz) ==========
+model ExchangeRate {
+  id            String   @id @default(cuid())
+  fromCurrency  String   @default("TRY")
+  toCurrency    String   @default("USD")
+  rate          Float    @default(0)
+  source        String   @default("manual")
+  isActive      Boolean  @default(true)
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 32. PURCHASE ORDERS (Satinalma Siparisleri) ==========
+model PurchaseOrder {
+  id            String   @id @default(cuid())
+  poNumber      String   @unique
+  supplierId    String   @default("")
+  supplierName  String   @default("")
+  status        String   @default("pending")
+  items         String   @default("[]")
+  totalAmount   Float    @default(0)
+  currency      String   @default("TRY")
+  expectedDate  DateTime?
+  receivedDate  DateTime?
+  notes         String   @default("")
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 33. INVENTORY FORECAST (Envanter Tahmin) ==========
+model InventoryForecast {
+  id            String   @id @default(cuid())
+  productId     String   @default("")
+  productName   String   @default("")
+  sku           String   @default("")
+  currentStock  Int      @default(0)
+  dailySales    Float    @default(0)
+  daysOfStock   Int      @default(0)
+  reorderPoint  Int      @default(0)
+  suggestedOrder Int     @default(0)
+  trend         String   @default("stable")
+  confidence    Float    @default(0)
+  period        String   @default("30d")
+  forecastData  String   @default("[]")
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 34. LISTING QUALITY SCORE (Urun Kalite Skoru) ==========
+model ListingQualityScore {
+  id            String   @id @default(cuid())
+  productId     String   @default("")
+  productName   String   @default("")
+  sku           String   @default("")
+  marketplace   String   @default("")
+  overallScore  Int      @default(0)
+  titleScore    Int      @default(0)
+  imageScore    Int      @default(0)
+  descScore     Int      @default(0)
+  priceScore    Int      @default(0)
+  attributeScore Int     @default(0)
+  seoScore      Int      @default(0)
+  issues        String   @default("[]")
+  suggestions   String   @default("[]")
+  lastChecked   DateTime @default(now())
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 35. CARRIER RATE (Kargo Fiyat Karsilastirma) ==========
+model CarrierRate {
+  id            String   @id @default(cuid())
+  carrier       String   @default("")
+  service       String   @default("standart")
+  zone          String   @default("")
+  basePrice     Float    @default(0)
+  perKg         Float    @default(0)
+  maxWeight     Float    @default(0)
+  estimatedDays Int      @default(0)
+  isActive      Boolean  @default(true)
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 36. EMAIL CAMPAIGN (E-posta Kampanyasi) ==========
+model EmailCampaign {
+  id            String   @id @default(cuid())
+  name          String
+  subject       String   @default("")
+  body          String   @default("")
+  segment       String   @default("all")
+  status        String   @default("draft")
+  sentCount     Int      @default(0)
+  openCount     Int      @default(0)
+  clickCount    Int      @default(0)
+  bounceCount   Int      @default(0)
+  scheduledAt   DateTime?
+  sentAt        DateTime?
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 37. AB TEST (A/B Testi) ==========
+model AbTest {
+  id            String   @id @default(cuid())
+  name          String
+  description   String   @default("")
+  type          String   @default("feed")
+  marketplace   String   @default("")
+  variantA      String   @default("{}")
+  variantB      String   @default("{}")
+  metric        String   @default("conversion")
+  impressionsA  Int      @default(0)
+  impressionsB  Int      @default(0)
+  clicksA       Int      @default(0)
+  clicksB       Int      @default(0)
+  conversionsA  Int      @default(0)
+  conversionsB  Int      @default(0)
+  winner        String   @default("")
+  confidence    Float    @default(0)
+  status        String   @default("running")
+  startDate     DateTime?
+  endDate       DateTime?
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 38. DROPSHIP ORDER (Dropshipping) ==========
+model DropshipOrder {
+  id            String   @id @default(cuid())
+  orderNumber   String   @unique
+  supplierId    String   @default("")
+  supplierName  String   @default("")
+  productId     String   @default("")
+  productName   String   @default("")
+  customerName  String   @default("")
+  customerAddr  String   @default("")
+  costPrice     Float    @default(0)
+  sellPrice     Float    @default(0)
+  profit        Float    @default(0)
+  status        String   @default("pending")
+  trackingNo    String   @default("")
+  marketplace   String   @default("")
+  storeId       String   @default("default")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ========== 39. PRODUCT BUNDLE (Paket/Combo Yonetimi) ==========
+model ProductBundle {
+  id              String   @id @default(cuid())
+  name            String
+  sku             String   @unique
+  description     String   @default("")
+  bundleType      String   @default("fixed") // fixed, dynamic, customizable
+  components      String   @default("[]")    // [{productId, quantity, costShare}]
+  totalCost       Float    @default(0)
+  sellingPrice    Float    @default(0)
+  discount        Float    @default(0)
+  stock           Int      @default(0)      // calculated from min component stock
+  minComponentStock Int    @default(0)
+  marketplace     String   @default("")
+  isActive        Boolean  @default(true)
+  isListed        Boolean  @default(false)
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 40. BUY BOX ANALYSIS (Buy Box Optimizasyonu) ==========
+model BuyBoxAnalysis {
+  id              String   @id @default(cuid())
+  productId       String   @default("")
+  productName     String   @default("")
+  sku             String   @default("")
+  asin            String   @default("")
+  marketplace     String   @default("amazon")
+  ourPrice        Float    @default(0)
+  buyBoxPrice     Float    @default(0)
+  buyBoxSeller    String   @default("")
+  isBuyBoxWinner  Boolean  @default(false)
+  buyBoxWinRate   Float    @default(0)
+  competitors     String   @default("[]")   // [{seller, price, rating, fulfilledBy}]
+  suggestedPrice  Float    @default(0)
+  minPrice        Float    @default(0)
+  maxPrice        Float    @default(0)
+  fairPrice       Float    @default(0)
+  ourRating       Float    @default(0)
+  ourFeedback     Int      @default(0)
+  ourFbaEligible  Boolean  @default(false)
+  notes           String   @default("")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 41. B2B CUSTOMER (Toptan Musteri) ==========
+model B2BCustomer {
+  id              String   @id @default(cuid())
+  companyName     String
+  contactName     String   @default("")
+  email           String   @default("")
+  phone           String   @default("")
+  taxNo           String   @default("")
+  taxOffice       String   @default("")
+  address         String   @default("")
+  city            String   @default("")
+  country         String   @default("TR")
+  creditLimit     Float    @default(0)
+  usedCredit      Float    @default(0)
+  paymentTerms    String   @default("cod") // cod, net15, net30, net60
+  priceTier       String   @default("standard") // standard, silver, gold, platinum
+  discountRate    Float    @default(0)
+  minOrderAmount  Float    @default(0)
+  totalOrders     Int      @default(0)
+  totalVolume     Float    @default(0)
+  status          String   @default("active") // active, suspended, pending
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 42. B2B ORDER (Toptan Siparis) ==========
+model B2BOrder {
+  id              String   @id @default(cuid())
+  orderNumber     String   @unique
+  customerId      String   @default("")
+  customerName    String   @default("")
+  companyName     String   @default("")
+  status          String   @default("pending") // pending, confirmed, processing, shipped, delivered
+  items           String   @default("[]")
+  totalAmount     Float    @default(0)
+  discount        Float    @default(0)
+  taxAmount       Float    @default(0)
+  netAmount       Float    @default(0)
+  paymentTerms    String   @default("cod")
+  dueDate         DateTime?
+  paidAt          DateTime?
+  notes           String   @default("")
+  shippingAddr    String   @default("")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 43. REPRICER RULE (Dinamik Fiyatlandirma) ==========
+model RepricerRule {
+  id              String   @id @default(cuid())
+  name            String
+  description     String   @default("")
+  marketplace     String   @default("all")
+  strategy        String   @default("match_lowest") // match_lowest, beat_by, below_avg, win_buybox, custom
+  targetPosition  Int      @default(1)       // 1=lowest, 2=second lowest, etc.
+  beatBy          Float    @default(0)       // amount to beat competition by
+  beatByType      String   @default("fixed") // fixed, percentage
+  minPrice        Float    @default(0)
+  maxPrice        Float    @default(0)
+  costFloor       Boolean  @default(true)
+  minMargin       Float    @default(0)
+  maxMargin       Float    @default(0)
+  rounding        String   @default("none") // none, up_99, nearest_50, nearest_10
+  schedule        String   @default("always") // always, business_hours, custom
+  productIds      String   @default("[]")
+  categoryIds     String   @default("[]")
+  isActive        Boolean  @default(true)
+  priority        Int      @default(0)
+  lastRun         DateTime?
+  runCount        Int      @default(0)
+  adjustmentsCount Int     @default(0)
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 44. REPRICER LOG (Fiyat Degisim Logu) ==========
+model RepricerLog {
+  id              String   @id @default(cuid())
+  ruleId          String   @default("")
+  ruleName        String   @default("")
+  productId       String   @default("")
+  productName     String   @default("")
+  sku             String   @default("")
+  marketplace     String   @default("")
+  oldPrice        Float    @default(0)
+  newPrice        Float    @default(0)
+  competitorAvg   Float    @default(0)
+  buyBoxPrice     Float    @default(0)
+  reason          String   @default("")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+}
+
+// ========== 45. SMART ORDER RULE (Akilli Siparis Kurali) ==========
+model SmartOrderRule {
+  id              String   @id @default(cuid())
+  name            String
+  description     String   @default("")
+  triggerType     String   @default("order_created") // order_created, payment_received, shipped
+  conditions      String   @default("[]")    // [{field, operator, value}]
+  actions         String   @default("[]")    // [{type, params}]
+  priority        Int      @default(0)
+  isActive        Boolean  @default(true)
+  matchCount      Int      @default(0)
+  lastMatched     DateTime?
+  channels        String   @default("[]")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 46. SELLER PERFORMANCE (Satici Performans Skoru) ==========
+model SellerPerformance {
+  id              String   @id @default(cuid())
+  marketplace     String   @default("")
+  period          String   @default("monthly") // daily, weekly, monthly
+  date            String   @default("")
+  orderCount      Int      @default(0)
+  onTimeShipment  Float    @default(0)       // percentage
+  cancellationRate Float   @default(0)       // percentage
+  returnRate      Float    @default(0)       // percentage
+  validTracking   Float    @default(0)       // percentage
+  responseTime    Float    @default(0)       // hours
+  positiveRating  Float    @default(0)       // percentage
+  accountHealth   String   @default("healthy") // healthy, at_risk, critical
+  overallScore    Int      @default(0)       // 0-100
+  violations      Int      @default(0)
+  warnings        String   @default("[]")
+  recommendations String   @default("[]")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 47. BARCODE SCAN (Barkod Tarama) ==========
+model BarcodeScan {
+  id              String   @id @default(cuid())
+  barcode         String   @default("")
+  productId       String   @default("")
+  productName     String   @default("")
+  sku             String   @default("")
+  action          String   @default("lookup") // lookup, receive, pick, pack, stocktake, transfer
+  warehouseId     String   @default("")
+  binLocation     String   @default("")
+  quantity        Int      @default(1)
+  oldStock        Int      @default(0)
+  newStock        Int      @default(0)
+  scannedBy       String   @default("")
+  orderId         String   @default("")
+  notes           String   @default("")
+  status          String   @default("success") // success, not_found, error, duplicate
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+}
+
+// ========== 48. SOCIAL LISTING (Sosyal Ticaret) ==========
+model SocialListing {
+  id              String   @id @default(cuid())
+  productId       String   @default("")
+  productName     String   @default("")
+  sku             String   @default("")
+  platform        String   @default("")       // instagram, facebook, tiktok, pinterest, whatsapp
+  platformType    String   @default("")       // shop, catalog, story, post, reels
+  listingId       String   @default("")
+  status          String   @default("draft") // draft, active, paused, ended
+  title           String   @default("")
+  description     String   @default("")
+  price           Float    @default(0)
+  salePrice       Float    @default(0)
+  currency        String   @default("TRY")
+  images          String   @default("[]")
+  tags            String   @default("[]")
+  category        String   @default("")
+  inventorySync   Boolean  @default(false)
+  clicks          Int      @default(0)
+  impressions     Int      @default(0)
+  conversions     Int      @default(0)
+  revenue         Float    @default(0)
+  lastSync        DateTime?
+  lastError       String   @default("")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 49. AI CONTENT JOB (AI Icerik Stüdyosu) ==========
+model AiContentJob {
+  id              String   @id @default(cuid())
+  productId       String   @default("")
+  productName     String   @default("")
+  sku             String   @default("")
+  type            String   @default("description") // description, title, bullets, translation, seo_meta
+  sourceLanguage  String   @default("tr")
+  targetLanguage  String   @default("")
+  targetMarketplace String @default("")
+  inputText       String   @default("")
+  generatedText   String   @default("")
+  keywords        String   @default("[]")
+  tone            String   @default("professional") // professional, casual, luxury, technical
+  wordCount       Int      @default(0)
+  qualityScore    Int      @default(0)
+  status          String   @default("pending") // pending, generating, completed, failed
+  error           String   @default("")
+  applied         Boolean  @default(false)
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 50. BRAND PROTECTION ALERT (Marka Koruma & MAP) ==========
+model BrandProtectionAlert {
+  id              String   @id @default(cuid())
+  type            String   @default("map_violation") // map_violation, unauthorized_seller, counterfeit, trademark_abuse
+  productId       String   @default("")
+  productName     String   @default("")
+  sku             String   @default("")
+  marketplace     String   @default("")
+  seller          String   @default("")
+  sellerUrl       String   @default("")
+  detectedPrice   Float    @default(0)
+  mapPrice        Float    @default(0)
+  ourPrice        Float    @default(0)
+  violationAmount Float    @default(0)
+  evidence        String   @default("[]")
+  severity        String   @default("medium") // low, medium, high, critical
+  status          String   @default("detected") // detected, investigating, reported, resolved, dismissed
+  actionTaken     String   @default("")
+  reportedAt      DateTime?
+  resolvedAt      DateTime?
+  notes           String   @default("")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 51. SMART ALERT RULE (Akilli Bildirim Motoru) ==========
+model SmartAlertRule {
+  id              String   @id @default(cuid())
+  name            String
+  description     String   @default("")
+  category        String   @default("stock") // stock, price, order, performance, competitor, listing
+  metric          String   @default("")
+  condition       String   @default("below") // below, above, equals, change_percent, contains
+  threshold       Float    @default(0)
+  thresholdText   String   @default("")
+  channels        String   @default("[]") // email, push, webhook, sms, in_app
+  frequency       String   @default("once") // once, repeating, daily, weekly
+  cooldownMinutes Int      @default(60)
+  lastTriggered   DateTime?
+  triggerCount    Int      @default(0)
+  isActive        Boolean  @default(true)
+  filters         String   @default("{}") // additional filter criteria
+  assignedTo      String   @default("")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 52. PRODUCT LAUNCH (Urun Lansman Takvimi) ==========
+model ProductLaunch {
+  id              String   @id @default(cuid())
+  name            String
+  description     String   @default("")
+  productIds      String   @default("[]")
+  channels        String   @default("[]") // target marketplaces/channels
+  status          String   @default("planning") // planning, prepared, launched, completed, cancelled
+  priority        String   @default("normal") // low, normal, high, critical
+  launchDate      DateTime?
+  startDate       DateTime?
+  endDate         DateTime?
+  tasks           String   @default("[]") // [{name, status, assignee, dueDate}]
+  checklists      String   @default("{}") // {images: false, descriptions: false, pricing: false, inventory: false}
+  budget          Float    @default(0)
+  spent           Float    @default(0)
+  notes           String   @default("")
+  tags            String   @default("[]")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 53. TAX COMPLIANCE RULE (Vergi & Gumruk Uyumlulugu) ==========
+model TaxComplianceRule {
+  id              String   @id @default(cuid())
+  name            String
+  country         String   @default("TR")
+  region          String   @default("")
+  taxType         String   @default("vat") // vat, customs, import_duty, excise, sales_tax
+  rate            Float    @default(0)
+  thresholdMin    Float    @default(0)
+  thresholdMax    Float    @default(0)
+  category        String   @default("electronics")
+  hsCode          String   @default("")
+  isActive        Boolean  @default(true)
+  effectiveDate   DateTime?
+  expiryDate      DateTime?
+  notes           String   @default("")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 54. PROFIT SIMULATION (Kar Marji Simulatörü) ==========
+model ProfitSimulation {
+  id              String   @id @default(cuid())
+  name            String
+  description     String   @default("")
+  productId       String   @default("")
+  productName     String   @default("")
+  sku             String   @default("")
+  marketplace     String   @default("")
+  scenario        String   @default("single") // single, comparison, bulk
+  sellingPrice    Float    @default(0)
+  costPrice       Float    @default(0)
+  shippingCost    Float    @default(0)
+  marketplaceFee  Float    @default(0)
+  paymentFee      Float    @default(0)
+  taxRate         Float    @default(0)
+  taxAmount       Float    @default(0)
+  packagingCost   Float    @default(0)
+  returnRate      Float    @default(0)
+  returnCost      Float    @default(0)
+  advertisingCost Float    @default(0)
+  otherCosts      Float    @default(0)
+  totalCost       Float    @default(0)
+  netProfit       Float    @default(0)
+  profitMargin    Float    @default(0)
+  roi             Float    @default(0)
+  breakEvenUnits  Int      @default(0)
+  monthlyUnits    Int      @default(0)
+  monthlyProfit   Float    @default(0)
+  yearlyProfit    Float    @default(0)
+  comparisonData  String   @default("[]") // for comparison scenarios
+  status          String   @default("draft")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ========== 55. MICRO EXPORT (Mikro Ihracat) ==========
+model MicroExport {
+  id              String   @id @default(cuid())
+  exportNumber    String   @unique
+  country         String
+  carrier         String   @default("")
+  totalValue      Float    @default(0)
+  status          String   @default("pending") // pending, shipped, delivered, cancelled
+  trackingNo      String   @default("")
+  productName     String   @default("")
+  notes           String   @default("")
+  storeId         String   @default("default")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
