@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search, Plus, Trash2, Edit, Play, CheckCircle, XCircle, AlertTriangle,
   FileText, Image as ImageIcon, CheckSquare, DollarSign, Type, Settings, RefreshCw,

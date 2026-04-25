@@ -17,7 +17,8 @@ import {
   HelpCircle,
   LogOut,
   Layers,
-  Rss
+  Rss,
+  Wand2
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
