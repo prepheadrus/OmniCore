@@ -27,6 +27,14 @@ export class ProductController {
     return this.productService.updateProduct(id, data);
   }
 
+  @Post(':id/inline')
+  async updateProductInline(
+    @Param('id') id: string,
+    @Body() data: { field: string; value: number | string }
+  ) {
+    return this.productService.updateProductInline(id, data.field, data.value);
+  }
+
   @Delete(':id')
   async deleteProduct(@Param('id') id: string) {
     return this.productService.deleteProduct(id);

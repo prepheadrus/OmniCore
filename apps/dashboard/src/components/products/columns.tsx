@@ -24,6 +24,8 @@ export type Product = {
   stock: number
   status: ProductStatus
   imageUrl?: string
+  category?: string
+  brand?: string
   channels: string[] // Satış Kanalları
   subRows?: Product[]
 }
@@ -51,14 +53,33 @@ const InlineEditCell = ({
     setValue(initialValue)
   }, [initialValue])
 
-  const onBlur = () => {
+  const onBlur = async () => {
     setIsEditing(false)
     const newValue = type === "number" ? Number(value) : value
     if (initialValue !== newValue) {
       table.options.meta?.updateData(index, id, newValue)
-      toast.success(`${original.name} ürünü güncellendi`, {
-        description: `${id === 'price' ? 'Fiyat' : 'Stok'} başarıyla ${newValue} olarak değiştirildi.`,
-      })
+
+      // Optimistic update successful, send to backend
+      try {
+        const res = await fetch(`/api/products/${original.id}/inline`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ field: id, value: newValue })
+        })
+
+        if (!res.ok) throw new Error('Failed to update')
+
+        toast.success(`${original.name} ürünü güncellendi`, {
+          description: `${id === 'price' ? 'Fiyat' : 'Stok'} başarıyla ${newValue} olarak değiştirildi.`,
+        })
+      } catch (error) {
+        // Rollback on failure
+        table.options.meta?.updateData(index, id, initialValue)
+        setValue(initialValue)
+        toast.error('Güncelleme Başarısız', {
+          description: 'Lütfen tekrar deneyin.'
+        })
+      }
     }
   }
 
@@ -70,7 +91,7 @@ const InlineEditCell = ({
         onChange={(e) => setValue(e.target.value)}
         onBlur={onBlur}
         autoFocus
-        className="h-7 text-[13px] px-2 py-1 w-20 border-[#c6c6c6]/20 focus-visible:border-[#000000] focus-visible:ring-0 bg-[#ffffff] transition-colors"
+        className="h-7 text-[13px] px-2 py-1 w-20 border-slate-200 focus-visible:border-slate-400 focus-visible:ring-0 bg-white transition-colors shadow-none rounded-md"
       />
     )
   }
@@ -82,7 +103,7 @@ const InlineEditCell = ({
         e.stopPropagation();
         setIsEditing(true);
       }}
-      className="cursor-pointer hover:bg-[#f2f4f6] px-2 py-1 rounded transition-colors"
+      className="cursor-pointer hover:bg-slate-100 px-2 py-1 rounded-md transition-colors border border-transparent hover:border-slate-200"
     >
       {type === "number" && id === "price" ? `₺${Number(value).toFixed(2)}` : String(value)}
     </div>
@@ -96,13 +117,14 @@ const NameCell = ({ row, table }: { row: { original: Product; depth: number }; t
   return (
     <div className={`flex flex-col ${isVariant ? "pl-4" : ""}`}>
       <Link
-        href={`/products/${row.original.id}`}
-        className="text-left font-medium text-[#191c1e] text-[13px] hover:text-[#000000] hover:underline decoration-[#333b50]/30 transition-colors cursor-pointer"
+        href={`?productId=${row.original.id}`}
+        scroll={false}
+        className="text-left font-medium text-slate-800 text-[13px] hover:text-slate-900 hover:underline decoration-slate-300 transition-colors cursor-pointer"
         onClick={(e) => e.stopPropagation()}
       >
         {row.original.name}
       </Link>
-      <span className="text-[#474747] font-mono text-[11px]">{row.original.sku}</span>
+      <span className="text-slate-500 font-mono text-[11px]">{row.original.sku}</span>
     </div>
   )
 }
@@ -118,7 +140,7 @@ export const columns: ColumnDef<Product>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
-        className="translate-y-[2px] border-[#c6c6c6]/40 data-[state=checked]:bg-[#000000] data-[state=checked]:text-[#ffffff]"
+        className="translate-y-[2px] border-slate-200 data-[state=checked]:bg-slate-900 data-[state=checked]:text-slate-50"
       />
     ),
     cell: ({ row }) => (
@@ -127,13 +149,13 @@ export const columns: ColumnDef<Product>[] = [
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
-          className="translate-y-[2px] border-[#c6c6c6]/40 data-[state=checked]:bg-[#000000] data-[state=checked]:text-[#ffffff]"
+          className="translate-y-[2px] border-slate-200 data-[state=checked]:bg-slate-900 data-[state=checked]:text-slate-50"
         />
         {row.getCanExpand() && (
           <Button
             variant="ghost"
             size="icon"
-            className="h-5 w-5 p-0 hover:bg-[#f2f4f6]"
+            className="h-5 w-5 p-0 hover:bg-slate-100"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -141,9 +163,9 @@ export const columns: ColumnDef<Product>[] = [
             }}
           >
             {row.getIsExpanded() ? (
-              <ChevronDown className="h-3 w-3 text-[#474747]" />
+              <ChevronDown className="h-3 w-3 text-slate-500" />
             ) : (
-              <ChevronRight className="h-3 w-3 text-[#474747]" />
+              <ChevronRight className="h-3 w-3 text-slate-500" />
             )}
           </Button>
         )}
@@ -160,11 +182,11 @@ export const columns: ColumnDef<Product>[] = [
       if (row.depth > 0 && !imageUrl) return <div className="h-8 w-8 ml-4"></div>
 
       return (
-        <div className="h-8 w-8 rounded-md bg-[#f2f4f6] border border-[#c6c6c6]/20 flex items-center justify-center overflow-hidden">
+        <div className="h-8 w-8 rounded-md bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
           {imageUrl ? (
             <Image src={imageUrl} alt="Product" width={32} height={32} className="h-full w-full object-cover" />
           ) : (
-            <ImageIcon className="h-4 w-4 text-[#c6c6c6]" />
+            <ImageIcon className="h-4 w-4 text-slate-400" />
           )}
         </div>
       )
@@ -176,6 +198,15 @@ export const columns: ColumnDef<Product>[] = [
     accessorFn: (row) => `${row.name} ${row.sku}`,
     cell: ({ row, table }) => <NameCell row={row} table={table} />,
 
+  },
+  {
+    accessorKey: "category",
+    header: "Kategori",
+    cell: ({ row }) => (
+      <div className="px-2 py-1 text-[13px] text-[#474747]">
+        {row.getValue("category") || "-"}
+      </div>
+    ),
   },
   {
     accessorKey: "stock",
@@ -208,23 +239,23 @@ export const columns: ColumnDef<Product>[] = [
       switch (status) {
         case "IN_STOCK":
           label = "Aktif"
-          colorClass = "bg-[#f0fdf4] text-[#166534] border-transparent"
+          colorClass = "bg-emerald-50 text-emerald-700 border-transparent shadow-none"
           break
         case "OUT_OF_STOCK":
           label = "Tükendi"
-          colorClass = "bg-[#ffdad6] text-[#ba1a1a] border-transparent"
+          colorClass = "bg-red-50 text-red-700 border-transparent shadow-none"
           break
         case "INACTIVE":
           label = "Taslak"
-          colorClass = "bg-[#f2f4f6] text-[#474747] border-transparent"
+          colorClass = "bg-slate-100 text-slate-700 border-transparent shadow-none"
           break
         default:
           label = status
-          colorClass = "bg-[#f2f4f6] text-[#474747] border-transparent"
+          colorClass = "bg-slate-100 text-slate-700 border-transparent shadow-none"
       }
 
       return (
-        <Badge variant="outline" className={`${colorClass} font-medium border text-[11px] px-1.5 py-0 rounded-md`}>
+        <Badge variant="outline" className={`${colorClass} font-medium text-[11px] px-1.5 py-0 rounded-md`}>
           {label}
         </Badge>
       )
@@ -241,11 +272,11 @@ export const columns: ColumnDef<Product>[] = [
       const margin = Number(row.getValue("margin"))
       const isProfitable = margin > 0
       const colorClass = isProfitable
-        ? "bg-[#f0fdf4] text-[#166534] border-transparent"
-        : "bg-[#ffdad6] text-[#ba1a1a] border-transparent"
+        ? "bg-emerald-50 text-emerald-700 border-transparent shadow-none"
+        : "bg-red-50 text-red-700 border-transparent shadow-none"
 
       return (
-        <Badge variant="outline" className={`${colorClass} font-medium border text-[11px] px-1.5 py-0 rounded-md`}>
+        <Badge variant="outline" className={`${colorClass} font-medium text-[11px] px-1.5 py-0 rounded-md`}>
           {margin > 0 ? "+" : ""}{margin}%
         </Badge>
       )
@@ -253,15 +284,26 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "channels",
-    header: "Kanallar",
+    header: "Pazar Yeri",
     cell: ({ row }) => {
       const channels = row.getValue("channels") as string[]
       if (!channels || channels.length === 0) return <span className="text-[#c6c6c6] text-[11px]">-</span>
+
+      const getChannelInitial = (ch: string) => {
+        switch(ch.toLowerCase()) {
+            case 'trendyol': return 'T'
+            case 'hepsiburada': return 'H'
+            case 'amazon': return 'A'
+            case 'n11': return 'N'
+            default: return ch.charAt(0).toUpperCase()
+        }
+      }
+
       return (
         <div className="flex gap-1">
           {channels.map((ch) => (
-             <Badge key={ch} variant="secondary" className="bg-[#e6e8ea] text-[#191c1e] text-[10px] px-1 py-0 border-0 h-4 rounded-sm">
-               {ch.charAt(0).toUpperCase()}
+             <Badge key={ch} variant="secondary" className="bg-[#e6e8ea] text-[#191c1e] text-[10px] px-1 py-0 border border-slate-200 h-4 rounded-sm shadow-none">
+               {getChannelInitial(ch)}
              </Badge>
           ))}
         </div>

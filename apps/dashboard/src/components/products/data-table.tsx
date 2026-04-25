@@ -89,8 +89,23 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
 
   const selectedRowsCount = table.getFilteredSelectedRowModel().rows.length
 
+  const handleTabChange = (value: string) => {
+      if (value === "ALL") {
+          table.getColumn("status")?.setFilterValue(undefined)
+      } else {
+          table.getColumn("status")?.setFilterValue(value)
+      }
+  }
+
   return (
     <div className="space-y-4 relative">
+      <div className="flex items-center space-x-4 border-b border-slate-200 pb-2 mb-4">
+        <button onClick={() => handleTabChange("ALL")} className={`text-[13px] font-medium pb-2 border-b-2 transition-colors ${table.getColumn("status")?.getFilterValue() === undefined ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500 hover:text-slate-700"}`}>Tümü</button>
+        <button onClick={() => handleTabChange("IN_STOCK")} className={`text-[13px] font-medium pb-2 border-b-2 transition-colors ${table.getColumn("status")?.getFilterValue() === "IN_STOCK" ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500 hover:text-slate-700"}`}>Satışta</button>
+        <button onClick={() => handleTabChange("OUT_OF_STOCK")} className={`text-[13px] font-medium pb-2 border-b-2 transition-colors ${table.getColumn("status")?.getFilterValue() === "OUT_OF_STOCK" ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500 hover:text-slate-700"}`}>Tükendi</button>
+        <button onClick={() => handleTabChange("INACTIVE")} className={`text-[13px] font-medium pb-2 border-b-2 transition-colors ${table.getColumn("status")?.getFilterValue() === "INACTIVE" ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500 hover:text-slate-700"}`}>Taslak</button>
+      </div>
+
       <div className="flex items-center justify-between">
         <Input
           placeholder="Ürün adı veya SKU ara..."
@@ -98,40 +113,39 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
           onChange={(event) =>
             table.getColumn("nameAndSku")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm h-8 text-[13px] bg-[#ffffff] border-[#c6c6c6]/20 focus-visible:border-[#000000] focus-visible:ring-0"
+          className="max-w-sm h-8 text-[13px] bg-white border-slate-200 focus-visible:border-slate-400 focus-visible:ring-0 shadow-none rounded-md"
         />
         <div className="flex items-center gap-2">
             <Select
-                value={(table.getColumn("status")?.getFilterValue() as string) ?? "ALL"}
+                value={(table.getColumn("category")?.getFilterValue() as string) ?? "ALL"}
                 onValueChange={(value) => {
                     if (value === "ALL") {
-                        table.getColumn("status")?.setFilterValue(undefined)
+                        table.getColumn("category")?.setFilterValue(undefined)
                     } else {
-                        table.getColumn("status")?.setFilterValue(value)
+                        table.getColumn("category")?.setFilterValue(value)
                     }
                 }}
             >
-                <SelectTrigger className="w-[130px] h-8 text-[13px] bg-[#ffffff] border-[#c6c6c6]/20 focus:ring-0 focus:border-[#000000]">
-                    <SelectValue placeholder="Durum Seç" />
+                <SelectTrigger className="w-[180px] h-8 text-[13px] bg-white border-slate-200 focus:ring-0 focus:border-slate-400 shadow-none rounded-md">
+                    <SelectValue placeholder="Kategori Seç" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#ffffff] border-[#c6c6c6]/20">
-                    <SelectItem value="ALL" className="text-[13px]">Tümü</SelectItem>
-                    <SelectItem value="IN_STOCK" className="text-[13px]">Satışta</SelectItem>
-                    <SelectItem value="OUT_OF_STOCK" className="text-[13px]">Tükendi</SelectItem>
-                    <SelectItem value="INACTIVE" className="text-[13px]">Pasif</SelectItem>
+                <SelectContent className="bg-white border-slate-200 shadow-sm rounded-md">
+                    <SelectItem value="ALL" className="text-[13px]">Tüm Kategoriler</SelectItem>
+                    <SelectItem value="Temizlik" className="text-[13px]">Temizlik</SelectItem>
+                    <SelectItem value="Aksesuar" className="text-[13px]">Aksesuar</SelectItem>
                 </SelectContent>
             </Select>
         </div>
       </div>
 
-      <div className="rounded-[6px] border border-[#c6c6c6]/20 bg-[#ffffff] overflow-hidden">
+      <div className="rounded-md border border-slate-200 bg-white overflow-hidden shadow-none">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent border-[#c6c6c6]/20">
+              <TableRow key={headerGroup.id} className="hover:bg-transparent border-slate-200">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="h-8 py-1 px-2 text-[12px] text-[#474747] font-semibold bg-[#f2f4f6]">
+                    <TableHead key={header.id} className="h-8 py-1 px-2 text-[12px] text-slate-600 font-medium bg-slate-50 border-b border-slate-200">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -150,8 +164,8 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-[#f2f4f6] transition-colors border-[#c6c6c6]/10 cursor-pointer"
-                  onClick={() => router.push(`/products/${row.original.id}`)}
+                  className="hover:bg-slate-50 transition-colors border-slate-100 cursor-pointer"
+                  onClick={() => router.replace(`?productId=${row.original.id}`, { scroll: false })}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="py-2 px-2 text-[13px]">
@@ -162,7 +176,7 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-[#474747]">
+                <TableCell colSpan={columns.length} className="h-24 text-center text-slate-500">
                   Ürün bulunamadı.
                 </TableCell>
               </TableRow>
@@ -172,18 +186,18 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
       </div>
 
       {selectedRowsCount > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#000000] text-[#dae2fd] px-6 py-3 rounded-[6px] shadow-lg flex items-center gap-6 z-50 animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-slate-50 px-6 py-3 rounded-md shadow-sm flex items-center gap-6 z-50 animate-in slide-in-from-bottom-5">
           <span className="text-[13px] font-medium">
             {selectedRowsCount} ürün seçildi
           </span>
-          <div className="flex items-center gap-2 border-l border-[#333b50] pl-6">
-            <Button size="sm" variant="ghost" className="h-7 text-[12px] hover:bg-[#333b50] hover:text-[#ffffff]">
+          <div className="flex items-center gap-2 border-l border-slate-700 pl-6">
+            <Button size="sm" variant="ghost" className="h-7 text-[12px] hover:bg-slate-800 hover:text-white">
               Satışa Aç
             </Button>
-            <Button size="sm" variant="ghost" className="h-7 text-[12px] hover:bg-[#333b50] hover:text-[#ffffff]">
+            <Button size="sm" variant="ghost" className="h-7 text-[12px] hover:bg-slate-800 hover:text-white">
               Satışa Kapat
             </Button>
-            <Button size="sm" variant="ghost" className="h-7 text-[12px] text-[#ffdad6] hover:bg-[#410002] hover:text-[#ffdad6]">
+            <Button size="sm" variant="ghost" className="h-7 text-[12px] text-red-300 hover:bg-red-950 hover:text-red-300">
               Sil
             </Button>
           </div>
@@ -196,7 +210,7 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
           size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
-          className="h-8 text-[12px] border-[#c6c6c6]/20 text-[#191c1e] hover:bg-[#f2f4f6]"
+          className="h-8 text-[12px] border-slate-200 text-slate-700 hover:bg-slate-50 shadow-none rounded-md"
         >
           Önceki
         </Button>
@@ -205,7 +219,7 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
           size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
-          className="h-8 text-[12px] border-[#c6c6c6]/20 text-[#191c1e] hover:bg-[#f2f4f6]"
+          className="h-8 text-[12px] border-slate-200 text-slate-700 hover:bg-slate-50 shadow-none rounded-md"
         >
           Sonraki
         </Button>
