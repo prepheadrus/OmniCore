@@ -18,10 +18,12 @@ async function getProducts(searchParams?: { [key: string]: string | string[] | u
   const apiUrl = env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
   try {
     const cookieStore = await cookies();
+    const channelId = cookieStore.get('channel-id')?.value || 'trendyol';
     const res = await fetch(`${apiUrl}/products?${query.toString()}`, {
       cache: 'no-store',
       headers: {
         Cookie: cookieStore.toString(),
+        'x-channel-id': channelId,
       },
     })
     if (!res.ok) {
