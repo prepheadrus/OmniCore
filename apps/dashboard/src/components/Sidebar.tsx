@@ -37,7 +37,7 @@ export default function Sidebar() {
       items: [
         { name: 'Siparişler', icon: ShoppingCart, href: '/orders' },
         { name: 'İadeler', icon: Undo, href: '/returns' },
-        { name: 'Envanter', icon: Package, href: '/inventory' },
+        { name: 'Ürünler', icon: Package, href: '/products' },
         { name: 'Müşteriler', icon: Users, href: '/customers' },
       ],
     },
@@ -87,10 +87,10 @@ export default function Sidebar() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-sm duration-200 ease-in-out font-medium ${
+                    className={`flex items-center space-x-3 px-3 py-2 rounded-sm duration-200 ease-in-out font-medium border ${
                       isActive
-                        ? 'bg-white text-[#2d3435] shadow-sm'
-                        : 'text-[#5a6061] hover:text-[#2d3435] hover:bg-[#ebeeef]/50'
+                        ? 'bg-white text-[#2d3435] shadow-none border-slate-200'
+                        : 'text-[#5a6061] hover:text-[#2d3435] hover:bg-[#ebeeef]/50 border-transparent'
                     }`}
                   >
                     <Icon size={18} className={isActive ? 'text-[#2d3435]' : 'text-[#5a6061]'} />

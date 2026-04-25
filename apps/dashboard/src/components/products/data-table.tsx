@@ -129,7 +129,7 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
                 <SelectTrigger className="w-[180px] h-8 text-[13px] bg-white border-slate-200 focus:ring-0 focus:border-slate-400 shadow-none rounded-md">
                     <SelectValue placeholder="Kategori Seç" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-slate-200 shadow-sm rounded-md">
+                <SelectContent className="bg-white border-slate-200 shadow-none rounded-md">
                     <SelectItem value="ALL" className="text-[13px]">Tüm Kategoriler</SelectItem>
                     <SelectItem value="Temizlik" className="text-[13px]">Temizlik</SelectItem>
                     <SelectItem value="Aksesuar" className="text-[13px]">Aksesuar</SelectItem>
@@ -186,7 +186,7 @@ export function DataTable({ columns, data: initialData }: DataTableProps) {
       </div>
 
       {selectedRowsCount > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-slate-50 px-6 py-3 rounded-md shadow-sm flex items-center gap-6 z-50 animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-slate-50 px-6 py-3 rounded-md shadow-none flex items-center gap-6 z-50 animate-in slide-in-from-bottom-5">
           <span className="text-[13px] font-medium">
             {selectedRowsCount} ürün seçildi
           </span>
