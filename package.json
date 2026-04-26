@@ -55,6 +55,7 @@
     "jest-environment-node": "^30.0.2",
     "jest-util": "^30.0.2",
     "nx": "22.6.4",
+    "playwright": "^1.59.1",
     "postcss": "8.4.38",
     "prettier": "~3.6.2",
     "prisma": "6.19.3",

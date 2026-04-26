@@ -2,7 +2,7 @@ import { IsString, IsBoolean, IsOptional, IsInt, IsObject } from 'class-validato
 
 export class CreateContentRuleDto {
   @IsString()
-  name: string;
+  name = '';
 
   @IsString()
   @IsOptional()
@@ -41,7 +41,7 @@ export class UpdateContentRuleDto extends CreateContentRuleDto {}
 
 export class CreateFeedQualityRuleDto {
   @IsString()
-  name: string;
+  name = '';
 
   @IsString()
   @IsOptional()

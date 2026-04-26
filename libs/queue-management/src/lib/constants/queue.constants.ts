@@ -6,8 +6,10 @@ export enum JobTypes {
   GENERATE_INVOICE = 'GENERATE_INVOICE',
   GENERATE_CARGO_BARCODE = 'GENERATE_CARGO_BARCODE',
   UPDATE_PRICE = 'UPDATE_PRICE',
+  REPRICE_UPDATE = 'REPRICE_UPDATE',
 }
 
 export const MARKETPLACE_SYNC_QUEUE = 'marketplace-sync-queue';
 export const INVOICE_QUEUE = 'invoice-queue';
 export const CARGO_QUEUE = 'cargo-queue';
+export const REPRICER_QUEUE = 'repricer-queue';

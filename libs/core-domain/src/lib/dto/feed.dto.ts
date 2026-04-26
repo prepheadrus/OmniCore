@@ -2,7 +2,7 @@ import { IsString, IsOptional, IsEnum, IsInt, IsObject } from 'class-validator';
 
 export class CreateFeedDto {
   @IsString()
-  name: string;
+  name = '';
 
   @IsOptional()
   @IsString()

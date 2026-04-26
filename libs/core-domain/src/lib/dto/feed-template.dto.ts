@@ -3,7 +3,7 @@ import { IsString, IsOptional, IsBoolean, IsNumber, IsObject, IsNotEmpty, IsArra
 export class CreateFeedTemplateDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name = '';
 
   @IsOptional()
   @IsString()
