@@ -14,19 +14,19 @@ OmniCore'u kullanırken ihtiyacınız olan tüm bilgilere buradan ulaşabilirsin
 - [Feed Optimizasyonu ve Kurallar](modules/feed-optimization.md)
 - [Yeni Ürün Oluşturma Kılavuzu](modules/new-product.md)
 - [Ürün Ekleme ve Düzenleme](product-management.md)
-- [AI ile İçerik Optimizasyonu](product-management.md#yapay-zeka-ai-ile-ürün-zenginleştirme)
 
 ## 🛒 Satış ve Operasyon
 - [Siparişler Sayfası Kullanımı](modules/orders.md)
 - [İade Yönetimi (Reverse Logistics)](modules/returns.md)
 - [Sipariş Takibi ve Onaylama](order-management.md)
-- [Fatura ve Kargo Barkodu İşlemleri](order-management.md#kargo-ve-paketleme)
+
+## 💰 Fiyatlandırma ve Rekabet
+- [Akıllı Fiyatlandırma Modülü](modules/smart-pricing.md)
+- [Fiyatlandırma Stratejileri](pricing-strategy.md)
+- [BuyBox ve Rakip Takibi](pricing-strategy.md#agresif-buybox-rakip-odaklı)
 
 ## ⚙️ Yapılandırma
 - [Ayarlar ve Entegrasyonlar](modules/settings.md)
-
-## ❓ Sıkça Sorulan Sorular (SSS)
-*(Yakında eklenecek)*
 
 ---
 *Yardım dökümanlarında bulamadığınız bir konu mu var? Bize `destek@omnicore.ai` adresinden ulaşabilirsiniz.*

@@ -57,7 +57,7 @@ export default function Sidebar() {
       title: 'ZEKA & SİSTEM',
       items: [
         { name: 'Rekabet Radarı', icon: Radar, href: '/radar' },
-        { name: 'Otonom Fiyatlandırma', icon: Tags, href: '/pricing' },
+        { name: 'Akıllı Fiyatlandırma', icon: Tags, href: '/pricing' },
         { name: 'Senkronizasyon', icon: RefreshCcw, href: '/sync' },
       ],
     },
