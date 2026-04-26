@@ -55,10 +55,10 @@ export default function ProductFeeds() {
   const handleToggleStatus = async (feed: Feed) => {
     const next = feed.status === 'active' ? 'paused' : 'active';
     try {
-      await fetch('/api/feeds', {
-        method: 'PUT',
+      await fetch(`/api/feeds/${feed.id}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: feed.id, status: next }),
+        body: JSON.stringify({ status: next }),
       });
       await fetchFeeds();
     } catch (error) {
@@ -69,7 +69,13 @@ export default function ProductFeeds() {
   const handleDelete = async (feed: Feed) => {
     // Optimistic removal
     setFeeds((prev) => prev.filter((f) => f.id !== feed.id));
-    // In a real scenario, call DELETE /api/feeds/:id here
+    try {
+      await fetch(`/api/feeds/${feed.id}`, { method: 'DELETE' });
+    } catch (error) {
+      console.error('Failed to delete feed', error);
+      // Revert optimistic removal if needed
+      await fetchFeeds();
+    }
   };
 
   const handleSyncNow = async (feed: Feed) => {
@@ -77,11 +83,10 @@ export default function ProductFeeds() {
     // Simulate sync delay
     await new Promise((r) => setTimeout(r, 1800));
     try {
-      await fetch('/api/feeds', {
-        method: 'PUT',
+      await fetch(`/api/feeds/${feed.id}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: feed.id,
           lastImport: new Date().toISOString(),
           totalProducts: Math.floor(Math.random() * 800) + 200,
           validProducts: Math.floor(Math.random() * 600) + 180,
