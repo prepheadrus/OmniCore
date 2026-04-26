@@ -3,35 +3,25 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import {
   TrendingUp, Target, Plus, BarChart3, Settings, Save, X, ToggleLeft
 } from 'lucide-react';
 import { PriceRuleSchema, PriceRuleFormData } from '@omnicore/core-domain';
-
-interface Product {
-  id: string; name: string; sku: string; price: number; cost: number;
-  stock: number; category: string; marketplace: string;
-}
+import { useGetPriceRules, useCreatePriceRule } from './hooks';
+import { toast } from 'sonner';
 
 const RULE_TYPE_LABELS: Record<string, string> = { markup: 'Markup', discount: 'İndirim', match: 'Eşleştirme', max_price: 'Maks Fiyat' };
 const RULE_TYPE_BADGE: Record<string, string> = { markup: 'bg-emerald-50 text-emerald-700', discount: 'bg-rose-50 text-rose-700', match: 'bg-blue-50 text-blue-700', max_price: 'bg-amber-50 text-amber-700' };
 const MARKETPLACE_LABELS: Record<string, string> = { all: 'Tüm Kanallar', trendyol: 'Trendyol', hepsiburada: 'Hepsiburada', n11: 'n11' };
 
-const fmt = (n: number) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(n);
-
 function marginBadge(m: number) { return m > 30 ? 'bg-emerald-50 text-emerald-700' : m > 15 ? 'bg-blue-50 text-blue-700' : m > 5 ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'; }
-
-const initialProducts: Product[] = [
-  { id: '1', name: 'Pakbey Konsantre Cam Suyu 1 Lt', sku: 'PKB-001', price: 120, cost: 45, stock: 150, category: 'Oto Bakım', marketplace: 'all' },
-  { id: '2', name: 'Lastik Parlatıcı (400 ml)', sku: 'PKB-002', price: 190, cost: 95, stock: 85, category: 'Oto Bakım', marketplace: 'trendyol' },
-  { id: '3', name: 'Demir Tozu Sökücü', sku: 'PKB-003', price: 480, cost: 200, stock: 12, category: 'Kimyasallar', marketplace: 'all' },
-];
 
 export default function SmartPricing() {
   const [activeTab, setActiveTab] = useState<'rules'|'analysis'|'competitors'>('rules');
-  const [rules, setRules] = useState<PriceRuleFormData[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const { data: rules = [], isPending: isLoadingRules, isError: isErrorRules } = useGetPriceRules();
+  const createRuleMutation = useCreatePriceRule();
 
   const form = useForm<PriceRuleFormData>({
     resolver: zodResolver(PriceRuleSchema),
@@ -53,9 +43,16 @@ export default function SmartPricing() {
   });
 
   const onSubmit = (data: PriceRuleFormData) => {
-    setRules(prev => [...prev, data]);
-    setDialogOpen(false);
-    form.reset();
+    createRuleMutation.mutate(data, {
+      onSuccess: () => {
+        toast.success('Fiyat kuralı başarıyla oluşturuldu.');
+        setDialogOpen(false);
+        form.reset();
+      },
+      onError: (error) => {
+        toast.error('Kural oluşturulurken bir hata oluştu: ' + error.message);
+      }
+    });
   };
 
   return (
@@ -111,7 +108,7 @@ export default function SmartPricing() {
         ].map(t => (
           <button
             key={t.id}
-            onClick={() => setActiveTab(t.id as any)}
+            onClick={() => setActiveTab(t.id as 'rules' | 'analysis' | 'competitors')}
             className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === t.id
                 ? 'border-slate-800 text-slate-800'
@@ -126,7 +123,22 @@ export default function SmartPricing() {
       {/* Rules Tab Content */}
       {activeTab === 'rules' && (
         <div className="bg-white rounded-md border border-slate-200 shadow-sm overflow-hidden">
-          {rules.length === 0 ? (
+          {isLoadingRules ? (
+            <div className="p-8 space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="flex items-center gap-4 animate-pulse">
+                  <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+                  <div className="h-4 bg-slate-200 rounded w-1/6"></div>
+                  <div className="h-4 bg-slate-200 rounded w-1/6"></div>
+                  <div className="h-4 bg-slate-200 rounded w-1/6"></div>
+                </div>
+              ))}
+            </div>
+          ) : isErrorRules ? (
+            <div className="p-12 text-center text-rose-600 font-medium">
+              Kurallar yüklenirken bir hata oluştu.
+            </div>
+          ) : rules.length === 0 ? (
             <div className="p-12 text-center flex flex-col items-center">
               <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
                 <Target className="w-8 h-8 text-slate-400" />
@@ -313,9 +325,10 @@ export default function SmartPricing() {
               <button
                 type="submit"
                 form="rule-form"
-                className="flex items-center gap-2 px-4 py-2 rounded-md bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium transition-colors shadow-sm"
+                disabled={createRuleMutation.isPending}
+                className="flex items-center gap-2 px-4 py-2 rounded-md bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium transition-colors shadow-sm disabled:opacity-50"
               >
-                <Save className="w-4 h-4" /> Kaydet
+                {createRuleMutation.isPending ? 'Kaydediliyor...' : <><Save className="w-4 h-4" /> Kaydet</>}
               </button>
             </div>
           </div>

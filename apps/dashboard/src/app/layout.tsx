@@ -7,6 +7,7 @@ export const metadata = {
 
 import { Toaster } from 'sonner';
 import { Inter } from 'next/font/google';
+import { Providers } from '../components/providers';
 
 // Initialize the Inter font
 const inter = Inter({
@@ -22,8 +23,10 @@ export default function RootLayout({
   return (
     <html lang="tr" className={inter.className}>
       <body className="bg-slate-50 min-h-screen flex overflow-hidden">
-        {children}
-        <Toaster position="top-right" richColors />
+        <Providers>
+          {children}
+          <Toaster position="top-right" richColors />
+        </Providers>
       </body>
     </html>
   );
