@@ -18,9 +18,12 @@ OmniCore'u kullanırken ihtiyacınız olan tüm bilgilere buradan ulaşabilirsin
 ## 🛒 Satış ve Operasyon
 - [Siparişler Sayfası Kullanımı](modules/orders.md)
 - [İade Yönetimi (Reverse Logistics)](modules/returns.md)
+- [Tedarikçi Yönetimi](modules/suppliers.md)
+- [Alım Faturaları](modules/invoices.md)
 - [Sipariş Takibi ve Onaylama](order-management.md)
 
 ## 💰 Fiyatlandırma ve Rekabet
+- [Rekabet Radarı ve Analiz](modules/radar.md)
 - [Akıllı Fiyatlandırma Modülü](modules/smart-pricing.md)
 - [Fiyatlandırma Stratejileri](pricing-strategy.md)
 - [BuyBox ve Rakip Takibi](pricing-strategy.md#agresif-buybox-rakip-odaklı)
