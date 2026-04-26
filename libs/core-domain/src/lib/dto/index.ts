@@ -7,3 +7,4 @@ export * from './procurement/purchase-invoice.dto';
 export * from './feed.dto';
 export * from './category-mapping.dto';
 export * from './feed-template.dto';
+export * from './feed-optimization.dto';

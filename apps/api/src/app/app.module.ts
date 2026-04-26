@@ -18,6 +18,7 @@ import { ProcurementModule } from './procurement/procurement.module';
 import { FeedsModule } from './feeds/feeds.module';
 import { CategoryMappingsModule } from './category-mappings/category-mappings.module';
 import { FeedTemplatesModule } from './feed-templates/feed-templates.module';
+import { FeedOptimizationModule } from './feed-optimization/feed-optimization.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { FeedTemplatesModule } from './feed-templates/feed-templates.module';
     FeedsModule,
     CategoryMappingsModule,
     FeedTemplatesModule,
+    FeedOptimizationModule,
   ],
   controllers: [AppController, AiAgentController, QueueController, ],
   providers: [AppService, SyncCronService],
