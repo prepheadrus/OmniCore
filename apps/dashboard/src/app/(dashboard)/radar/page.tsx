@@ -11,7 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { MockCompetitorDataProvider, CompetitorData } from "../../../../../../libs/pricing/src/lib/services/mock-competitor-data.provider";
+import { MockCompetitorDataProvider, CompetitorData } from '@omnicore/pricing';
 import {
   Table,
   TableBody,
