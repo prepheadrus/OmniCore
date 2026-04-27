@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/store/useAppStore';
 import { useLicenseStore } from '@/store/useLicenseStore';
-import { IntegrationModal } from './IntegrationModal';
 import { Cog as CogIcon, Store, ShoppingCart, FileText, Truck, Warehouse, Globe, Link2, CheckCircle, XCircle, RefreshCw, Shield } from 'lucide-react';
 
 interface Integration { id: string; name: string; type: string; platform: string; status: string; }
@@ -45,12 +44,9 @@ export default function Settings() {
   const license = useLicenseStore();
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedIntegration, setSelectedIntegration] = useState<Integration | null>(null);
 
   useEffect(() => {
-    const loadIntegrations = () => {
-      fetch('/api/integrations')
+    fetch('/api/integrations')
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
@@ -61,15 +57,12 @@ export default function Settings() {
       })
       .catch(() => setIntegrations(defaultIntegrations))
       .finally(() => setLoading(false));
-    };
-    loadIntegrations();
   }, []);
 
   if (loading) return (<div className={`${sidebarOpen?'lg:ml-64':'ml-16'} min-h-screen bg-slate-50 p-6 transition-all`}><h1 className="mb-6 text-2xl font-bold text-slate-800">Entegrasyon Ayarlari</h1><div className="animate-pulse space-y-4">{[1,2,3].map(i=><Card key={i}><CardContent className="p-5"><div className="h-20 bg-slate-200 rounded"/></CardContent></Card>)}</div></div>);
 
   return (
     <div className={`${sidebarOpen?'lg:ml-64':'ml-16'} min-h-screen bg-slate-50 p-6 transition-all`}>
-      <IntegrationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} integration={selectedIntegration} onSuccess={() => { window.location.reload(); }} />
       <div className="flex items-center justify-between mb-6">
         <div><h1 className="text-2xl font-bold text-slate-800">Entegrasyon Ayarlari</h1><p className="text-sm text-slate-500">Bagli pazaryerleri ve hizmetleri yonetin</p></div>
       </div>
@@ -99,7 +92,7 @@ export default function Settings() {
             <h2 className="text-lg font-semibold text-slate-700 flex items-center gap-2 mb-3">{g.icon} {g.label}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {items.map((item) => (
-                <Card key={item.id} className="cursor-pointer hover:border-emerald-500 transition-colors" onClick={() => { setSelectedIntegration(item); setIsModalOpen(true); }}>
+                <Card key={item.id}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>

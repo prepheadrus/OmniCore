@@ -274,7 +274,7 @@ async function main() {
   // Webhook Endpoints
   await prisma.webhookEndpoint.createMany({ data: [
     { name: 'ERP Sync Webhook', url: 'https://erp.example.com/api/webhook', secret: 'whsec_abc123def456', events: '["order.created","order.updated","product.stock_changed"]', isActive: true, successCount: 245, failCount: 3, lastTriggered: new Date() },
-    { name: 'Slack Bildirim', url: 'https://hooks.slack.com/services/T00/B00/[id]', events: '["order.created","return.created","stock.low"]', isActive: true, successCount: 120, failCount: 15, lastTriggered: new Date() },
+    { name: 'Slack Bildirim', url: 'https://hooks.slack.com/services/T00/B00/xxx', events: '["order.created","return.created","stock.low"]', isActive: true, successCount: 120, failCount: 15, lastTriggered: new Date() },
     { name: 'Firma CRM Webhook', url: 'https://crm.firma.com/webhooks/pazarlogic', events: '["customer.created","customer.updated"]', isActive: false, successCount: 45, failCount: 0 },
   ] });
 
