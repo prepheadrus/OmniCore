@@ -281,14 +281,14 @@ export default function CarrierRates() {
                 <BarChart3 className="h-4 w-4 text-slate-400" /> Fiyat Grafiği
               </h3>
               <div className="flex-1 w-full min-h-0">
-                <ResponsiveContainer width="100%" height="100%">
+                <div style={{ width: "100%", height: "100%", minHeight: 300 }}><ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 40 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                     <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#64748b' }} stroke="#e2e8f0" angle={-45} textAnchor="end" />
                     <YAxis tick={{ fontSize: 11, fill: '#64748b' }} stroke="#e2e8f0" tickFormatter={(value) => `₺${value}`} />
                     <Tooltip 
                       contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px' }}
-                      formatter={(value: number) => [`₺${value.toFixed(2)}`, 'Toplam Fiyat']} 
+                      formatter={(value: any) => [`₺${value.toFixed(2)}`, 'Toplam Fiyat']}
                     />
                     <Bar dataKey="fiyat" radius={[4, 4, 0, 0]} maxBarSize={50}>
                       {chartData.map((entry, index) => (
@@ -296,7 +296,7 @@ export default function CarrierRates() {
                       ))}
                     </Bar>
                   </BarChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer></div>
               </div>
             </div>
           </div>

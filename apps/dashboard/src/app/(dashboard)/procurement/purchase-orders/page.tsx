@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Suspense } from "react"
 import { DataTableSkeleton } from "../../../../components/shared/data-table-skeleton"
 import { DataTable } from "../../../../components/procurement/purchase-orders/data-table"

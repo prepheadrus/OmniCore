@@ -38,7 +38,7 @@ export default function SalesTrendsChart() {
       </div>
 
       <div className="flex-1 w-full h-full border-b border-l border-slate-100">
-        <ResponsiveContainer width="100%" height={280}>
+        <div style={{ width: "100%", height: 280, minHeight: 280 }}><ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
             <Tooltip
               content={<CustomTooltip />}
@@ -61,7 +61,7 @@ export default function SalesTrendsChart() {
               dy={10}
             />
           </BarChart>
-        </ResponsiveContainer>
+        </ResponsiveContainer></div>
       </div>
     </div>
   );
