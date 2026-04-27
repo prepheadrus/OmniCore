@@ -269,7 +269,7 @@ export default function ListingQuality() {
             <h2 className="text-base font-semibold text-slate-800">Kalite Boyutları</h2>
           </div>
           <div className="h-72 w-full flex-1">
-            <ResponsiveContainer width="100%" height="100%">
+            <div style={{ width: "100%", height: "100%", minHeight: 300 }}><ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData}>
                 <PolarGrid stroke="#e2e8f0" />
                 <PolarAngleAxis dataKey="dimension" tick={{ fill: '#64748b', fontSize: 11 }} />
@@ -277,7 +277,7 @@ export default function ListingQuality() {
                 <Radar name="Ortalama Skor" dataKey="değer" stroke="#10b981" fill="#10b981" fillOpacity={0.3} strokeWidth={2} />
                 <Tooltip contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
               </RadarChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer></div>
           </div>
         </div>
 
@@ -333,7 +333,7 @@ export default function ListingQuality() {
                           </span>
                         </td>
                         {['title', 'image', 'description', 'price', 'attributes', 'seo'].map((key) => {
-                          const val = (listing.scores as Record<string, number>)[key];
+                          const val = (listing.scores as unknown as Record<string, number>)[key];
                           return (
                             <td key={key} className="py-3 px-2">
                               <div className="flex flex-col items-center gap-1">

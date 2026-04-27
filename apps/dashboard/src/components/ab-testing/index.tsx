@@ -247,7 +247,7 @@ export default function AbTesting() {
           )}
         </div>
         <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
+          <div style={{ width: "100%", height: "100%", minHeight: 300 }}><ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 10 }} stroke="#e2e8f0" angle={-15} textAnchor="end" height={60} />
@@ -259,7 +259,7 @@ export default function AbTesting() {
                 ))}
               </Bar>
             </BarChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer></div>
         </div>
       </div>
 

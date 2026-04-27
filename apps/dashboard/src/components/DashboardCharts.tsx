@@ -44,7 +44,7 @@ export default function DashboardCharts() {
   return (
     <div className="w-full h-96 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
       <h2 className="text-xl font-semibold mb-4 text-gray-800">Kârlılık Analizi</h2>
-      <ResponsiveContainer width="100%" height="100%">
+      <div style={{ width: "100%", height: "100%", minHeight: 300 }}><ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={mockData}
           margin={{
@@ -63,7 +63,7 @@ export default function DashboardCharts() {
           <Bar dataKey="komisyon" stackId="a" fill="#ffc658" name="Komisyon" />
           <Bar dataKey="netKar" stackId="a" fill="#82ca9d" name="Net Kâr" />
         </BarChart>
-      </ResponsiveContainer>
+      </ResponsiveContainer></div>
     </div>
   );
 }

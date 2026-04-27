@@ -554,17 +554,17 @@ export default function ProfitSimulator() {
                     <DollarSign className="h-4 w-4 text-violet-600" /> Maliyet Dağılımı
                   </h3>
                   <div className="h-72">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <div style={{ width: "100%", height: "100%", minHeight: 300 }}><ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie data={quickResult.breakdown.filter(d => d.value > 0)} cx="50%" cy="50%" innerRadius={60} outerRadius={110} paddingAngle={2} dataKey="value">
                           {quickResult.breakdown.filter(d => d.value > 0).map((entry, idx) => (
                             <Cell key={idx} fill={entry.color} />
                           ))}
                         </Pie>
-                        <Tooltip formatter={(value: number) => [fmt(value), '']} contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
+                        <Tooltip formatter={(value: any) => [fmt(value), '']} contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
                         <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} formatter={(value: string) => <span className="text-slate-700">{value}</span>} />
                       </PieChart>
-                    </ResponsiveContainer>
+                    </ResponsiveContainer></div>
                   </div>
                 </div>
               </>
@@ -587,7 +587,7 @@ export default function ProfitSimulator() {
               <BarChart3 className="h-4 w-4 text-violet-600" /> Kanal Karşılaştırma Grafiği
             </h3>
             <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
+              <div style={{ width: "100%", height: "100%", minHeight: 300 }}><ResponsiveContainer width="100%" height="100%">
                 <BarChart data={channelComparison} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} />
@@ -602,7 +602,7 @@ export default function ProfitSimulator() {
                   </Bar>
                   <Bar yAxisId="right" dataKey="netProfit" name="Net Kâr (₺)" fill="#a78bfa" radius={[4, 4, 0, 0]} barSize={24} opacity={0.7} />
                 </BarChart>
-              </ResponsiveContainer>
+              </ResponsiveContainer></div>
             </div>
           </div>
 
@@ -683,7 +683,7 @@ export default function ProfitSimulator() {
                 <Target className="h-4 w-4 text-violet-600" /> Senaryo Karşılaştırma Grafiği
               </h3>
               <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
+                <div style={{ width: "100%", height: "100%", minHeight: 300 }}><ResponsiveContainer width="100%" height="100%">
                   <BarChart data={scenarioResults} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#64748b' }} />
@@ -695,7 +695,7 @@ export default function ProfitSimulator() {
                       ))}
                     </Bar>
                   </BarChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer></div>
               </div>
             </div>
 

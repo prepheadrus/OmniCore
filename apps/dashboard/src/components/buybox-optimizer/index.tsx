@@ -343,7 +343,7 @@ function AnalysisDialog({
                 <TrendingUp className="h-4 w-4 text-slate-500" /> Fiyat Geçmişi (Son 7 Gün)
               </h4>
               <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
+                <div style={{ width: "100%", height: "100%", minHeight: 300 }}><ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                     <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#64748b' }} stroke="#e2e8f0" />
@@ -352,7 +352,7 @@ function AnalysisDialog({
                     <Bar dataKey="ourPrice" name="Bizim Fiyat" fill="#10b981" radius={[2, 2, 0, 0]} barSize={12} />
                     <Bar dataKey="buyBoxPrice" name="Buy Box Fiyatı" fill="#3b82f6" radius={[2, 2, 0, 0]} barSize={12} />
                   </BarChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer></div>
               </div>
             </div>
           </div>
@@ -882,145 +882,6 @@ export default function BuyBoxOptimizer() {
 
       {/* Analysis Dialog */}
       <AnalysisDialog product={selectedProduct} open={dialogOpen} onOpenChange={setDialogOpen} />
-    </div>
-  );
-}
-
-function AnalysisDialog({ product, open, onOpenChange }: { product: BuyBoxProduct | null; open: boolean; onOpenChange: (v: boolean) => void }) {
-  if (!open || !product) return null;
-
-  const allPrices = [
-    { name: 'Biz', price: product.ourPrice, isUs: true },
-    ...product.competitors.map(c => ({ name: c.name, price: c.price, isUs: false })),
-  ].sort((a, b) => a.price - b.price);
-
-  const minPrice = allPrices[0]?.price || 1;
-  const maxPrice = allPrices[allPrices.length - 1]?.price || 1;
-  const priceRange = maxPrice - minPrice || 1;
-
-  const priceDiff = product.ourPrice - product.buyBoxPrice;
-  const suggestedChanged = product.suggestedPrice !== product.ourPrice;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-md shadow-xl w-full max-w-4xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
-        <div className="p-5 border-b border-slate-200 bg-slate-50 flex items-start justify-between flex-shrink-0">
-          <div>
-            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2"><Package className="h-5 w-5 text-emerald-600" /> {product.name}</h2>
-            <div className="flex items-center gap-3 mt-2">
-              <span className="inline-block px-2 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px] font-bold uppercase tracking-wider">{product.marketplace}</span>
-              <span className="text-xs text-slate-500 font-mono font-medium">ASIN: {product.asin}</span>
-              <span className="text-[10px] text-slate-400">Son güncelleme: {product.lastUpdated}</span>
-            </div>
-          </div>
-          <button onClick={() => onOpenChange(false)} className="p-1.5 text-slate-400 hover:bg-slate-200 rounded transition-colors"><X className="h-5 w-5" /></button>
-        </div>
-        
-        <div className="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-4 flex flex-col items-center justify-center text-center">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Bizim Fiyat</p>
-              <p className="text-2xl font-bold text-slate-800">{fmt(product.ourPrice)}</p>
-            </div>
-            <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 flex flex-col items-center justify-center text-center">
-              <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Buy Box Fiyatı</p>
-              <p className="text-2xl font-bold text-emerald-700">{fmt(product.buyBoxPrice)}</p>
-            </div>
-            <div className="rounded-md border border-amber-200 bg-amber-50 p-4 flex flex-col items-center justify-center text-center">
-              <p className="text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">Önerilen Fiyat</p>
-              <p className="text-2xl font-bold text-amber-700">{fmt(product.suggestedPrice)}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="rounded-md border border-slate-200 p-5 shadow-sm">
-              <h4 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2"><BarChart3 className="h-4 w-4 text-slate-500" /> Rakip Fiyat Karşılaştırması</h4>
-              <div className="space-y-4">
-                {allPrices.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <div className={`w-32 text-xs truncate ${item.isUs ? 'text-emerald-700 font-bold' : 'text-slate-600 font-medium'}`}>
-                      {item.name} {item.isUs && <span className="ml-1.5 text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded uppercase tracking-wider">SİZ</span>}
-                    </div>
-                    <div className="flex-1 h-7 bg-slate-100 rounded overflow-hidden">
-                      <div className={`h-full rounded transition-all duration-700 flex items-center px-2 ${item.isUs ? (item.price === product.buyBoxPrice ? 'bg-emerald-500' : 'bg-amber-500') : (item.price === product.buyBoxPrice ? 'bg-blue-500' : 'bg-slate-400')}`} style={{ width: `${Math.max(15, ((item.price - minPrice + priceRange * 0.1) / (priceRange * 1.2)) * 100)}%` }}>
-                        <span className="text-[10px] font-bold text-white">{fmt(item.price)}</span>
-                      </div>
-                    </div>
-                    {item.price === product.buyBoxPrice ? <Trophy className="h-4 w-4 text-amber-500 shrink-0" /> : <div className="w-4 shrink-0" />}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-md border border-slate-200 overflow-hidden shadow-sm flex flex-col">
-              <div className="p-3 border-b border-slate-200 bg-slate-50">
-                <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2"><Store className="h-4 w-4 text-slate-500" /> Satıcı Analizi</h4>
-              </div>
-              <div className="overflow-x-auto flex-1">
-                <table className="w-full text-sm text-left">
-                  <thead>
-                    <tr className="border-b border-slate-200 bg-white">
-                      <th className="py-2 px-3 font-medium text-slate-500 text-[10px] uppercase tracking-wider">Satıcı</th>
-                      <th className="py-2 px-3 font-medium text-slate-500 text-[10px] uppercase tracking-wider text-right">Fiyat</th>
-                      <th className="py-2 px-3 font-medium text-slate-500 text-[10px] uppercase tracking-wider text-center">Puan</th>
-                      <th className="py-2 px-3 font-medium text-slate-500 text-[10px] uppercase tracking-wider text-center">FBA</th>
-                      <th className="py-2 px-3 font-medium text-slate-500 text-[10px] uppercase tracking-wider text-center">Süre</th>
-                      <th className="py-2 px-3 font-medium text-slate-500 text-[10px] uppercase tracking-wider text-center">BB</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    <tr className="bg-emerald-50/50">
-                      <td className="py-2 px-3 font-bold text-emerald-700 text-xs">Biz (Siz)</td>
-                      <td className="py-2 px-3 text-right font-bold text-emerald-700 text-xs">{fmt(product.ourPrice)}</td>
-                      <td className="py-2 px-3 text-center text-xs text-slate-400">—</td>
-                      <td className="py-2 px-3 text-center"><Shield className="h-3.5 w-3.5 text-emerald-600 mx-auto" /></td>
-                      <td className="py-2 px-3 text-center text-xs text-slate-500">—</td>
-                      <td className="py-2 px-3 text-center">{product.won ? <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700">EVET</span> : <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-red-100 text-red-700">HAYIR</span>}</td>
-                    </tr>
-                    {product.competitors.map((comp, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50">
-                        <td className="py-2 px-3 text-xs font-medium text-slate-700 truncate max-w-[100px]">{comp.name}</td>
-                        <td className={`py-2 px-3 text-right text-xs font-bold ${comp.price === product.buyBoxPrice ? 'text-blue-600' : 'text-slate-700'}`}>{fmtShort(comp.price)}</td>
-                        <td className="py-2 px-3 text-center"><span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-slate-600"><Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" /> {comp.rating}</span></td>
-                        <td className="py-2 px-3 text-center">{comp.fba ? <Truck className="h-3.5 w-3.5 text-blue-500 mx-auto" /> : <Minus className="h-3.5 w-3.5 text-slate-300 mx-auto" />}</td>
-                        <td className="py-2 px-3 text-center text-xs font-medium text-slate-600">{comp.deliveryDays}G</td>
-                        <td className="py-2 px-3 text-center">{comp.price === product.buyBoxPrice && <Trophy className="h-3 w-3 text-amber-500 mx-auto" />}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-md border border-amber-200 bg-amber-50 p-5 shadow-sm">
-            <div className="flex items-start gap-4">
-              <div className="p-2.5 bg-amber-100 rounded-md shrink-0"><Zap className="h-6 w-6 text-amber-600" /></div>
-              <div>
-                <h4 className="text-base font-bold text-amber-800 mb-2">Önerilen Fiyat Stratejisi: {fmt(product.suggestedPrice)}</h4>
-                <p className="text-sm font-medium text-amber-700 leading-relaxed mb-4">{product.reasoning}</p>
-                <div className="flex flex-wrap items-center gap-3 text-xs font-medium">
-                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white border border-amber-200 text-slate-700 shadow-sm">
-                    {priceDiff > 0 ? <TrendingDown className="h-4 w-4 text-red-500" /> : priceDiff < 0 ? <TrendingUp className="h-4 w-4 text-emerald-500" /> : <Minus className="h-4 w-4 text-slate-400" />}
-                    Fiyat Farkı: <strong className={priceDiff > 0 ? 'text-red-600' : 'text-emerald-600'}>{priceDiff > 0 ? '+' : ''}{fmt(priceDiff)}</strong>
-                  </span>
-                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white border border-amber-200 text-slate-700 shadow-sm">
-                    <Trophy className="h-4 w-4 text-amber-500" />
-                    Kazanma: <strong className="text-amber-700">%{product.winRate}</strong>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3 flex-shrink-0">
-          <button onClick={() => onOpenChange(false)} className="px-5 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-md transition-colors shadow-sm">Kapat</button>
-          <button onClick={() => onOpenChange(false)} className={`px-5 py-2.5 text-white text-sm font-medium rounded-md transition-colors shadow-sm flex items-center gap-2 ${suggestedChanged ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-800 hover:bg-slate-700'}`}>
-            <Check className="h-4 w-4" /> {suggestedChanged ? 'Önerilen Fiyatı Uygula' : 'Mevcut Fiyatı Koru'}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
