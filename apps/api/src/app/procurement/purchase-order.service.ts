@@ -89,11 +89,27 @@ export class PurchaseOrderService {
         throw new BadRequestException('Purchase Order is already received.');
       }
 
-      for (const item of order.items) {
-        const variant = await tx.productVariant.findUnique({
-          where: { id: item.productVariantId },
+      // Extract unique variant IDs
+      const variantIds = [...new Set(order.items.map(item => item.productVariantId))];
+
+      // Fetch variants in chunks to avoid parameter limits (e.g. Postgres 65k limit)
+      const CHUNK_SIZE = 1000;
+      const variantsMap = new Map<string, Prisma.ProductVariantGetPayload<{ include: { product: true } }>>();
+
+      for (let i = 0; i < variantIds.length; i += CHUNK_SIZE) {
+        const chunk = variantIds.slice(i, i + CHUNK_SIZE);
+        const variantsChunk = await tx.productVariant.findMany({
+          where: { id: { in: chunk } },
           include: { product: true },
         });
+
+        for (const v of variantsChunk) {
+          variantsMap.set(v.id, v);
+        }
+      }
+
+      for (const item of order.items) {
+        const variant = variantsMap.get(item.productVariantId);
 
         if (!variant) {
           throw new NotFoundException(`Product variant ${item.productVariantId} not found`);
