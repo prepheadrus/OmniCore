@@ -27,14 +27,27 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getResponse()
         : 'Internal server error';
 
-    // Log the full stack trace for debugging
+    // Log the full stack trace for debugging, except for 404 Not Found to reduce noise
     if (exception instanceof Error) {
-      this.logger.error(`[${request.method}] ${request.url} - ${exception.message}`, exception.stack);
-      console.error('--- Stack Trace ---');
-      console.error(exception);
-      console.error('-------------------');
+      if (status === HttpStatus.NOT_FOUND) {
+        this.logger.warn(
+          `[${request.method}] ${request.url} - ${exception.message}`,
+        );
+      } else {
+        this.logger.error(
+          `[${request.method}] ${request.url} - ${exception.message}`,
+          exception.stack,
+        );
+        console.error('--- Stack Trace ---');
+        console.error(exception);
+        console.error('-------------------');
+      }
     } else {
-      this.logger.error(`[${request.method}] ${request.url} - ${exception}`);
+      if (status === HttpStatus.NOT_FOUND) {
+        this.logger.warn(`[${request.method}] ${request.url} - ${exception}`);
+      } else {
+        this.logger.error(`[${request.method}] ${request.url} - ${exception}`);
+      }
     }
 
     response.status(status).json({
