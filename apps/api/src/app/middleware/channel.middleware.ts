@@ -10,6 +10,10 @@ export class ChannelMiddleware implements NestMiddleware {
   constructor(private readonly cls: ClsService) {}
 
   use(req: Request, res: Response, next: NextFunction) {
+    if (req.method === 'OPTIONS') {
+      return next();
+    }
+
     const channelId = req.headers['x-channel-id'] ||
                       req.headers['x-sales-channel-id'] ||
                       req.cookies?.['channel-id'] ||
