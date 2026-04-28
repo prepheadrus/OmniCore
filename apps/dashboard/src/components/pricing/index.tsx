@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  TrendingUp, Target, Plus, BarChart3, Settings, Save, X, ToggleLeft
+  TrendingUp, Target, Plus, BarChart3, Settings, Save, X, ToggleLeft, Check, AlertTriangle, TrendingDown
 } from 'lucide-react';
 import { PriceRuleSchema, PriceRuleFormData } from '@omnicore/core-domain';
 import { useGetPriceRules, useCreatePriceRule } from './hooks';
@@ -14,7 +14,19 @@ const RULE_TYPE_LABELS: Record<string, string> = { markup: 'Markup', discount: '
 const RULE_TYPE_BADGE: Record<string, string> = { markup: 'bg-emerald-50 text-emerald-700', discount: 'bg-rose-50 text-rose-700', match: 'bg-blue-50 text-blue-700', max_price: 'bg-amber-50 text-amber-700' };
 const MARKETPLACE_LABELS: Record<string, string> = { all: 'Tüm Kanallar', trendyol: 'Trendyol', hepsiburada: 'Hepsiburada', n11: 'n11' };
 
+const fmt = (n: number) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(n);
+
+function marginColor(m: number) { return m > 30 ? 'text-emerald-600' : m > 15 ? 'text-blue-600' : m > 5 ? 'text-amber-600' : 'text-rose-600'; }
 function marginBadge(m: number) { return m > 30 ? 'bg-emerald-50 text-emerald-700' : m > 15 ? 'bg-blue-50 text-blue-700' : m > 5 ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'; }
+function marginLabel(m: number) { return m > 30 ? 'Yüksek' : m > 15 ? 'Orta' : m > 5 ? 'Düşük' : 'Zarar'; }
+
+const MOCK_PRODUCTS = [
+  { id: '1', name: 'Kablosuz Kulaklık', sku: 'AUDIO-01', price: 1299, cost: 800, stock: 45, category: 'Elektronik', marketplace: 'Trendyol' },
+  { id: '2', name: 'Akıllı Saat', sku: 'WATCH-02', price: 2499, cost: 1500, stock: 12, category: 'Elektronik', marketplace: 'Hepsiburada' },
+  { id: '3', name: 'Koşu Ayakkabısı', sku: 'SHOE-03', price: 1899, cost: 1200, stock: 0, category: 'Giyim', marketplace: 'Trendyol' },
+  { id: '4', name: 'Yoga Matı', sku: 'SPORTS-04', price: 349, cost: 150, stock: 89, category: 'Spor', marketplace: 'n11' },
+  { id: '5', name: 'Su Şişesi 1L', sku: 'HOME-05', price: 129, cost: 130, stock: 200, category: 'Ev', marketplace: 'Trendyol' },
+];
 
 export default function SmartPricing() {
   const [activeTab, setActiveTab] = useState<'rules'|'analysis'|'competitors'>('rules');
@@ -22,6 +34,30 @@ export default function SmartPricing() {
 
   const { data: rules = [], isPending: isLoadingRules, isError: isErrorRules } = useGetPriceRules();
   const createRuleMutation = useCreatePriceRule();
+
+  const products = MOCK_PRODUCTS;
+
+  const marginStats = useMemo(() => {
+    const margins = products.map(p => ((p.price - p.cost) / p.price) * 100);
+    const high = margins.filter(m => m > 30).length;
+    const medium = margins.filter(m => m > 15 && m <= 30).length;
+    const low = margins.filter(m => m > 5 && m <= 15).length;
+    const loss = margins.filter(m => m <= 5).length;
+    return { high, medium, low, loss };
+  }, [products]);
+
+  const competitorData = useMemo(() =>
+    products.map(p => {
+      const seed = p.id.charCodeAt(0);
+      const trendyol = +(p.price * (0.92 + ((seed * 7) % 16) / 100)).toFixed(2);
+      const hb = +(p.price * (0.94 + ((seed * 11) % 12) / 100)).toFixed(2);
+      const n11 = +(p.price * (0.90 + ((seed * 13) % 20) / 100)).toFixed(2);
+      const minComp = Math.min(trendyol, hb, n11);
+      const status = p.price < minComp ? 'En Ucuz' : p.price < minComp * 1.05 ? 'Orta' : 'Pahalı';
+      return { ...p, trendyol, hb, n11, status };
+    }),
+    [products]
+  );
 
   const form = useForm<PriceRuleFormData>({
     resolver: zodResolver(PriceRuleSchema),
@@ -203,6 +239,121 @@ export default function SmartPricing() {
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Analysis Tab Content */}
+      {activeTab === 'analysis' && (
+        <div className="space-y-5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              ['Yüksek Marj', marginStats.high, 'bg-emerald-50 text-emerald-600 border border-emerald-100', Check], 
+              ['Orta Marj', marginStats.medium, 'bg-blue-50 text-blue-600 border border-blue-100', BarChart3], 
+              ['Düşük Marj', marginStats.low, 'bg-amber-50 text-amber-600 border border-amber-100', AlertTriangle], 
+              ['Zarar', marginStats.loss, 'bg-rose-50 text-rose-600 border border-rose-100', TrendingDown]
+            ].map(([label, count, cls, Icon]) => (
+              <div key={label as string} className="bg-white p-5 rounded-md border border-slate-200 shadow-sm flex items-center gap-4">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-md ${cls}`}>
+                  {(() => { const I = Icon as React.ComponentType<{ className?: string }>; return <I className="h-5 w-5" />; })()}
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">{label as string}</p>
+                  <p className="text-2xl font-bold text-slate-800 mt-1">{count as number}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white rounded-md border border-slate-200 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50">
+                    <th className="text-left py-3 px-4 font-medium text-slate-500">Ürün Adı</th>
+                    <th className="text-left py-3 px-4 font-medium text-slate-500">SKU</th>
+                    <th className="text-right py-3 px-4 font-medium text-slate-500">Maliyet</th>
+                    <th className="text-right py-3 px-4 font-medium text-slate-500">Satış Fiyatı</th>
+                    <th className="text-right py-3 px-4 font-medium text-slate-500">Marj %</th>
+                    <th className="text-right py-3 px-4 font-medium text-slate-500">Marj TL</th>
+                    <th className="text-left py-3 px-4 font-medium text-slate-500">Durum</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map(p => { 
+                    const m = ((p.price - p.cost) / p.price) * 100; 
+                    const tl = p.price - p.cost; 
+                    return (
+                      <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                        <td className="py-3 px-4 font-medium text-slate-800">{p.name}</td>
+                        <td className="py-3 px-4 text-slate-500">{p.sku}</td>
+                        <td className="py-3 px-4 text-right text-slate-500">{fmt(p.cost)}</td>
+                        <td className="py-3 px-4 text-right font-medium text-slate-800">{fmt(p.price)}</td>
+                        <td className={`py-3 px-4 text-right font-semibold ${marginColor(m)}`}>{m.toFixed(1)}%</td>
+                        <td className={`py-3 px-4 text-right font-medium ${tl > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{fmt(tl)}</td>
+                        <td className="py-3 px-4">
+                          <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-medium ${marginBadge(m)}`}>
+                            {marginLabel(m)}
+                          </span>
+                        </td>
+                      </tr>
+                    ); 
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Competitors Tab Content */}
+      {activeTab === 'competitors' && (
+        <div className="bg-white rounded-md border border-slate-200 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-blue-500" />
+            <h3 className="font-semibold text-slate-800">Pazaryer Karşılaştırma (Simüle Edilmiş)</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 bg-white">
+                  <th className="text-left py-3 px-4 font-medium text-slate-500">Ürün</th>
+                  <th className="text-right py-3 px-4 font-medium text-slate-500">Bizim Fiyat</th>
+                  <th className="text-right py-3 px-4 font-medium text-slate-500">Trendyol Ort.</th>
+                  <th className="text-right py-3 px-4 font-medium text-slate-500">HB Ort.</th>
+                  <th className="text-right py-3 px-4 font-medium text-slate-500">n11 Ort.</th>
+                  <th className="text-left py-3 px-4 font-medium text-slate-500">Durum</th>
+                </tr>
+              </thead>
+              <tbody>
+                {competitorData.map(c => {
+                  const cheapest = c.status === 'En Ucuz';
+                  const medium = c.status === 'Orta';
+                  return (
+                    <tr key={c.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                      <td className="py-3 px-4 font-medium text-slate-800">{c.name}</td>
+                      <td className={`py-3 px-4 text-right font-semibold ${cheapest ? 'text-emerald-600' : 'text-slate-800'}`}>
+                        {fmt(c.price)}
+                      </td>
+                      <td className={`py-3 px-4 text-right ${c.trendyol < c.price ? 'text-rose-500' : 'text-emerald-600'}`}>
+                        {fmt(c.trendyol)}
+                      </td>
+                      <td className={`py-3 px-4 text-right ${c.hb < c.price ? 'text-rose-500' : 'text-emerald-600'}`}>
+                        {fmt(c.hb)}
+                      </td>
+                      <td className={`py-3 px-4 text-right ${c.n11 < c.price ? 'text-rose-500' : 'text-emerald-600'}`}>
+                        {fmt(c.n11)}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-medium ${cheapest ? 'bg-emerald-50 text-emerald-700' : medium ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'}`}>
+                          {c.status}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

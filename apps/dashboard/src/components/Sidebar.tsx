@@ -84,6 +84,7 @@ export default function Sidebar() {
       title: 'ZEKA & SİSTEM',
       items: [
         { name: 'Veri Otomasyonu', icon: Bot, href: '/automation' },
+        { name: 'Dinamik Fiyatlandırma', icon: Zap, href: '/dynamic-pricing' },
         { name: 'A/B Test', icon: FlaskConical, href: '/ab-testing' },
         { name: 'İçerik Optimizasyonu', icon: Sparkles, href: '/content-rules' },
         { name: 'Listeleme Kalitesi', icon: Star, href: '/listing-quality' },
