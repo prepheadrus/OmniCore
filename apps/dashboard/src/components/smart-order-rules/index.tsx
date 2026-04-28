@@ -419,7 +419,7 @@ export default function SmartOrderRules() {
                           <React.Fragment key={c.id}>
                             <span className="inline-flex items-center px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium">{getFieldLabel(c.field)}</span>
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold uppercase">{getOperatorLabel(c.operator)}</span>
-                            <span className="inline-flex items-center px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-800 text-xs font-medium">"{c.value}"</span>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-800 text-xs font-medium">&quot;{c.value}&quot;</span>
                             {i < rule.conditions.length - 1 && <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 text-[10px] font-bold uppercase">VE</span>}
                           </React.Fragment>
                         ))}
