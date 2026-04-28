@@ -29,6 +29,14 @@ async function bootstrap() {
     }),
   );
 
+  // Enable CORS
+  app.enableCors({
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: ['Content-Type', 'Accept', 'Authorization', 'x-channel-id', 'x-sales-channel-id'],
+    credentials: true,
+  });
+
   // Configure Swagger/OpenAPI documentation
   const config = new DocumentBuilder()
     .setTitle('Omnicore API')
@@ -41,7 +49,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   const port = process.env.PORT || 3000;
-  await app.listen(port, '0.0.0.0');;
+  await app.listen(port, '0.0.0.0');
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,
   );
