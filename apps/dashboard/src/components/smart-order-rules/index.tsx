@@ -38,9 +38,9 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+} from '@omnicore/ui/components/ui/card';
+import { Button } from '@omnicore/ui/components/ui/button';
+import { Badge } from '@omnicore/ui/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -48,27 +48,32 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@omnicore/ui/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
+} from '@omnicore/ui/components/ui/select';
+import { Input } from '@omnicore/ui/components/ui/input';
+import { Switch } from '@omnicore/ui/components/ui/switch';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from '@omnicore/ui/components/ui/tabs';
+import { Progress } from '@omnicore/ui/components/ui/progress';
+import { Separator } from '@omnicore/ui/components/ui/separator';
+import { ScrollArea } from '@omnicore/ui/components/ui/scroll-area';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { Label } from '@/components/ui/label';
+} from '@omnicore/ui/components/ui/tooltip';
+import { Label } from '@omnicore/ui/components/ui/label';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -189,10 +194,16 @@ const initialRules: SmartOrderRule[] = [
   {
     id: 'rule-001',
     name: 'Yüksek Değerli Sipariş - Aras Kargo',
-    description: '5000₺ üzeri siparişlerde Aras Kargoyu otomatik atar ve sigorta etiketi ekler',
+    description:
+      '5000₺ üzeri siparişlerde Aras Kargoyu otomatik atar ve sigorta etiketi ekler',
     trigger: 'order_created',
     conditions: [
-      { id: 'c1', field: 'order_amount', operator: 'greater_than', value: '5000' },
+      {
+        id: 'c1',
+        field: 'order_amount',
+        operator: 'greater_than',
+        value: '5000',
+      },
     ],
     actions: [
       { id: 'a1', type: 'assign_carrier', params: 'Aras Kargo' },
@@ -208,11 +219,22 @@ const initialRules: SmartOrderRule[] = [
   {
     id: 'rule-002',
     name: 'İstanbul Hızlı Kargo',
-    description: 'İstanbul adresli siparişleri aynı gün teslimat kargosuna yönlendirir',
+    description:
+      'İstanbul adresli siparişleri aynı gün teslimat kargosuna yönlendirir',
     trigger: 'payment_received',
     conditions: [
-      { id: 'c2', field: 'shipping_city', operator: 'equals', value: 'İstanbul' },
-      { id: 'c2b', field: 'order_amount', operator: 'less_than', value: '15000' },
+      {
+        id: 'c2',
+        field: 'shipping_city',
+        operator: 'equals',
+        value: 'İstanbul',
+      },
+      {
+        id: 'c2b',
+        field: 'order_amount',
+        operator: 'less_than',
+        value: '15000',
+      },
     ],
     actions: [
       { id: 'a2a', type: 'assign_carrier', params: 'Yurtiçi Same Day' },
@@ -228,10 +250,16 @@ const initialRules: SmartOrderRule[] = [
   {
     id: 'rule-003',
     name: 'Otomatik Etiket + Fatura Yazdırma',
-    description: '2000₺ üzeri siparişlerde kargo etiketi ve faturayı otomatik yazdırır',
+    description:
+      '2000₺ üzeri siparişlerde kargo etiketi ve faturayı otomatik yazdırır',
     trigger: 'payment_received',
     conditions: [
-      { id: 'c3', field: 'order_amount', operator: 'greater_than', value: '2000' },
+      {
+        id: 'c3',
+        field: 'order_amount',
+        operator: 'greater_than',
+        value: '2000',
+      },
     ],
     actions: [
       { id: 'a3a', type: 'print_label', params: 'Kargo Etiketi + Fatura' },
@@ -250,8 +278,18 @@ const initialRules: SmartOrderRule[] = [
     description: '5000₺ üzeri ve yeni müşteri siparişlerini manuel onaya alır',
     trigger: 'order_created',
     conditions: [
-      { id: 'c4a', field: 'order_amount', operator: 'greater_than', value: '5000' },
-      { id: 'c4b', field: 'customer_segment', operator: 'equals', value: 'Yeni Müşteri' },
+      {
+        id: 'c4a',
+        field: 'order_amount',
+        operator: 'greater_than',
+        value: '5000',
+      },
+      {
+        id: 'c4b',
+        field: 'customer_segment',
+        operator: 'equals',
+        value: 'Yeni Müşteri',
+      },
     ],
     actions: [
       { id: 'a4a', type: 'hold_order', params: 'Manuel Onay Bekliyor' },
@@ -268,11 +306,22 @@ const initialRules: SmartOrderRule[] = [
   {
     id: 'rule-005',
     name: 'Trendyol Elektronik Özel Kural',
-    description: 'Trendyol elektronik kategorisi siparişlerinde özel kargo ve ekstra koruma',
+    description:
+      'Trendyol elektronik kategorisi siparişlerinde özel kargo ve ekstra koruma',
     trigger: 'order_created',
     conditions: [
-      { id: 'c5a', field: 'marketplace', operator: 'equals', value: 'Trendyol' },
-      { id: 'c5b', field: 'product_category', operator: 'equals', value: 'Elektronik' },
+      {
+        id: 'c5a',
+        field: 'marketplace',
+        operator: 'equals',
+        value: 'Trendyol',
+      },
+      {
+        id: 'c5b',
+        field: 'product_category',
+        operator: 'equals',
+        value: 'Elektronik',
+      },
     ],
     actions: [
       { id: 'a5a', type: 'assign_carrier', params: 'Trendyol Express' },
@@ -288,10 +337,16 @@ const initialRules: SmartOrderRule[] = [
   {
     id: 'rule-006',
     name: 'Hepsiburada Kargo Şablonu',
-    description: 'Hepsiburada siparişlerinde otomatik Hepsijet kargo ataması yapar',
+    description:
+      'Hepsiburada siparişlerinde otomatik Hepsijet kargo ataması yapar',
     trigger: 'payment_received',
     conditions: [
-      { id: 'c6', field: 'marketplace', operator: 'equals', value: 'Hepsiburada' },
+      {
+        id: 'c6',
+        field: 'marketplace',
+        operator: 'equals',
+        value: 'Hepsiburada',
+      },
     ],
     actions: [
       { id: 'a6a', type: 'assign_carrier', params: 'Hepsijet' },
@@ -307,14 +362,19 @@ const initialRules: SmartOrderRule[] = [
   {
     id: 'rule-007',
     name: 'Çoklu Ürün Sipariş Bölme',
-    description: '5 adet üzeri siparişleri otomatik olarak ayrı kargolara böler',
+    description:
+      '5 adet üzeri siparişleri otomatik olarak ayrı kargolara böler',
     trigger: 'order_created',
     conditions: [
       { id: 'c7', field: 'item_count', operator: 'greater_than', value: '5' },
       { id: 'c7b', field: 'weight', operator: 'greater_than', value: '30' },
     ],
     actions: [
-      { id: 'a7a', type: 'split_order', params: 'Ağırlık bazlı: max 20kg/coli' },
+      {
+        id: 'a7a',
+        type: 'split_order',
+        params: 'Ağırlık bazlı: max 20kg/coli',
+      },
       { id: 'a7b', type: 'add_tag', params: 'Çoklu Koli' },
     ],
     channels: ['all'],
@@ -327,10 +387,16 @@ const initialRules: SmartOrderRule[] = [
   {
     id: 'rule-008',
     name: 'Kapıda Ödeme Siparişleri',
-    description: 'Kapıda ödeme siparişlerinde müşteriye bilgilendirme e-postası gönderir',
+    description:
+      'Kapıda ödeme siparişlerinde müşteriye bilgilendirme e-postası gönderir',
     trigger: 'payment_received',
     conditions: [
-      { id: 'c8', field: 'payment_method', operator: 'equals', value: 'Kapıda Ödeme' },
+      {
+        id: 'c8',
+        field: 'payment_method',
+        operator: 'equals',
+        value: 'Kapıda Ödeme',
+      },
     ],
     actions: [
       { id: 'a8a', type: 'send_email', params: 'Kapıda ödeme onay şablonu' },
@@ -350,12 +416,31 @@ const initialRules: SmartOrderRule[] = [
     trigger: 'order_created',
     conditions: [
       { id: 'c9a', field: 'marketplace', operator: 'equals', value: 'Etsy' },
-      { id: 'c9b', field: 'shipping_city', operator: 'not_equals', value: 'İstanbul' },
-      { id: 'c9c', field: 'shipping_city', operator: 'not_equals', value: 'Ankara' },
-      { id: 'c9d', field: 'shipping_city', operator: 'not_equals', value: 'İzmir' },
+      {
+        id: 'c9b',
+        field: 'shipping_city',
+        operator: 'not_equals',
+        value: 'İstanbul',
+      },
+      {
+        id: 'c9c',
+        field: 'shipping_city',
+        operator: 'not_equals',
+        value: 'Ankara',
+      },
+      {
+        id: 'c9d',
+        field: 'shipping_city',
+        operator: 'not_equals',
+        value: 'İzmir',
+      },
     ],
     actions: [
-      { id: 'a9a', type: 'assign_carrier', params: 'DHL Express International' },
+      {
+        id: 'a9a',
+        type: 'assign_carrier',
+        params: 'DHL Express International',
+      },
       { id: 'a9b', type: 'add_tag', params: 'Uluslararası Gönderi' },
       { id: 'a9c', type: 'assign_priority', params: 'Normal' },
     ],
@@ -369,10 +454,16 @@ const initialRules: SmartOrderRule[] = [
   {
     id: 'rule-010',
     name: 'Ankara/İzmir Standart Yönlendirme',
-    description: 'Ankara ve İzmir adresli siparişleri Yurtiçi Kargoya yönlendirir',
+    description:
+      'Ankara ve İzmir adresli siparişleri Yurtiçi Kargoya yönlendirir',
     trigger: 'payment_received',
     conditions: [
-      { id: 'c10a', field: 'shipping_city', operator: 'equals', value: 'Ankara' },
+      {
+        id: 'c10a',
+        field: 'shipping_city',
+        operator: 'equals',
+        value: 'Ankara',
+      },
     ],
     actions: [
       { id: 'a10a', type: 'assign_carrier', params: 'Yurtiçi Kargo' },
@@ -390,15 +481,17 @@ const initialRules: SmartOrderRule[] = [
 // ─── Helper Functions ────────────────────────────────────────────────────────
 
 function getFieldLabel(fieldValue: string): string {
-  return CONDITION_FIELDS.find(f => f.value === fieldValue)?.label ?? fieldValue;
+  return (
+    CONDITION_FIELDS.find((f) => f.value === fieldValue)?.label ?? fieldValue
+  );
 }
 
 function getOperatorLabel(opValue: string): string {
-  return CONDITION_OPERATORS.find(o => o.value === opValue)?.label ?? opValue;
+  return CONDITION_OPERATORS.find((o) => o.value === opValue)?.label ?? opValue;
 }
 
 function getChannelLabel(channelValue: string): string {
-  return CHANNELS.find(c => c.value === channelValue)?.label ?? channelValue;
+  return CHANNELS.find((c) => c.value === channelValue)?.label ?? channelValue;
 }
 
 function formatMatchCount(count: number): string {
@@ -425,9 +518,7 @@ function formatLastMatched(iso: string): string {
 function ConditionFlow({ conditions }: { conditions: RuleCondition[] }) {
   if (conditions.length === 0) {
     return (
-      <span className="text-xs text-slate-400 italic">
-        Koşul tanımlanmamış
-      </span>
+      <span className="text-xs text-slate-400 italic">Koşul tanımlanmamış</span>
     );
   }
 
@@ -540,7 +631,10 @@ function RuleCard({
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Badge variant="outline" className="gap-1 border-amber-300 bg-amber-50 text-[11px] text-amber-700">
+                        <Badge
+                          variant="outline"
+                          className="gap-1 border-amber-300 bg-amber-50 text-[11px] text-amber-700"
+                        >
                           <Shield className="w-3 h-3" />
                           Yüksek Öncelik
                         </Badge>
@@ -612,7 +706,10 @@ function RuleCard({
           <div className="flex items-center gap-1.5">
             <BarChart3 className="w-3.5 h-3.5" />
             <span>
-              <strong className="text-slate-800">{formatMatchCount(rule.matchCount)}</strong> eşleşme
+              <strong className="text-slate-800">
+                {formatMatchCount(rule.matchCount)}
+              </strong>{' '}
+              eşleşme
             </span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -721,13 +818,13 @@ function RuleFormDialog({
 
   const updateForm = useCallback(
     <K extends keyof RuleFormState>(key: K, val: RuleFormState[K]) => {
-      setForm(prev => ({ ...prev, [key]: val }));
+      setForm((prev) => ({ ...prev, [key]: val }));
     },
-    []
+    [],
   );
 
   const addCondition = useCallback(() => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
       conditions: [
         ...prev.conditions,
@@ -742,26 +839,26 @@ function RuleFormDialog({
   }, []);
 
   const removeCondition = useCallback((id: string) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      conditions: prev.conditions.filter(c => c.id !== id),
+      conditions: prev.conditions.filter((c) => c.id !== id),
     }));
   }, []);
 
   const updateCondition = useCallback(
     (id: string, key: keyof RuleCondition, value: string) => {
-      setForm(prev => ({
+      setForm((prev) => ({
         ...prev,
-        conditions: prev.conditions.map(c =>
-          c.id === id ? { ...c, [key]: value } : c
+        conditions: prev.conditions.map((c) =>
+          c.id === id ? { ...c, [key]: value } : c,
         ),
       }));
     },
-    []
+    [],
   );
 
   const addAction = useCallback(() => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
       actions: [
         ...prev.actions,
@@ -771,22 +868,22 @@ function RuleFormDialog({
   }, []);
 
   const removeAction = useCallback((id: string) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      actions: prev.actions.filter(a => a.id !== id),
+      actions: prev.actions.filter((a) => a.id !== id),
     }));
   }, []);
 
   const updateAction = useCallback(
     (id: string, key: keyof RuleAction, value: string) => {
-      setForm(prev => ({
+      setForm((prev) => ({
         ...prev,
-        actions: prev.actions.map(a =>
-          a.id === id ? { ...a, [key]: value } : a
+        actions: prev.actions.map((a) =>
+          a.id === id ? { ...a, [key]: value } : a,
         ),
       }));
     },
-    []
+    [],
   );
 
   const handleSave = useCallback(() => {
@@ -802,7 +899,8 @@ function RuleFormDialog({
       active: editingRule?.active ?? true,
       matchCount: editingRule?.matchCount ?? 0,
       lastMatched: editingRule?.lastMatched ?? new Date().toISOString(),
-      createdAt: editingRule?.createdAt ?? new Date().toISOString().split('T')[0],
+      createdAt:
+        editingRule?.createdAt ?? new Date().toISOString().split('T')[0],
     };
     onSave(saved);
     onOpenChange(false);
@@ -812,7 +910,7 @@ function RuleFormDialog({
     form.name.trim().length > 0 &&
     form.conditions.length > 0 &&
     form.actions.length > 0 &&
-    form.conditions.every(c => c.value.trim().length > 0);
+    form.conditions.every((c) => c.value.trim().length > 0);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -839,7 +937,7 @@ function RuleFormDialog({
                   id="rule-name"
                   placeholder="örn: Yüksek değerli siparişlerde X kargoyu ata"
                   value={form.name}
-                  onChange={e => updateForm('name', e.target.value)}
+                  onChange={(e) => updateForm('name', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -848,7 +946,7 @@ function RuleFormDialog({
                   id="rule-desc"
                   placeholder="Kuralın ne yaptığını kısaca açıklayın"
                   value={form.description}
-                  onChange={e => updateForm('description', e.target.value)}
+                  onChange={(e) => updateForm('description', e.target.value)}
                 />
               </div>
             </div>
@@ -863,7 +961,7 @@ function RuleFormDialog({
               </Label>
               <Select
                 value={form.trigger}
-                onValueChange={v => updateForm('trigger', v as TriggerType)}
+                onValueChange={(v) => updateForm('trigger', v as TriggerType)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -926,13 +1024,13 @@ function RuleFormDialog({
                   )}
                   <Select
                     value={cond.field}
-                    onValueChange={v => updateCondition(cond.id, 'field', v)}
+                    onValueChange={(v) => updateCondition(cond.id, 'field', v)}
                   >
                     <SelectTrigger className="w-[160px] shrink-0 text-xs bg-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {CONDITION_FIELDS.map(f => (
+                      {CONDITION_FIELDS.map((f) => (
                         <SelectItem key={f.value} value={f.value}>
                           {f.label}
                         </SelectItem>
@@ -941,13 +1039,15 @@ function RuleFormDialog({
                   </Select>
                   <Select
                     value={cond.operator}
-                    onValueChange={v => updateCondition(cond.id, 'operator', v)}
+                    onValueChange={(v) =>
+                      updateCondition(cond.id, 'operator', v)
+                    }
                   >
                     <SelectTrigger className="w-[130px] shrink-0 text-xs bg-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {CONDITION_OPERATORS.map(o => (
+                      {CONDITION_OPERATORS.map((o) => (
                         <SelectItem key={o.value} value={o.value}>
                           {o.label}
                         </SelectItem>
@@ -958,7 +1058,7 @@ function RuleFormDialog({
                     className="flex-1 text-xs bg-white"
                     placeholder="Değer girin..."
                     value={cond.value}
-                    onChange={e =>
+                    onChange={(e) =>
                       updateCondition(cond.id, 'value', e.target.value)
                     }
                   />
@@ -1017,13 +1117,13 @@ function RuleFormDialog({
                   )}
                   <Select
                     value={act.type}
-                    onValueChange={v => updateAction(act.id, 'type', v)}
+                    onValueChange={(v) => updateAction(act.id, 'type', v)}
                   >
                     <SelectTrigger className="w-[180px] shrink-0 text-xs bg-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {ACTION_TYPES.map(a => (
+                      {ACTION_TYPES.map((a) => (
                         <SelectItem key={a.value} value={a.value}>
                           {a.label}
                         </SelectItem>
@@ -1034,7 +1134,9 @@ function RuleFormDialog({
                     className="flex-1 text-xs bg-white"
                     placeholder="Parametre (örn: Aras Kargo)"
                     value={act.params}
-                    onChange={e => updateAction(act.id, 'params', e.target.value)}
+                    onChange={(e) =>
+                      updateAction(act.id, 'params', e.target.value)
+                    }
                   />
                   <Button
                     variant="ghost"
@@ -1056,13 +1158,13 @@ function RuleFormDialog({
                 <Label>Kanal</Label>
                 <Select
                   value={form.channels[0] ?? 'all'}
-                  onValueChange={v => updateForm('channels', [v])}
+                  onValueChange={(v) => updateForm('channels', [v])}
                 >
                   <SelectTrigger className="w-full text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {CHANNELS.map(ch => (
+                    {CHANNELS.map((ch) => (
                       <SelectItem key={ch.value} value={ch.value}>
                         {ch.label}
                       </SelectItem>
@@ -1078,7 +1180,7 @@ function RuleFormDialog({
                     min={1}
                     max={10}
                     value={form.priority}
-                    onChange={e =>
+                    onChange={(e) =>
                       updateForm('priority', parseInt(e.target.value) || 5)
                     }
                     className="w-20 text-xs"
@@ -1101,10 +1203,7 @@ function RuleFormDialog({
         </ScrollArea>
 
         <DialogFooter className="mt-4 pt-4 border-t">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             İptal
           </Button>
           <Button
@@ -1128,14 +1227,16 @@ export default function SmartOrderRules() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<SmartOrderRule | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused'>(
+    'all',
+  );
   const [triggerFilter, setTriggerFilter] = useState<string>('all');
 
   // Stats
   const stats = useMemo(() => {
-    const activeRules = rules.filter(r => r.active).length;
+    const activeRules = rules.filter((r) => r.active).length;
     const totalMatches = rules.reduce((sum, r) => sum + r.matchCount, 0);
-    const autoActions = rules.filter(r => r.active).length;
+    const autoActions = rules.filter((r) => r.active).length;
     const last7DaysMatches = Math.floor(totalMatches * 0.12); // simulated
     return {
       activeRules,
@@ -1149,7 +1250,7 @@ export default function SmartOrderRules() {
 
   // Filtered rules
   const filteredRules = useMemo(() => {
-    return rules.filter(r => {
+    return rules.filter((r) => {
       const matchSearch =
         searchQuery === '' ||
         r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -1165,8 +1266,8 @@ export default function SmartOrderRules() {
   }, [rules, searchQuery, statusFilter, triggerFilter]);
 
   const handleToggle = useCallback((id: string) => {
-    setRules(prev =>
-      prev.map(r => (r.id === id ? { ...r, active: !r.active } : r))
+    setRules((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, active: !r.active } : r)),
     );
   }, []);
 
@@ -1176,14 +1277,14 @@ export default function SmartOrderRules() {
   }, []);
 
   const handleDelete = useCallback((id: string) => {
-    setRules(prev => prev.filter(r => r.id !== id));
+    setRules((prev) => prev.filter((r) => r.id !== id));
   }, []);
 
   const handleSave = useCallback((rule: SmartOrderRule) => {
-    setRules(prev => {
-      const exists = prev.find(r => r.id === rule.id);
+    setRules((prev) => {
+      const exists = prev.find((r) => r.id === rule.id);
       if (exists) {
-        return prev.map(r => (r.id === rule.id ? rule : r));
+        return prev.map((r) => (r.id === rule.id ? rule : r));
       }
       return [rule, ...prev];
     });
@@ -1209,7 +1310,8 @@ export default function SmartOrderRules() {
                 Akıllı Sipariş Kuralları
               </h1>
               <p className="mt-1 text-sm text-slate-500">
-                Siparişlerinizi otomatik kurallar ile yönetin. Koşullar tanımlayın, aksiyonlar atayın ve zaman kazanın.
+                Siparişlerinizi otomatik kurallar ile yönetin. Koşullar
+                tanımlayın, aksiyonlar atayın ve zaman kazanın.
               </p>
             </div>
             <Button
@@ -1239,7 +1341,12 @@ export default function SmartOrderRules() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-4">
-                <Progress value={(stats.activeRules / Math.max(stats.totalRules, 1)) * 100} className="h-1.5" />
+                <Progress
+                  value={
+                    (stats.activeRules / Math.max(stats.totalRules, 1)) * 100
+                  }
+                  className="h-1.5"
+                />
               </CardContent>
             </Card>
 
@@ -1255,7 +1362,8 @@ export default function SmartOrderRules() {
               </CardHeader>
               <CardContent className="pb-4">
                 <p className="text-xs text-slate-500">
-                  Ort. {formatMatchCount(Math.round(stats.avgMatchPerRule))} / kural
+                  Ort. {formatMatchCount(Math.round(stats.avgMatchPerRule))} /
+                  kural
                 </p>
               </CardContent>
             </Card>
@@ -1271,9 +1379,7 @@ export default function SmartOrderRules() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-4">
-                <p className="text-xs text-slate-500">
-                  Aktif otomasyon kuralı
-                </p>
+                <p className="text-xs text-slate-500">Aktif otomasyon kuralı</p>
               </CardContent>
             </Card>
 
@@ -1304,15 +1410,24 @@ export default function SmartOrderRules() {
           <Tabs defaultValue="all-rules">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white p-3 rounded-lg border shadow-sm">
               <TabsList className="bg-transparent">
-                <TabsTrigger value="all-rules" className="gap-1.5 data-[state=active]:bg-slate-100">
+                <TabsTrigger
+                  value="all-rules"
+                  className="gap-1.5 data-[state=active]:bg-slate-100"
+                >
                   <Layers className="w-4 h-4" />
                   Tüm Kurallar
                 </TabsTrigger>
-                <TabsTrigger value="active" className="gap-1.5 data-[state=active]:bg-slate-100">
+                <TabsTrigger
+                  value="active"
+                  className="gap-1.5 data-[state=active]:bg-slate-100"
+                >
                   <Play className="w-4 h-4" />
                   Aktif
                 </TabsTrigger>
-                <TabsTrigger value="paused" className="gap-1.5 data-[state=active]:bg-slate-100">
+                <TabsTrigger
+                  value="paused"
+                  className="gap-1.5 data-[state=active]:bg-slate-100"
+                >
                   <Pause className="w-4 h-4" />
                   Pasif
                 </TabsTrigger>
@@ -1324,7 +1439,7 @@ export default function SmartOrderRules() {
                   <Input
                     placeholder="Kural ara..."
                     value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-[200px] pl-8 text-xs sm:w-[240px] bg-slate-50"
                   />
                 </div>
@@ -1358,7 +1473,7 @@ export default function SmartOrderRules() {
               {/* Active Tab */}
               <TabsContent value="active" className="m-0">
                 <RuleListRenderer
-                  rules={filteredRules.filter(r => r.active)}
+                  rules={filteredRules.filter((r) => r.active)}
                   onToggle={handleToggle}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
@@ -1368,7 +1483,7 @@ export default function SmartOrderRules() {
               {/* Paused Tab */}
               <TabsContent value="paused" className="m-0">
                 <RuleListRenderer
-                  rules={filteredRules.filter(r => !r.active)}
+                  rules={filteredRules.filter((r) => !r.active)}
                   onToggle={handleToggle}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
@@ -1411,7 +1526,8 @@ function RuleListRenderer({
           Kural bulunamadı
         </h3>
         <p className="mt-1 text-sm text-slate-500">
-          Filtrelere uygun kural yok. Farklı filtreler deneyin veya yeni bir kural oluşturun.
+          Filtrelere uygun kural yok. Farklı filtreler deneyin veya yeni bir
+          kural oluşturun.
         </p>
       </div>
     );
@@ -1419,7 +1535,7 @@ function RuleListRenderer({
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      {rules.map(rule => (
+      {rules.map((rule) => (
         <RuleCard
           key={rule.id}
           rule={rule}

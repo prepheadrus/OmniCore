@@ -1,9 +1,15 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@omnicore/ui/components/ui/card';
+import { Button } from '@omnicore/ui/components/ui/button';
+import { Badge } from '@omnicore/ui/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -11,7 +17,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@omnicore/ui/components/ui/table';
 import {
   Dialog,
   DialogContent,
@@ -19,28 +25,33 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@omnicore/ui/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
+} from '@omnicore/ui/components/ui/select';
+import { Input } from '@omnicore/ui/components/ui/input';
+import { Switch } from '@omnicore/ui/components/ui/switch';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@omnicore/ui/components/ui/tabs';
+import { Progress } from '@omnicore/ui/components/ui/progress';
+import { Separator } from '@omnicore/ui/components/ui/separator';
+import { ScrollArea } from '@omnicore/ui/components/ui/scroll-area';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+} from '@omnicore/ui/components/ui/tooltip';
+import { Label } from '@omnicore/ui/components/ui/label';
+import { Textarea } from '@omnicore/ui/components/ui/textarea';
 import {
   Zap,
   RefreshCw,
@@ -496,7 +507,7 @@ const INITIAL_LOGS: PriceChangeLog[] = [
   {
     id: 'l10',
     date: '2025-01-15 10:20',
-    product: 'L\'Oréal Paris Şampuan',
+    product: "L'Oréal Paris Şampuan",
     productSku: 'KOZ-LOP-SMP-500',
     marketplace: 'Amazon TR',
     oldPrice: 249.9,
@@ -504,7 +515,7 @@ const INITIAL_LOGS: PriceChangeLog[] = [
     changePercent: -0.16,
     competitorAvg: 255,
     ruleName: 'Amazon TR Kozmetik',
-    reason: 'Ortalamanın altında, 50\'ye yuvarlandı',
+    reason: "Ortalamanın altında, 50'ye yuvarlandı",
   },
   {
     id: 'l11',
@@ -673,7 +684,8 @@ export default function DynamicPricing() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
   const [formData, setFormData] = useState<RuleFormData>(EMPTY_FORM);
-  const [logFilterMarketplace, setLogFilterMarketplace] = useState<string>('all');
+  const [logFilterMarketplace, setLogFilterMarketplace] =
+    useState<string>('all');
 
   // ── Derived data ──
 
@@ -724,8 +736,8 @@ export default function DynamicPricing() {
         prev.map((r) =>
           r.id === editingRuleId
             ? { ...r, ...formData, adjustmentCount: r.adjustmentCount }
-            : r
-        )
+            : r,
+        ),
       );
     } else {
       const newRule: RepricingRule = {
@@ -744,7 +756,7 @@ export default function DynamicPricing() {
 
   function handleToggleActive(ruleId: string) {
     setRules((prev) =>
-      prev.map((r) => (r.id === ruleId ? { ...r, isActive: !r.isActive } : r))
+      prev.map((r) => (r.id === ruleId ? { ...r, isActive: !r.isActive } : r)),
     );
   }
 
@@ -752,7 +764,10 @@ export default function DynamicPricing() {
     setRules((prev) => prev.filter((r) => r.id !== ruleId));
   }
 
-  function updateForm<K extends keyof RuleFormData>(key: K, value: RuleFormData[K]) {
+  function updateForm<K extends keyof RuleFormData>(
+    key: K,
+    value: RuleFormData[K],
+  ) {
     setFormData((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -787,9 +802,11 @@ export default function DynamicPricing() {
             <div className="flex items-center gap-3">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2">
+                  <Button variant="outline" className="gap-2">
                     <RefreshCw className="h-4 w-4" />
-                    <span className="hidden sm:inline">Tüm Kuralları Çalıştır</span>
+                    <span className="hidden sm:inline">
+                      Tüm Kuralları Çalıştır
+                    </span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -797,7 +814,6 @@ export default function DynamicPricing() {
                 </TooltipContent>
               </Tooltip>
               <Button
-                size="sm"
                 className="gap-2 bg-emerald-600 hover:bg-emerald-700"
                 onClick={openCreateDialog}
               >
@@ -837,7 +853,9 @@ export default function DynamicPricing() {
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Aktif Kural</p>
-                      <p className="text-2xl font-bold text-slate-900">{activeRulesCount}</p>
+                      <p className="text-2xl font-bold text-slate-900">
+                        {activeRulesCount}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -860,8 +878,12 @@ export default function DynamicPricing() {
                       <Percent className="h-6 w-6 text-amber-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Ort. Fiyat Değişimi</p>
-                      <p className="text-2xl font-bold text-slate-900">-%{avgPriceChange}</p>
+                      <p className="text-sm text-slate-500">
+                        Ort. Fiyat Değişimi
+                      </p>
+                      <p className="text-2xl font-bold text-slate-900">
+                        -%{avgPriceChange}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -885,9 +907,12 @@ export default function DynamicPricing() {
                 <CardHeader className="pb-0">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                      <CardTitle className="text-base">Fiyat Kuralları</CardTitle>
+                      <CardTitle className="text-base">
+                        Fiyat Kuralları
+                      </CardTitle>
                       <CardDescription>
-                        Toplam {rules.length} kural tanımlı, {activeRulesCount} tanesi aktif
+                        Toplam {rules.length} kural tanımlı, {activeRulesCount}{' '}
+                        tanesi aktif
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-slate-400">
@@ -901,15 +926,31 @@ export default function DynamicPricing() {
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-slate-50 hover:bg-slate-50">
-                          <TableHead className="min-w-[180px]">Kural Adı</TableHead>
-                          <TableHead className="min-w-[120px]">Pazar Yeri</TableHead>
-                          <TableHead className="min-w-[160px]">Strateji</TableHead>
-                          <TableHead className="text-right min-w-[90px]">Min Fiyat</TableHead>
-                          <TableHead className="text-right min-w-[90px]">Max Fiyat</TableHead>
+                          <TableHead className="min-w-[180px]">
+                            Kural Adı
+                          </TableHead>
+                          <TableHead className="min-w-[120px]">
+                            Pazar Yeri
+                          </TableHead>
+                          <TableHead className="min-w-[160px]">
+                            Strateji
+                          </TableHead>
+                          <TableHead className="text-right min-w-[90px]">
+                            Min Fiyat
+                          </TableHead>
+                          <TableHead className="text-right min-w-[90px]">
+                            Max Fiyat
+                          </TableHead>
                           <TableHead className="min-w-[90px]">Durum</TableHead>
-                          <TableHead className="min-w-[130px]">Son Çalışma</TableHead>
-                          <TableHead className="text-right min-w-[100px]">Ayar. Sayısı</TableHead>
-                          <TableHead className="min-w-[90px] text-right">İşlem</TableHead>
+                          <TableHead className="min-w-[130px]">
+                            Son Çalışma
+                          </TableHead>
+                          <TableHead className="text-right min-w-[100px]">
+                            Ayar. Sayısı
+                          </TableHead>
+                          <TableHead className="min-w-[90px] text-right">
+                            İşlem
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -917,14 +958,19 @@ export default function DynamicPricing() {
                           <TableRow key={rule.id}>
                             <TableCell>
                               <div>
-                                <p className="font-medium text-slate-900 text-sm">{rule.name}</p>
+                                <p className="font-medium text-slate-900 text-sm">
+                                  {rule.name}
+                                </p>
                                 <p className="text-xs text-slate-400 max-w-[200px] truncate">
                                   {rule.description}
                                 </p>
                               </div>
                             </TableCell>
                             <TableCell>
-                              <Badge variant="outline" className="font-normal text-xs">
+                              <Badge
+                                variant="outline"
+                                className="font-normal text-xs"
+                              >
                                 {getMarketplaceLabel(rule.marketplace)}
                               </Badge>
                             </TableCell>
@@ -954,28 +1000,37 @@ export default function DynamicPricing() {
                               </div>
                             </TableCell>
                             <TableCell className="text-right text-sm text-slate-600">
-                              {rule.minPrice > 0 ? formatCurrency(rule.minPrice) : '-'}
+                              {rule.minPrice > 0
+                                ? formatCurrency(rule.minPrice)
+                                : '-'}
                             </TableCell>
                             <TableCell className="text-right text-sm text-slate-600">
-                              {rule.maxPrice > 0 ? formatCurrency(rule.maxPrice) : 'Sınırsız'}
+                              {rule.maxPrice > 0
+                                ? formatCurrency(rule.maxPrice)
+                                : 'Sınırsız'}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Switch
-                                  size="sm"
                                   checked={rule.isActive}
-                                  onCheckedChange={() => handleToggleActive(rule.id)}
+                                  onCheckedChange={() =>
+                                    handleToggleActive(rule.id)
+                                  }
                                 />
                                 <span
                                   className={`text-xs font-medium ${
-                                    rule.isActive ? 'text-emerald-600' : 'text-slate-400'
+                                    rule.isActive
+                                      ? 'text-emerald-600'
+                                      : 'text-slate-400'
                                   }`}
                                 >
                                   {rule.isActive ? 'Aktif' : 'Pasif'}
                                 </span>
                               </div>
                             </TableCell>
-                            <TableCell className="text-sm text-slate-500">{rule.lastRun}</TableCell>
+                            <TableCell className="text-sm text-slate-500">
+                              {rule.lastRun}
+                            </TableCell>
                             <TableCell className="text-right">
                               <span className="text-sm font-semibold text-slate-700">
                                 {rule.adjustmentCount.toLocaleString('tr-TR')}
@@ -987,7 +1042,7 @@ export default function DynamicPricing() {
                                   <TooltipTrigger asChild>
                                     <Button
                                       variant="ghost"
-                                      size="icon-xs"
+                                      size="icon"
                                       onClick={() => openEditDialog(rule)}
                                     >
                                       <Pencil className="h-3.5 w-3.5" />
@@ -999,7 +1054,7 @@ export default function DynamicPricing() {
                                   <TooltipTrigger asChild>
                                     <Button
                                       variant="ghost"
-                                      size="icon-xs"
+                                      size="icon"
                                       className="text-red-400 hover:text-red-600"
                                       onClick={() => handleDeleteRule(rule.id)}
                                     >
@@ -1061,12 +1116,24 @@ export default function DynamicPricing() {
                         <TableRow className="bg-slate-50 hover:bg-slate-50">
                           <TableHead className="min-w-[130px]">Tarih</TableHead>
                           <TableHead className="min-w-[200px]">Ürün</TableHead>
-                          <TableHead className="min-w-[110px]">Pazar Yeri</TableHead>
-                          <TableHead className="text-right min-w-[95px]">Eski Fiyat</TableHead>
-                          <TableHead className="text-right min-w-[95px]">Yeni Fiyat</TableHead>
-                          <TableHead className="text-right min-w-[85px]">Değişim</TableHead>
-                          <TableHead className="text-right min-w-[100px]">Rakip Ort.</TableHead>
-                          <TableHead className="min-w-[180px]">Kural Adı</TableHead>
+                          <TableHead className="min-w-[110px]">
+                            Pazar Yeri
+                          </TableHead>
+                          <TableHead className="text-right min-w-[95px]">
+                            Eski Fiyat
+                          </TableHead>
+                          <TableHead className="text-right min-w-[95px]">
+                            Yeni Fiyat
+                          </TableHead>
+                          <TableHead className="text-right min-w-[85px]">
+                            Değişim
+                          </TableHead>
+                          <TableHead className="text-right min-w-[100px]">
+                            Rakip Ort.
+                          </TableHead>
+                          <TableHead className="min-w-[180px]">
+                            Kural Adı
+                          </TableHead>
                           <TableHead className="min-w-[200px]">Neden</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1084,11 +1151,16 @@ export default function DynamicPricing() {
                                 <p className="text-sm font-medium text-slate-800 max-w-[220px] truncate">
                                   {log.product}
                                 </p>
-                                <p className="text-xs text-slate-400">{log.productSku}</p>
+                                <p className="text-xs text-slate-400">
+                                  {log.productSku}
+                                </p>
                               </div>
                             </TableCell>
                             <TableCell>
-                              <Badge variant="outline" className="font-normal text-xs">
+                              <Badge
+                                variant="outline"
+                                className="font-normal text-xs"
+                              >
                                 {log.marketplace}
                               </Badge>
                             </TableCell>
@@ -1129,7 +1201,10 @@ export default function DynamicPricing() {
                                     {log.reason}
                                   </p>
                                 </TooltipTrigger>
-                                <TooltipContent side="bottom" className="max-w-[300px]">
+                                <TooltipContent
+                                  side="bottom"
+                                  className="max-w-[300px]"
+                                >
                                   <p className="text-xs">{log.reason}</p>
                                 </TooltipContent>
                               </Tooltip>
@@ -1138,7 +1213,10 @@ export default function DynamicPricing() {
                         ))}
                         {filteredLogs.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={9} className="h-24 text-center text-sm text-slate-400">
+                            <TableCell
+                              colSpan={9}
+                              className="h-24 text-center text-sm text-slate-400"
+                            >
                               Bu filtre için kayıt bulunamadı.
                             </TableCell>
                           </TableRow>
@@ -1160,11 +1238,15 @@ export default function DynamicPricing() {
                       <DollarSign className="h-6 w-6 text-emerald-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Toplam Gelir Etkisi</p>
+                      <p className="text-sm text-slate-500">
+                        Toplam Gelir Etkisi
+                      </p>
                       <p className="text-2xl font-bold text-emerald-600">
                         +{formatCurrency(revenueImpact)}
                       </p>
-                      <p className="text-xs text-emerald-500 mt-0.5">↑ Son 30 gün</p>
+                      <p className="text-xs text-emerald-500 mt-0.5">
+                        ↑ Son 30 gün
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -1176,7 +1258,9 @@ export default function DynamicPricing() {
                     <div>
                       <p className="text-sm text-slate-500">Ek Satış Hacmi</p>
                       <p className="text-2xl font-bold text-slate-900">1.847</p>
-                      <p className="text-xs text-blue-500 mt-0.5">↑ %23 artış</p>
+                      <p className="text-xs text-blue-500 mt-0.5">
+                        ↑ %23 artış
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -1186,9 +1270,13 @@ export default function DynamicPricing() {
                       <Eye className="h-6 w-6 text-amber-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Buy Box Kazanma Oranı</p>
+                      <p className="text-sm text-slate-500">
+                        Buy Box Kazanma Oranı
+                      </p>
                       <p className="text-2xl font-bold text-slate-900">%78.4</p>
-                      <p className="text-xs text-amber-500 mt-0.5">↑ %5.2 iyileşme</p>
+                      <p className="text-xs text-amber-500 mt-0.5">
+                        ↑ %5.2 iyileşme
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -1210,7 +1298,9 @@ export default function DynamicPricing() {
                 {/* Marketplace Performance */}
                 <Card className="py-0 overflow-hidden">
                   <CardHeader>
-                    <CardTitle className="text-base">Pazar Yeri Bazlı Performans</CardTitle>
+                    <CardTitle className="text-base">
+                      Pazar Yeri Bazlı Performans
+                    </CardTitle>
                     <CardDescription>
                       Her pazaryeri için ayarlama ve etki özeti
                     </CardDescription>
@@ -1257,16 +1347,22 @@ export default function DynamicPricing() {
                       ].map((mp) => (
                         <div key={mp.name} className="space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-slate-700">{mp.name}</span>
+                            <span className="text-sm font-medium text-slate-700">
+                              {mp.name}
+                            </span>
                             <span className="text-xs text-slate-400">
-                              {mp.adjustments.toLocaleString('tr-TR')} ayarlama ·{' '}
+                              {mp.adjustments.toLocaleString('tr-TR')} ayarlama
+                              ·{' '}
                               <span className="text-emerald-600 font-medium">
                                 +{formatCurrency(mp.impact)}
                               </span>
                             </span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <Progress value={mp.buyBoxRate} className="h-2 flex-1" />
+                            <Progress
+                              value={mp.buyBoxRate}
+                              className="h-2 flex-1"
+                            />
                             <span className="text-xs font-medium text-slate-500 w-12 text-right">
                               %{mp.buyBoxRate}
                             </span>
@@ -1283,7 +1379,9 @@ export default function DynamicPricing() {
                 {/* Revenue Impact Summary */}
                 <Card className="py-0 overflow-hidden">
                   <CardHeader>
-                    <CardTitle className="text-base">Gelir Etkisi Özeti</CardTitle>
+                    <CardTitle className="text-base">
+                      Gelir Etkisi Özeti
+                    </CardTitle>
                     <CardDescription>
                       Dinamik fiyatlandırmanın satışlara etkisi
                     </CardDescription>
@@ -1293,13 +1391,17 @@ export default function DynamicPricing() {
                       <div className="rounded-lg border border-slate-200 p-4 bg-slate-50">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <p className="text-xs text-slate-500 mb-1">Ayarlamadan Önce</p>
+                            <p className="text-xs text-slate-500 mb-1">
+                              Ayarlamadan Önce
+                            </p>
                             <p className="text-lg font-bold text-slate-600">
                               {formatCurrency(1850000)}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-slate-500 mb-1">Ayarlamadan Sonra</p>
+                            <p className="text-xs text-slate-500 mb-1">
+                              Ayarlamadan Sonra
+                            </p>
                             <p className="text-lg font-bold text-emerald-600">
                               {formatCurrency(2134750)}
                             </p>
@@ -1341,8 +1443,13 @@ export default function DynamicPricing() {
                             pct: 9.1,
                           },
                         ].map((s) => (
-                          <div key={s.name} className="flex items-center justify-between">
-                            <span className="text-sm text-slate-600">{s.name}</span>
+                          <div
+                            key={s.name}
+                            className="flex items-center justify-between"
+                          >
+                            <span className="text-sm text-slate-600">
+                              {s.name}
+                            </span>
                             <div className="flex items-center gap-3">
                               <Progress value={s.pct} className="h-1.5 w-24" />
                               <span className="text-xs font-semibold text-emerald-600 w-20 text-right">
@@ -1361,8 +1468,9 @@ export default function DynamicPricing() {
                               Maliyet Tabanı Koruması
                             </p>
                             <p className="text-xs text-emerald-600 mt-1">
-                              Son 30 günde 34 fiyat ayarlaması maliyet tabanı tarafından engellendi. 
-                              Asgari marj korunarak {'>'}42.000 TL olası zarar önledi.
+                              Son 30 günde 34 fiyat ayarlaması maliyet tabanı
+                              tarafından engellendi. Asgari marj korunarak {'>'}
+                              42.000 TL olası zarar önledi.
                             </p>
                           </div>
                         </div>
@@ -1375,7 +1483,9 @@ export default function DynamicPricing() {
               {/* Daily Price Change Chart (Simple Bar) */}
               <Card className="py-0 overflow-hidden">
                 <CardHeader>
-                  <CardTitle className="text-base">Günlük Fiyat Ayarlama Dağılımı</CardTitle>
+                  <CardTitle className="text-base">
+                    Günlük Fiyat Ayarlama Dağılımı
+                  </CardTitle>
                   <CardDescription>
                     Son 7 günlük fiyat ayarlama aktivitesi
                   </CardDescription>
@@ -1392,13 +1502,20 @@ export default function DynamicPricing() {
                       { day: '9 Ocak', count: 9, maxRef: 15 },
                     ].map((d) => (
                       <div key={d.day} className="flex items-center gap-3">
-                        <span className="text-sm text-slate-600 w-36 shrink-0">{d.day}</span>
+                        <span className="text-sm text-slate-600 w-36 shrink-0">
+                          {d.day}
+                        </span>
                         <div className="flex-1 bg-slate-100 rounded-full h-6 overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full flex items-center justify-end pr-2 transition-all"
-                            style={{ width: `${(d.count / d.maxRef) * 100}%`, minWidth: '2rem' }}
+                            style={{
+                              width: `${(d.count / d.maxRef) * 100}%`,
+                              minWidth: '2rem',
+                            }}
                           >
-                            <span className="text-xs font-bold text-white">{d.count}</span>
+                            <span className="text-xs font-bold text-white">
+                              {d.count}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -1443,7 +1560,9 @@ export default function DynamicPricing() {
                       id="rule-desc"
                       placeholder="Kuralın amacını kısaca açıklayın..."
                       value={formData.description}
-                      onChange={(e) => updateForm('description', e.target.value)}
+                      onChange={(e) =>
+                        updateForm('description', e.target.value)
+                      }
                       rows={2}
                     />
                   </div>
@@ -1503,7 +1622,9 @@ export default function DynamicPricing() {
                     <Label htmlFor="target-position">Hedef Pozisyon</Label>
                     <Select
                       value={String(formData.targetPosition)}
-                      onValueChange={(v) => updateForm('targetPosition', Number(v))}
+                      onValueChange={(v) =>
+                        updateForm('targetPosition', Number(v))
+                      }
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue />
@@ -1544,7 +1665,9 @@ export default function DynamicPricing() {
                         type="number"
                         className="flex-1"
                         value={formData.beatByValue}
-                        onChange={(e) => updateForm('beatByValue', Number(e.target.value))}
+                        onChange={(e) =>
+                          updateForm('beatByValue', Number(e.target.value))
+                        }
                         min={0}
                         step={0.5}
                       />
@@ -1568,7 +1691,9 @@ export default function DynamicPricing() {
                       type="number"
                       placeholder="0"
                       value={formData.minPrice || ''}
-                      onChange={(e) => updateForm('minPrice', Number(e.target.value))}
+                      onChange={(e) =>
+                        updateForm('minPrice', Number(e.target.value))
+                      }
                       min={0}
                     />
                   </div>
@@ -1579,7 +1704,9 @@ export default function DynamicPricing() {
                       type="number"
                       placeholder="Sınırsız"
                       value={formData.maxPrice || ''}
-                      onChange={(e) => updateForm('maxPrice', Number(e.target.value))}
+                      onChange={(e) =>
+                        updateForm('maxPrice', Number(e.target.value))
+                      }
                       min={0}
                     />
                   </div>
@@ -1608,7 +1735,9 @@ export default function DynamicPricing() {
                         id="min-margin"
                         type="number"
                         value={formData.minMargin}
-                        onChange={(e) => updateForm('minMargin', Number(e.target.value))}
+                        onChange={(e) =>
+                          updateForm('minMargin', Number(e.target.value))
+                        }
                         min={0}
                         max={100}
                       />
@@ -1642,7 +1771,7 @@ export default function DynamicPricing() {
                     {formData.roundingStrategy === '50' &&
                       'Fiyatlar 50 ile biter: Örn: 450 TL, 1.250 TL'}
                     {formData.roundingStrategy === '10' &&
-                      'Fiyatlar 10\'un katına yuvarlanır: Örn: 500 TL, 1.300 TL'}
+                      "Fiyatlar 10'un katına yuvarlanır: Örn: 500 TL, 1.300 TL"}
                     {formData.roundingStrategy === 'none' &&
                       'Yuvarlama uygulanmaz, ham fiyat kullanılır'}
                   </p>
@@ -1678,7 +1807,9 @@ export default function DynamicPricing() {
                       id="product-filter"
                       placeholder="SKU veya ürün adı..."
                       value={formData.productFilter}
-                      onChange={(e) => updateForm('productFilter', e.target.value)}
+                      onChange={(e) =>
+                        updateForm('productFilter', e.target.value)
+                      }
                     />
                   </div>
                   <div className="space-y-1.5">
