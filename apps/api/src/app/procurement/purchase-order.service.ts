@@ -108,6 +108,10 @@ export class PurchaseOrderService {
         }
       }
 
+      // Prepare bulk data arrays for batch processing
+      const variantUpdates: { id: string; quantity: number; newMovingAverageCost: Prisma.Decimal }[] = [];
+      const stockMovements: { productVariantId: string; channelId: string | null; eventType: 'RESTOCK'; quantityChange: number; unitCost: Prisma.Decimal; referenceId: string }[] = [];
+
       for (const item of order.items) {
         const variant = variantsMap.get(item.productVariantId);
 
@@ -134,26 +138,55 @@ export class PurchaseOrderService {
           newMovingAverageCost = currentTotalValue.add(newTotalValue).div(totalQuantity);
         }
 
-        // Update product variant stock and moving average cost
-        await tx.productVariant.update({
-          where: { id: variant.id },
-          data: {
-            stock: { increment: item.quantity },
-            movingAverageCost: newMovingAverageCost,
-          },
+        variantUpdates.push({
+          id: variant.id,
+          quantity: item.quantity,
+          newMovingAverageCost
         });
 
-        // Create stock movement record
-        await tx.stockMovement.create({
-          data: {
-            productVariantId: variant.id,
-            channelId: null,
-            eventType: 'RESTOCK',
-            quantityChange: item.quantity,
-            unitCost: newUnitCost,
-            referenceId: order.id,
-          },
+        stockMovements.push({
+          productVariantId: variant.id,
+          channelId: null,
+          eventType: 'RESTOCK',
+          quantityChange: item.quantity,
+          unitCost: newUnitCost,
+          referenceId: order.id,
         });
+      }
+
+      // Process variant updates in chunks
+      const UPDATE_CHUNK_SIZE = 50;
+      for (let i = 0; i < variantUpdates.length; i += UPDATE_CHUNK_SIZE) {
+        const chunk = variantUpdates.slice(i, i + UPDATE_CHUNK_SIZE);
+        await Promise.all(
+          chunk.map(update =>
+            tx.productVariant.update({
+              where: { id: update.id },
+              data: {
+                stock: { increment: update.quantity },
+                movingAverageCost: update.newMovingAverageCost,
+              },
+            })
+          )
+        );
+      }
+
+      // Create stock movements using createMany if available, else chunked create
+      if (tx.stockMovement.createMany) {
+         await tx.stockMovement.createMany({
+            data: stockMovements
+         });
+      } else {
+        for (let i = 0; i < stockMovements.length; i += UPDATE_CHUNK_SIZE) {
+          const chunk = stockMovements.slice(i, i + UPDATE_CHUNK_SIZE);
+          await Promise.all(
+            chunk.map(movement =>
+              tx.stockMovement.create({
+                data: movement,
+              })
+            )
+          );
+        }
       }
 
       // Update purchase order status
