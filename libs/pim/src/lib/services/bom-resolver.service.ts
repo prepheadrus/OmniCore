@@ -69,18 +69,22 @@ export class BomResolverService {
       return resolvedItems;
     }
 
-    // Iterate through all items in the bundle
-    for (const component of variant.bundleItems) {
+    // Resolve all child components concurrently
+    const childPromises = variant.bundleItems.map((component) => {
       const childQuantity = component.quantity * multiplier;
 
       // Recursively resolve child components
-      const childResolved = await this.resolveBundle(
+      return this.resolveBundle(
         component.childVariantId,
         childQuantity,
         new Set(visited) // Pass a copy of the visited set for this branch
       );
+    });
 
-      // Merge the results
+    const results = await Promise.all(childPromises);
+
+    // Merge the results
+    for (const childResolved of results) {
       for (const [childId, childQty] of childResolved.entries()) {
         const currentQty = resolvedItems.get(childId) || 0;
         resolvedItems.set(childId, currentQty + childQty);
