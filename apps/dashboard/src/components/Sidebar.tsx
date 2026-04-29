@@ -88,6 +88,7 @@ export default function Sidebar() {
         { name: 'Dinamik Fiyatlandırma', icon: Zap, href: '/dynamic-pricing' },
         { name: 'A/B Test', icon: FlaskConical, href: '/ab-testing' },
         { name: 'İçerik Optimizasyonu', icon: Sparkles, href: '/content-rules' },
+        { name: 'AI İçerik Stüdyosu', icon: Wand2, href: '/ai-content' },
         { name: 'Listeleme Kalitesi', icon: Star, href: '/listing-quality' },
         { name: 'Rekabet Radarı', icon: Radar, href: '/radar' },
         { name: 'Buy Box Optimizasyonu', icon: Trophy, href: '/buybox-optimizer' },
