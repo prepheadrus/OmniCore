@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { DataTable } from "./data-table";
 import { columns, CampaignData } from "./columns";
 import { DataTableSkeleton } from "./data-table-skeleton";
 import { useChannel } from "../../contexts/ChannelContext";
 import { generateMockCampaigns } from "./mock-data";
+import { AdvertisingDashboard } from "./advertising-dashboard";
 
 export function AdvertisingClient() {
   const { selectedChannelId } = useChannel();
@@ -24,12 +25,21 @@ export function AdvertisingClient() {
   }, [selectedChannelId]);
 
   if (isLoading) {
-    return <DataTableSkeleton />;
+    return (
+      <div className="flex-1 flex flex-col gap-6">
+        <DataTableSkeleton />
+      </div>
+    );
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
-      <DataTable columns={columns} data={data} />
+    <div className="flex-1 flex flex-col gap-6 overflow-hidden bg-[#fbfcfc]">
+      <div className="p-0">
+        <AdvertisingDashboard data={data} />
+      </div>
+      <div className="flex-1 w-full bg-white rounded-md border border-slate-200 flex flex-col shadow-none overflow-hidden mx-0">
+        <DataTable columns={columns} data={data} />
+      </div>
     </div>
   );
 }
