@@ -76,6 +76,7 @@ export default function Sidebar() {
         { name: 'Fiyat Yönetimi', icon: DollarSign, href: '/price-management' },
         { name: 'Kargo Karşılaştırma', icon: Scale, href: '/carrier-rates' },
         { name: 'Kampanya Yönetimi', icon: Megaphone, href: '/campaigns' },
+        { name: 'Reklam Yönetimi', icon: Megaphone, href: '/advertising' },
         { name: 'ROI & Kar Analizi', icon: TrendingUp, href: '/roi-profit' },
         { name: 'Kar Marjı Simülatörü', icon: Calculator, href: '/profit-simulator' },
       ],
