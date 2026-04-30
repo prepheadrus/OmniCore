@@ -35,7 +35,7 @@ import {
   Scale,
   Trophy,
   Zap
-} from 'lucide-react';
+, Brain} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -89,6 +89,7 @@ export default function Sidebar() {
         { name: 'A/B Test', icon: FlaskConical, href: '/ab-testing' },
         { name: 'İçerik Optimizasyonu', icon: Sparkles, href: '/content-rules' },
         { name: 'AI İçerik Stüdyosu', icon: Wand2, href: '/ai-content' },
+        { name: 'AI SEO Motoru', icon: Brain, href: '/ai-seo' },
         { name: 'Listeleme Kalitesi', icon: Star, href: '/listing-quality' },
         { name: 'Rekabet Radarı', icon: Radar, href: '/radar' },
         { name: 'Buy Box Optimizasyonu', icon: Trophy, href: '/buybox-optimizer' },
