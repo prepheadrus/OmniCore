@@ -32,7 +32,7 @@ export class PurchaseInvoiceService {
     const { page = 1, limit = 10, supplierId, documentNo, status } = filterDto;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
 
     if (supplierId) {
       where.supplierId = supplierId;
