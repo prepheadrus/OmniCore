@@ -2,6 +2,7 @@
 
 import React from 'react';
 import {
+  ShieldAlert,
   LayoutDashboard,
   BarChart2,
   ShoppingCart,
@@ -95,6 +96,8 @@ export default function Sidebar() {
         { name: 'Buy Box Optimizasyonu', icon: Trophy, href: '/buybox-optimizer' },
         { name: 'Akıllı Fiyatlandırma', icon: Tags, href: '/pricing' },
         { name: 'Senkronizasyon', icon: RefreshCcw, href: '/sync' },
+        { name: 'Log & İzleme', icon: FileText, href: '/audit' },
+        { name: 'Marka Koruma & MAP', icon: ShieldAlert, href: '/brand-protection' },
       ],
     },
   ];

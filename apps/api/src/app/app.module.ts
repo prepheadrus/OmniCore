@@ -10,6 +10,8 @@ import { AiAgentsModule } from '@omnicore/ai-agents';
 import { AiAgentController } from './controllers/ai-agent.controller';
 import { QueueController } from './controllers/queue.controller';
 import { PricingApiModule } from './pricing/pricing.module';
+import { AuditModule } from './audit/audit.module';
+import { BrandProtectionModule } from './brand-protection/brand-protection.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SyncCronService } from './cron/sync.cron';
@@ -41,6 +43,8 @@ import { FeedOptimizationModule } from './feed-optimization/feed-optimization.mo
     FeedTemplatesModule,
     FeedOptimizationModule,
     PricingApiModule,
+    AuditModule,
+    BrandProtectionModule,
   ],
   controllers: [AppController, AiAgentController, QueueController, ],
   providers: [AppService, SyncCronService],
