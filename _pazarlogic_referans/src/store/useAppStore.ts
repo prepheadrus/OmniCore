@@ -52,7 +52,16 @@ export type PageKey =
   | 'smart-alerts'
   | 'product-launches'
   | 'tax-compliance'
-  | 'profit-simulator';
+  | 'profit-simulator'
+  | 'price-monitor'
+  | 'customer-questions'
+  | 'kvkk-compliance'
+  | 'opportunity-finder'
+  | 'cash-flow'
+  | 'review-analysis'
+  | 'bulk-operations'
+  | 'commission-tracker'
+  | 'sales-trends';
 
 interface AppState {
   currentPage: PageKey;

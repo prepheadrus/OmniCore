@@ -265,7 +265,7 @@ export async function POST(request: Request) {
         if (updateData.costPrice !== undefined || updateData.sellPrice !== undefined) {
           const newCost = updateData.costPrice !== undefined ? updateData.costPrice : existing.costPrice;
           const newSell = updateData.sellPrice !== undefined ? updateData.sellPrice : existing.sellPrice;
-          updateData.profit = Math.round((newSell as number - newCost as number) * 100) / 100;
+          updateData.profit = Math.round(((newSell as number) - ((newCost as number) ?? 0)) * 100) / 100;
         }
 
         const updated = await db.dropshipOrder.update({

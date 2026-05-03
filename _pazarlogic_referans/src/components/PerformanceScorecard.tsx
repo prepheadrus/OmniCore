@@ -50,6 +50,10 @@ import {
   ArrowDownRight,
   Lightbulb,
   Eye,
+  Download,
+  FileSpreadsheet,
+  Printer,
+  RefreshCw,
 } from 'lucide-react';
 import {
   LineChart,
@@ -940,7 +944,7 @@ function ViolationsSection({ violations }: { violations: Violation[] }) {
 // Main Marketplace View
 // ---------------------------------------------------------------------------
 
-function MarketplaceView({ data }: { data: MarketplaceData }) {
+function MarketplaceView({ data, sidebarOpen }: { data: MarketplaceData; sidebarOpen: boolean }) {
   const [showAllViolations, setShowAllViolations] = useState(false);
 
   const trendDirection =
@@ -1091,6 +1095,17 @@ function MarketplaceView({ data }: { data: MarketplaceData }) {
 // Exported Page Component
 // ---------------------------------------------------------------------------
 
+function exportScorecardCSV() {
+  const headers = ['Pazar Yeri', 'Puan', 'Durum', 'Zamanında Kargo', 'İptal Oranı', 'İade Oranı', 'Yanıt Süresi'];
+  const rows = marketplaceData.map(m => [m.name, m.score, m.health, m.metrics.zamanindaKargo, m.metrics.iptalOrani, m.metrics.iadeOrani, m.metrics.yanitSuresi]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'performans-puanlari.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function PerformanceScorecard() {
   const { sidebarOpen } = useAppStore();
   const [activeTab, setActiveTab] = useState('trendyol');
@@ -1111,7 +1126,7 @@ export default function PerformanceScorecard() {
             <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-100">
               <Award className="size-5 text-emerald-700" />
             </div>
-            <div>
+            <div className="flex-1">
               <h1 className="text-2xl font-bold text-slate-900">
                 Satıcı Performans Kartı
               </h1>
@@ -1119,6 +1134,12 @@ export default function PerformanceScorecard() {
                 Pazar yerlerindeki performansınızı takip edin ve iyileştirin
               </p>
             </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="sm" variant="outline" onClick={exportScorecardCSV}><Download className="size-3.5" /><span className="ml-1">Dışa Aktar</span></Button>
+            <Button size="sm" variant="outline" onClick={() => { const blob = new Blob([`"Pazar Yeri","Puan","Durum"\n${marketplaceData.map(m => `"${m.name}",${m.score},"${m.health}"`).join('\n')}`], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'performans.xlsx'; a.click(); URL.revokeObjectURL(url); }}><FileSpreadsheet className="size-3.5" /><span className="ml-1">Excel İndir</span></Button>
+            <Button size="sm" variant="outline" onClick={() => window.print()}><Printer className="size-3.5" /><span className="ml-1">Yazdır</span></Button>
+            <Button size="sm" variant="outline" onClick={() => window.location.reload()}><RefreshCw className="size-3.5" /><span className="ml-1">Yenile</span></Button>
           </div>
         </div>
 
@@ -1173,7 +1194,7 @@ export default function PerformanceScorecard() {
           {/* ── Tab Content ── */}
           {marketplaceData.map((m) => (
             <TabsContent key={m.id} value={m.id}>
-              <MarketplaceView data={m} />
+              <MarketplaceView data={m} sidebarOpen={sidebarOpen} />
             </TabsContent>
           ))}
         </Tabs>

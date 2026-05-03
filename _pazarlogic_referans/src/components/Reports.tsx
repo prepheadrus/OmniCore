@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppStore } from '@/store/useAppStore';
-import { BarChart3, TrendingUp, Package, AlertTriangle } from 'lucide-react';
+import { BarChart3, TrendingUp, Package, AlertTriangle, Download, FileSpreadsheet, Printer, RefreshCw } from 'lucide-react';
 
 interface ReportData {
   totalOrders: number; totalProducts: number; totalRevenue: number; totalShipments: number;
@@ -18,12 +19,28 @@ const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
 const fmt = (n: number) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(n);
 const statusLabels: Record<string, string> = { pending: 'Beklemede', processing: 'Hazirlaniyor', shipped: 'Kargoda', delivered: 'Teslim Edildi', cancelled: 'Iptal' };
 
+function exportToCSV(data: ReportData, filename: string) {
+  const marketHeaders = ['Pazaryeri', 'Siparis'];
+  const marketRows = data.ordersByMarketplace.map(m => [m.marketplace, m._count.id]);
+  const csv1 = [marketHeaders, ...marketRows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv1], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function Reports() {
   const { sidebarOpen } = useAppStore();
   const [data, setData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetch('/api/reports').then((r) => r.json()).then((d) => setData(d && typeof d === 'object' && !Array.isArray(d) ? d : null)).finally(() => setLoading(false)); }, []);
+  const fetchData = () => {
+    setLoading(true);
+    fetch('/api/reports').then((r) => r.json()).then((d) => setData(d && typeof d === 'object' && !Array.isArray(d) ? d : null)).finally(() => setLoading(false));
+  };
+
+  useEffect(() => { fetchData(); }, []);
 
   if (loading || !data) return (<div className={`${sidebarOpen?'lg:ml-64':'ml-16'} min-h-screen bg-slate-50 p-6 transition-all`}><h1 className="mb-6 text-2xl font-bold text-slate-800">Raporlar</h1><div className="animate-pulse"><div className="h-10 w-48 bg-slate-200 rounded mb-4"/></div></div>);
 
@@ -35,6 +52,15 @@ export default function Reports() {
   return (
     <div className={`${sidebarOpen?'lg:ml-64':'ml-16'} min-h-screen bg-slate-50 p-6 transition-all`}>
       <div className="mb-6"><h1 className="text-2xl font-bold text-slate-800">Raporlar & Analiz</h1><p className="text-sm text-slate-500">Detayli is zekasi raporlari</p></div>
+
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        <Button size="sm" variant="outline" onClick={() => data && exportToCSV(data, 'raporlar.csv')}><Download className="h-4 w-4 mr-1" /> Disa Aktar</Button>
+        <Button size="sm" variant="outline" onClick={() => data && exportToCSV(data, 'raporlar.xlsx')}><FileSpreadsheet className="h-4 w-4 mr-1" /> Excel Indir</Button>
+        <Button size="sm" variant="outline" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Yazdir</Button>
+        <Button size="sm" variant="outline" onClick={fetchData}><RefreshCw className="h-4 w-4 mr-1" /> Yenile</Button>
+      </div>
+
       <Tabs defaultValue="overview">
         <TabsList className="mb-6">
           <TabsTrigger value="overview">Genel Bakis</TabsTrigger>

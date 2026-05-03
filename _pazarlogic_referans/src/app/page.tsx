@@ -12,6 +12,7 @@ function useMounted() {
 }
 
 const LicenseActivation = dynamic(() => import('@/components/LicenseActivation'), { ssr: false });
+const NotificationCenter = dynamic(() => import('@/components/NotificationCenter'), { ssr: false });
 const Sidebar = dynamic(() => import('@/components/Sidebar'), { ssr: false });
 const Dashboard = dynamic(() => import('@/components/Dashboard'), { ssr: false });
 const Orders = dynamic(() => import('@/components/Orders'), { ssr: false });
@@ -65,6 +66,15 @@ const SmartAlerts = dynamic(() => import('@/components/SmartAlerts'), { ssr: fal
 const ProductLaunchCalendar = dynamic(() => import('@/components/ProductLaunchCalendar'), { ssr: false });
 const TaxCompliance = dynamic(() => import('@/components/TaxCompliance'), { ssr: false });
 const ProfitSimulator = dynamic(() => import('@/components/ProfitSimulator'), { ssr: false });
+const PriceMonitor = dynamic(() => import('@/components/PriceMonitor'), { ssr: false });
+const CustomerQuestions = dynamic(() => import('@/components/CustomerQuestions'), { ssr: false });
+const KvkkCompliance = dynamic(() => import('@/components/KvkkCompliance'), { ssr: false });
+const OpportunityFinder = dynamic(() => import('@/components/OpportunityFinder'), { ssr: false });
+const CashFlow = dynamic(() => import('@/components/CashFlow'), { ssr: false });
+const ReviewAnalysis = dynamic(() => import('@/components/ReviewAnalysis'), { ssr: false });
+const BulkOperations = dynamic(() => import('@/components/BulkOperations'), { ssr: false });
+const CommissionTracker = dynamic(() => import('@/components/CommissionTracker'), { ssr: false });
+const SalesTrendAnalysis = dynamic(() => import('@/components/SalesTrendAnalysis'), { ssr: false });
 
 const pages: Record<string, React.ComponentType> = {
   dashboard: Dashboard,
@@ -119,6 +129,15 @@ const pages: Record<string, React.ComponentType> = {
   'product-launches': ProductLaunchCalendar,
   'tax-compliance': TaxCompliance,
   'profit-simulator': ProfitSimulator,
+  'price-monitor': PriceMonitor,
+  'customer-questions': CustomerQuestions,
+  'kvkk-compliance': KvkkCompliance,
+  'opportunity-finder': OpportunityFinder,
+  'cash-flow': CashFlow,
+  'review-analysis': ReviewAnalysis,
+  'bulk-operations': BulkOperations,
+  'commission-tracker': CommissionTracker,
+  'sales-trends': SalesTrendAnalysis,
 };
 
 function AppContent() {
@@ -126,6 +145,7 @@ function AppContent() {
   const PageComponent = pages[currentPage] || Dashboard;
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const ownerName = useLicenseStore((s) => s.ownerName);
 
   useEffect(() => {
     fetch('/api/notifications').then(r => r.json()).then((data) => {
@@ -163,7 +183,7 @@ function AppContent() {
           {/* User */}
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold">
-              {typeof window !== 'undefined' ? (JSON.parse(localStorage.getItem('pazarlogic-user') || '{}').name || 'U')[0] : 'U'}
+              {(() => { try { return (ownerName || 'U')[0].toUpperCase(); } catch { return 'U'; } })()}
             </div>
           </div>
         </div>
@@ -173,7 +193,7 @@ function AppContent() {
       {showNotifications && (
         <div className={`fixed top-16 right-0 z-40 bg-white border-l border-b border-slate-200 shadow-lg transition-all ${sidebarOpen ? 'left-64' : 'left-16'}`}>
           <div onClick={(e) => { if (e.target === e.currentTarget) setShowNotifications(false); }} className="p-2">
-            <div id="notification-container" />
+            <NotificationCenter />
           </div>
         </div>
       )}

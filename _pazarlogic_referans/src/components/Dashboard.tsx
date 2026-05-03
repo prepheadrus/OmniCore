@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppStore } from '@/store/useAppStore';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
   ShoppingCart, DollarSign, Package, Plug, Rss,
   ArrowUpRight, AlertTriangle, Clock, Activity,
+  Download, FileSpreadsheet, Printer, RefreshCw,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -75,6 +77,20 @@ const relTime = (d: string) => {
   if (s < 604800) return `${Math.floor(s / 86400)} gün önce`;
   return new Date(d).toLocaleDateString('tr-TR');
 };
+
+function exportDashboardCSV(d: DashboardData | null, xlsx = false) {
+  if (!d) return;
+  const mp = d.marketplace.ordersPerMarketplace.map(m => m.marketplace);
+  const orders = d.marketplace.ordersPerMarketplace.map(m => m.orders);
+  const headers = ['Pazaryeri', 'Siparis Sayisi'];
+  const rows = mp.map((m, i) => [m, orders[i]]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = xlsx ? 'dashboard.xlsx' : 'dashboard.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
 
 function Skel({ className }: { className?: string }) {
   return <div className={cn('animate-pulse rounded-md bg-slate-200', className)} />;
@@ -152,15 +168,25 @@ export default function Dashboard() {
     <div className={cn('min-h-screen bg-slate-50 p-6 transition-all duration-300', sidebarOpen ? 'lg:ml-64' : 'ml-16')}>
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Gösterge Paneli</h1>
           <p className="text-sm text-slate-500 mt-0.5">PazarLogic — tüm entegrasyonlarınızın genel görünümü</p>
         </div>
-        <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-50 px-3 py-1">
-          <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          Canlı
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-50 px-3 py-1">
+            <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Canlı
+          </Badge>
+        </div>
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        <Button size="sm" variant="outline" onClick={() => exportDashboardCSV(data)}><Download className="h-4 w-4 mr-1" /> Dışa Aktar</Button>
+        <Button size="sm" variant="outline" onClick={() => exportDashboardCSV(data, true)}><FileSpreadsheet className="h-4 w-4 mr-1" /> Excel İndir</Button>
+        <Button size="sm" variant="outline" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Yazdır</Button>
+        <Button size="sm" variant="outline" onClick={() => { setLoading(true); Promise.all([fetch('/api/dashboard').then((r) => r.json()), fetch('/api/products').then((r) => r.json())]).then(([dash, prods]) => { setData(dash && typeof dash === 'object' && !Array.isArray(dash) ? dash : null); setLowStock((Array.isArray(prods) ? prods : []).filter((p: LowStockProduct) => p.stock <= 10).sort((a: LowStockProduct, b: LowStockProduct) => a.stock - b.stock)); }).finally(() => setLoading(false)); }}><RefreshCw className="h-4 w-4 mr-1" /> Yenile</Button>
       </div>
 
       {/* Row 1 — KPI cards */}

@@ -229,7 +229,7 @@ export default function ListingQuality() {
   const radarData = listings.length > 0
     ? Object.keys(dimensionLabels).map((key) => {
         const avg = Math.round(
-          listings.reduce((s, l) => s + (l.scores as Record<string, number>)[key], 0) / listings.length
+          listings.reduce((s, l) => s + (l.scores as unknown as Record<string, number>)[key], 0) / listings.length
         );
         return { dimension: dimensionLabels[key], değer: avg, tam: 100 };
       })
@@ -498,7 +498,7 @@ export default function ListingQuality() {
             )}
             <div className="mt-4 grid grid-cols-6 gap-3">
               {Object.entries(dimensionLabels).map(([key, label]) => {
-                const val = (listing.scores as Record<string, number>)[key];
+                const val = (listing.scores as unknown as Record<string, number>)[key];
                 return (
                   <div key={key} className="text-center">
                     <p className="text-xs text-slate-500 mb-1">{label}</p>

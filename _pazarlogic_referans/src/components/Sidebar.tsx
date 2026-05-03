@@ -8,7 +8,8 @@ import {
   FileCode, Cpu, Shield, Brain, Search, MessageCircle,
   Banknote, PackageCheck, Activity, Percent, Mail, Split, PackageSearch,
   Share2, ScanBarcode, Layers, Trophy, Building2, Zap, Waypoints, Award,
-  PenTool, ShieldAlert, BellRing, CalendarDays, Landmark, Calculator,
+  PenTool, ShieldAlert, BellRing, CalendarDays, Landmark, Calculator, Receipt,
+  MessageCircleQuestion, ShieldCheck, Crosshair, Wallet, MessageSquareHeart, Eye,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -39,6 +40,7 @@ const navGroups = [
       { key: 'smart-pricing', label: 'Akıllı Fiyatlandırma', icon: <Target className="h-5 w-5" /> },
       { key: 'stock-sync', label: 'Stok Senkronizasyonu', icon: <ArrowRightLeft className="h-5 w-5" /> },
       { key: 'roi-profit', label: 'ROI & Kar Analizi', icon: <TrendingUp className="h-5 w-5" /> },
+      { key: 'commission-tracker', label: 'Komisyon & Masraf Takibi', icon: <Receipt className="h-5 w-5" /> },
     ] as NavItem[],
   },
   {
@@ -49,6 +51,7 @@ const navGroups = [
       { key: 'returns', label: 'İade Yönetimi', icon: <RotateCcw className="h-5 w-5" /> },
       { key: 'warehouse', label: 'Depo (WMS)', icon: <Warehouse className="h-5 w-5" /> },
       { key: 'barcode-scanner', label: 'Barkod Tarayıcı', icon: <ScanBarcode className="h-5 w-5" /> },
+      { key: 'bulk-operations', label: 'Toplu Ürün İşlemleri', icon: <Layers className="h-5 w-5" /> },
     ] as NavItem[],
   },
   {
@@ -96,6 +99,9 @@ const navGroups = [
     name: 'DESTEK',
     items: [
       { key: 'live-chat', label: 'Canlı Destek Chat', icon: <MessageCircle className="h-5 w-5" /> },
+      { key: 'customer-questions', label: 'Müşteri Soruları', icon: <MessageCircleQuestion className="h-5 w-5" /> },
+      { key: 'review-analysis', label: 'Yorum & Değerlendirme', icon: <MessageSquareHeart className="h-5 w-5" /> },
+      { key: 'sales-trends', label: 'Satış Trend Analizi', icon: <Zap className="h-5 w-5" /> },
       { key: 'smart-alerts', label: 'Akıllı Bildirimler', icon: <BellRing className="h-5 w-5" /> },
       { key: 'brand-protection', label: 'Marka Koruma & MAP', icon: <ShieldAlert className="h-5 w-5" /> },
     ] as NavItem[],
@@ -113,12 +119,16 @@ const navGroups = [
       { key: 'product-launches', label: 'Lansman Takvimi', icon: <CalendarDays className="h-5 w-5" /> },
       { key: 'tax-compliance', label: 'Vergi & Gümrük', icon: <Landmark className="h-5 w-5" /> },
       { key: 'profit-simulator', label: 'Kar Simülatörü', icon: <Calculator className="h-5 w-5" /> },
+      { key: 'opportunity-finder', label: 'Fırsat Bulucu', icon: <Crosshair className="h-5 w-5" /> },
+      { key: 'cash-flow', label: 'Nakit Akış', icon: <Wallet className="h-5 w-5" /> },
     ] as NavItem[],
   },
   {
     name: 'SİSTEM',
     items: [
       { key: 'reports', label: 'Raporlar', icon: <BarChart3 className="h-5 w-5" /> },
+      { key: 'price-monitor', label: 'Akakçe & Rakip İzleme', icon: <Eye className="h-5 w-5" /> },
+      { key: 'kvkk-compliance', label: 'KVKK & Veri Yönetimi', icon: <ShieldCheck className="h-5 w-5" /> },
       { key: 'audit', label: 'Log & İzleme', icon: <ScrollText className="h-5 w-5" /> },
       { key: 'settings', label: 'Entegrasyonlar', icon: <Cog className="h-5 w-5" /> },
       { key: 'webhooks', label: 'API & Webhook', icon: <Webhook className="h-5 w-5" /> },

@@ -332,7 +332,7 @@ export async function POST(request: Request) {
           );
         }
 
-        const results = [];
+        const results: { productId: string; productName?: string; skor?: number; durum: string }[] = [];
         let createdCount = 0;
         let updatedCount = 0;
 

@@ -153,7 +153,7 @@ export async function POST(request: Request) {
           if (!isNaN(ed.getTime())) data.expectedDate = ed;
         }
 
-        const order = await db.purchaseOrder.create({ data });
+        const order = await db.purchaseOrder.create({ data: data as any });
         return NextResponse.json(order, { status: 201 });
       }
 

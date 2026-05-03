@@ -18,7 +18,7 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json(alerts, { next: { revalidate: 0 } });
+    return NextResponse.json(alerts);
   } catch {
     return NextResponse.json(
       { error: 'Failed to fetch brand protection alerts' },
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json(alert, { status: 201, next: { revalidate: 0 } });
+    return NextResponse.json(alert, { status: 201 });
   } catch {
     return NextResponse.json(
       { error: 'Failed to create brand protection alert' },
@@ -76,7 +76,8 @@ export async function POST(req: Request) {
 // PUT — Update a brand protection alert (change status, add notes, etc.)
 export async function PUT(req: Request) {
   try {
-    const id = req.nextUrl.searchParams.get('id');
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
@@ -103,7 +104,7 @@ export async function PUT(req: Request) {
       data: updateData,
     });
 
-    return NextResponse.json(alert, { next: { revalidate: 0 } });
+    return NextResponse.json(alert);
   } catch {
     return NextResponse.json(
       { error: 'Failed to update brand protection alert' },
@@ -115,14 +116,15 @@ export async function PUT(req: Request) {
 // DELETE — Delete a brand protection alert
 export async function DELETE(req: Request) {
   try {
-    const id = req.nextUrl.searchParams.get('id');
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
     await db.brandProtectionAlert.delete({ where: { id } });
 
-    return NextResponse.json({ success: true }, { next: { revalidate: 0 } });
+    return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(
       { error: 'Failed to delete brand protection alert' },

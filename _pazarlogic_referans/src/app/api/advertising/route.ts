@@ -167,7 +167,7 @@ export async function POST(request: Request) {
           if (!isNaN(ed.getTime())) data.endDate = ed;
         }
 
-        const campaign = await db.adCampaign.create({ data });
+        const campaign = await db.adCampaign.create({ data: data as any });
         return NextResponse.json(campaign, { status: 201 });
       }
 

@@ -542,10 +542,11 @@ export default function Advertising() {
       } else {
         // Simulate local update for demo
         if (editingCampaign) {
+          const { action: _action, id: _id, ...campaignFields } = payload;
           setCampaigns((prev) =>
             prev.map((c) =>
               c.id === editingCampaign.id
-                ? { ...c, ...payload, spent: c.spent, impressions: c.impressions, clicks: c.clicks, ctr: c.ctr, roas: c.roas }
+                ? { ...c, ...campaignFields, spent: c.spent, impressions: c.impressions, clicks: c.clicks, ctr: c.ctr, roas: c.roas }
                 : c,
             ),
           );

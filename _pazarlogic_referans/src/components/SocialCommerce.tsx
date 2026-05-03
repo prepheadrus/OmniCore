@@ -757,11 +757,25 @@ function PlatformListingTable({
   listings: SocialListing[];
 }) {
   const [listingsState, setListingsState] = useState(listings);
+  const [refreshing, setRefreshing] = useState(false);
 
   const toggleStockSync = (id: string) => {
     setListingsState((prev) =>
       prev.map((l) => (l.id === id ? { ...l, stockSync: !l.stockSync } : l))
     );
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await new Promise((r) => setTimeout(r, 1200));
+    setRefreshing(false);
+  };
+
+  const platformUrls: Record<Platform, string> = {
+    Instagram: 'https://www.instagram.com',
+    Facebook: 'https://www.facebook.com',
+    TikTok: 'https://www.tiktok.com',
+    Pinterest: 'https://www.pinterest.com',
   };
 
   return (
@@ -772,11 +786,11 @@ function PlatformListingTable({
           <Badge variant="secondary">{listingsState.length} ürün</Badge>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <RefreshCw className="size-3.5" />
-            Yenile
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={handleRefresh} disabled={refreshing}>
+            <RefreshCw className={`size-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            {refreshing ? 'Yenileniyor...' : 'Yenile'}
           </Button>
-          <Button variant="outline" size="sm" className="gap-1.5">
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => window.open(platformUrls[platform], '_blank', 'noopener,noreferrer')}>
             <ExternalLink className="size-3.5" />
             Platforma Git
           </Button>
@@ -1121,9 +1135,17 @@ function OverviewTab({ allListings }: { allListings: SocialListing[] }) {
 export default function SocialCommerce() {
   const { sidebarOpen } = useAppStore();
   const [activeTab, setActiveTab] = useState('genel');
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const getListingsByPlatform = (platform: Platform) =>
     mockListings.filter((l) => l.platform === platform);
+
+  const handleSync = async () => {
+    setIsSyncing(true);
+    await new Promise((r) => setTimeout(r, 2000));
+    setIsSyncing(false);
+    alert('Senkronizasyon tamamlandı!');
+  };
 
   const platforms: Platform[] = ['Instagram', 'Facebook', 'TikTok', 'Pinterest'];
 
@@ -1147,13 +1169,13 @@ export default function SocialCommerce() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-1.5">
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={() => alert('Raporlar hazırlanıyor...')}>
                 <BarChart3 className="size-3.5" />
                 Raporlar
               </Button>
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <RefreshCw className="size-3.5" />
-                Senkronize Et
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={handleSync} disabled={isSyncing}>
+                <RefreshCw className={`size-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                {isSyncing ? 'Senkronize Ediliyor...' : 'Senkronize Et'}
               </Button>
             </div>
           </div>

@@ -532,6 +532,51 @@ export default function AiContentStudio() {
     setSelectedRows(new Set());
   };
 
+  /* --- Preview Dialog State --- */
+  const [previewContent, setPreviewContent] = useState<{ title: string; content: string } | null>(null);
+
+  const handleApplyContent = (type: 'description' | 'titles' | 'translation') => {
+    let content = '';
+    let productId = '';
+    let contentType: 'description' | 'title_bullets' | 'translation' = type === 'titles' ? 'title_bullets' : type;
+
+    if (type === 'description' && generatedDesc) {
+      content = generatedDesc;
+      productId = selectedProduct;
+    } else if (type === 'titles' && generatedTitles) {
+      content = generatedTitles;
+      productId = selectedProduct;
+      contentType = 'title_bullets';
+    } else if (type === 'translation' && translatedContent) {
+      content = translatedContent;
+      productId = translateProduct;
+      contentType = 'translation';
+    }
+
+    if (!content || !productId) return;
+
+    setHistory((prev) =>
+      prev.map((h) =>
+        h.productId === productId && h.type === contentType
+          ? { ...h, status: 'applied' as const, content, qualityScore: h.qualityScore || 85 }
+          : h
+      )
+    );
+    toast.success('İçerik başarıyla uygulandı!');
+  };
+
+  const handleViewContent = (item: GeneratedContent) => {
+    setPreviewContent({ title: `${item.productName} — ${typeLabel(item.type)}`, content: item.content });
+  };
+
+  const handleReapplyContent = (item: GeneratedContent) => {
+    setHistory((prev) =>
+      prev.map((h) => (h.id === item.id ? { ...h, status: 'applied' as const } : h))
+    );
+    toast.success('İçerik yeniden uygulandı!');
+  };
+
+
   /* ---------- Loading ---------- */
   if (loading) {
     return (
@@ -728,7 +773,7 @@ export default function AiContentStudio() {
                         {copiedId === 'desc' ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
                         {copiedId === 'desc' ? 'Kopyalandı!' : 'Kopyala'}
                       </Button>
-                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white ml-auto">
+                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white ml-auto" onClick={() => handleApplyContent('description')}>
                         <Check className="h-4 w-4 mr-1" /> Uygula
                       </Button>
                     </div>
@@ -832,7 +877,7 @@ export default function AiContentStudio() {
                         {copiedId === 'titles' ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
                         {copiedId === 'titles' ? 'Kopyalandı!' : 'Kopyala'}
                       </Button>
-                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white ml-auto">
+                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white ml-auto" onClick={() => handleApplyContent('titles')}>
                         <Check className="h-4 w-4 mr-1" /> Uygula
                       </Button>
                     </div>
@@ -964,7 +1009,7 @@ export default function AiContentStudio() {
                         {copiedId === 'trans' ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
                         {copiedId === 'trans' ? 'Kopyalandı!' : 'Kopyala'}
                       </Button>
-                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white ml-auto">
+                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white ml-auto" onClick={() => handleApplyContent('translation')}>
                         <Check className="h-4 w-4 mr-1" /> Uygula
                       </Button>
                     </div>
@@ -1109,14 +1154,14 @@ export default function AiContentStudio() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-1">
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Görüntüle">
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Görüntüle" onClick={() => handleViewContent(h)}>
                                 <Eye className="h-4 w-4 text-slate-500" />
                               </Button>
                               <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Kopyala" onClick={() => handleCopy(h.content, h.id)}>
                                 {copiedId === h.id ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4 text-slate-500" />}
                               </Button>
                               {h.status !== 'applied' && (
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Yeniden Uygula">
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Yeniden Uygula" onClick={() => handleReapplyContent(h)}>
                                   <Check className="h-4 w-4 text-emerald-500" />
                                 </Button>
                               )}

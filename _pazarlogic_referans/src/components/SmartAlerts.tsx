@@ -192,6 +192,9 @@ export default function SmartAlerts() {
   const [formFrequency, setFormFrequency] = useState('immediate');
   const [formCooldown, setFormCooldown] = useState('30');
 
+  /* --- Edit Rule State --- */
+  const [editingRule, setEditingRule] = useState<AlertRule | null>(null);
+
   /* --- Filters --- */
   const [ruleSearch, setRuleSearch] = useState('');
   const [ruleCategoryFilter, setRuleCategoryFilter] = useState<string>('all');
@@ -312,6 +315,19 @@ export default function SmartAlerts() {
     setFormChannels(['email']);
     setFormFrequency('immediate');
     setFormCooldown('30');
+    setEditingRule(null);
+  };
+
+  const handleEditRule = (rule: AlertRule) => {
+    setEditingRule(rule);
+    setFormName(rule.name);
+    setFormCategory(rule.category);
+    setFormMetric(rule.metric);
+    setFormCondition(rule.condition);
+    setFormThreshold(rule.threshold);
+    setFormChannels(rule.channels);
+    setFormFrequency(rule.frequency);
+    setFormCooldown(String(rule.cooldownMinutes));
   };
 
   const toggleChannel = (channel: string) => {
@@ -487,7 +503,7 @@ export default function SmartAlerts() {
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end gap-1">
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Düzenle">
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Düzenle" onClick={() => handleEditRule(r)}>
                                   <Edit className="h-4 w-4 text-slate-500" />
                                 </Button>
                                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Sil" onClick={() => deleteRule(r.id)}>

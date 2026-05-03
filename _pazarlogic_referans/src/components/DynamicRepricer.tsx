@@ -676,6 +676,7 @@ export default function DynamicRepricer() {
   const [formData, setFormData] = useState<RuleFormData>(EMPTY_FORM);
   const [logFilterMarketplace, setLogFilterMarketplace] = useState<string>('all');
   const { sidebarOpen } = useAppStore();
+  const [isRunningRules, setIsRunningRules] = useState(false);
 
   // ── Derived data ──
 
@@ -754,6 +755,20 @@ export default function DynamicRepricer() {
     setRules((prev) => prev.filter((r) => r.id !== ruleId));
   }
 
+  async function handleRunAllRules() {
+    setIsRunningRules(true);
+    await new Promise((r) => setTimeout(r, 2000));
+    setRules((prev) =>
+      prev.map((r) => ({
+        ...r,
+        lastRun: new Date().toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '.'),
+        adjustmentCount: r.isActive ? r.adjustmentCount + Math.floor(Math.random() * 50) + 10 : r.adjustmentCount,
+      }))
+    );
+    setIsRunningRules(false);
+    alert('Tüm kurallar başarıyla çalıştırıldı!');
+  }
+
   function updateForm<K extends keyof RuleFormData>(key: K, value: RuleFormData[K]) {
     setFormData((prev) => ({ ...prev, [key]: value }));
   }
@@ -789,9 +804,9 @@ export default function DynamicRepricer() {
             <div className="flex items-center gap-3">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <RefreshCw className="h-4 w-4" />
-                    <span className="hidden sm:inline">Tüm Kuralları Çalıştır</span>
+                  <Button variant="outline" size="sm" className="gap-2" onClick={handleRunAllRules} disabled={isRunningRules}>
+                    <RefreshCw className={`h-4 w-4 ${isRunningRules ? 'animate-spin' : ''}`} />
+                    <span className="hidden sm:inline">{isRunningRules ? 'Çalıştırılıyor...' : 'Tüm Kuralları Çalıştır'}</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>

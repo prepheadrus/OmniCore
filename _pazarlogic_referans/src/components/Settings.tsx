@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/store/useAppStore';
 import { useLicenseStore } from '@/store/useLicenseStore';
-import { Cog as CogIcon, Store, ShoppingCart, FileText, Truck, Warehouse, Globe, Link2, CheckCircle, XCircle, RefreshCw, Shield } from 'lucide-react';
+import { Cog as CogIcon, Store, ShoppingCart, FileText, Truck, Warehouse, Globe, Link2, CheckCircle, XCircle, RefreshCw, Shield, Save } from 'lucide-react';
 
 interface Integration { id: string; name: string; type: string; platform: string; status: string; }
 
@@ -59,7 +59,13 @@ export default function Settings() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return (<div className={`${sidebarOpen?'lg:ml-64':'ml-16'} min-h-screen bg-slate-50 p-6 transition-all`}><h1 className="mb-6 text-2xl font-bold text-slate-800">Entegrasyon Ayarlari</h1><div className="animate-pulse space-y-4">{[1,2,3].map(i=><Card key={i}><CardContent className="p-5"><div className="h-20 bg-slate-200 rounded"/></CardContent></Card>)}</div></div>);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+
+  const handleSave = (section: string) => {
+    alert('Ayarlar kaydedildi!');
+    setSaveMessage(`${section} ayarlari kaydedildi`);
+    setTimeout(() => setSaveMessage(null), 3000);
+  };
 
   return (
     <div className={`${sidebarOpen?'lg:ml-64':'ml-16'} min-h-screen bg-slate-50 p-6 transition-all`}>
@@ -82,6 +88,12 @@ export default function Settings() {
         </CardContent>
       </Card>
 
+      {saveMessage && (
+        <div className="fixed bottom-4 right-4 z-50 bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-right">
+          <CheckCircle className="h-4 w-4" /> {saveMessage}
+        </div>
+      )}
+
       <Separator className="my-6" />
 
       {groups.map((g) => {
@@ -89,7 +101,10 @@ export default function Settings() {
         if (items.length === 0) return null;
         return (
           <div key={g.key} className="mb-6">
-            <h2 className="text-lg font-semibold text-slate-700 flex items-center gap-2 mb-3">{g.icon} {g.label}</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold text-slate-700 flex items-center gap-2">{g.icon} {g.label}</h2>
+              <Button size="sm" onClick={() => handleSave(g.label)}><Save className="h-4 w-4 mr-1" />Kaydet</Button>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {items.map((item) => (
                 <Card key={item.id}>

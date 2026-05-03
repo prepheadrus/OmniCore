@@ -195,7 +195,7 @@ export async function POST(request: Request) {
         const confidence = Math.round((50 + Math.random() * 45) * 100) / 100;
 
         // 30 gunluk tahmin verisi olustur
-        const forecastData = [];
+        const forecastData: { gun: number; tarih: string; tahminiSatis: number; tahminiStok: number }[] = [];
         for (let day = 1; day <= 30; day++) {
           let projectedSales = dailySales;
           if (trend === 'rising') projectedSales *= 1 + (day / 30) * 0.3;
@@ -273,7 +273,7 @@ export async function POST(request: Request) {
           );
         }
 
-        const results = [];
+        const results: { productId: string; productName: string; durum: string; gunlukSatis?: number; stokGun?: number }[] = [];
         let createdCount = 0;
         let updatedCount = 0;
 
@@ -291,7 +291,7 @@ export async function POST(request: Request) {
             const trend = trendOptions[Math.floor(Math.random() * trendOptions.length)];
             const confidence = Math.round((50 + Math.random() * 45) * 100) / 100;
 
-            const forecastData = [];
+            const forecastData: { gun: number; tahminiSatis: number }[] = [];
             for (let day = 1; day <= 30; day++) {
               let projectedSales = dailySales;
               if (trend === 'rising') projectedSales *= 1 + (day / 30) * 0.3;

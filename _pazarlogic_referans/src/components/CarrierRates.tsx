@@ -42,6 +42,9 @@ import {
   BarChart3,
   Package,
   Search,
+  FileSpreadsheet,
+  Printer,
+  RefreshCw,
 } from 'lucide-react';
 
 interface CarrierRate {
@@ -206,6 +209,36 @@ export default function CarrierRates() {
     'kg başı': r.perKg,
   }));
 
+  const handleExportExcel = () => {
+    const headers = ['Firma', 'Hizmet', 'Bolge', 'Basis Fiyat', 'Kg Basi', 'Maks Agirlik', 'Tahmini Gun', 'Durum'];
+    const rows = rates.map(r => [r.company, r.service, r.zone, r.basePrice, r.perKg, r.maxWeight, r.estimatedDays, r.active ? 'Aktif' : 'Pasif']);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'kargo-fiyatlari.xlsx'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handlePrint = () => window.print();
+
+  const handleRefresh = () => {
+    setLoading(true);
+    fetch('/api/carrier-rates')
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data?.rates) && data.rates.length > 0) {
+          setRates(data.rates);
+        } else {
+          setRates(demoRates);
+        }
+      })
+      .catch(() => {
+        setRates(demoRates);
+      })
+      .finally(() => setLoading(false));
+  };
+
   const calcPrice = (rate: CarrierRate, weight: number) => rate.basePrice + weight * rate.perKg;
 
   if (loading) {
@@ -367,13 +400,17 @@ export default function CarrierRates() {
             <Package className="h-5 w-5 text-emerald-600" />
             <h2 className="text-lg font-semibold text-slate-800">Kargo Fiyatları</h2>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
-            <DialogTrigger asChild>
-              <Button className="bg-emerald-600 hover:bg-emerald-700">
-                <Plus className="h-4 w-4 mr-1" />
-                Yeni Fiyat Ekle
-              </Button>
-            </DialogTrigger>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={handleExportExcel}><FileSpreadsheet className="h-4 w-4 mr-1" /> Excel İndir</Button>
+            <Button size="sm" variant="outline" onClick={handlePrint}><Printer className="h-4 w-4 mr-1" /> Yazdır</Button>
+            <Button size="sm" variant="outline" onClick={handleRefresh}><RefreshCw className="h-4 w-4 mr-1" /> Yenile</Button>
+            <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
+              <DialogTrigger asChild>
+                <Button className="bg-emerald-600 hover:bg-emerald-700">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Yeni Fiyat Ekle
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>{editingRate ? 'Fiyat Düzenle' : 'Yeni Kargo Fiyatı'}</DialogTitle>
@@ -432,6 +469,7 @@ export default function CarrierRates() {
               </div>
             </DialogContent>
           </Dialog>
+        </div>
         </div>
 
         <div className="overflow-x-auto">

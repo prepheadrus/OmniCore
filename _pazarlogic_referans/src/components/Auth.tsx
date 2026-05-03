@@ -7,8 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAppStore } from '@/store/useAppStore';
-import { LogIn, UserPlus, ShieldCheck, Store } from 'lucide-react';
+import { LogIn, UserPlus, ShieldCheck, Store, Pencil, Trash2 } from 'lucide-react';
 
 interface AuthUser {
   id: string;
@@ -53,6 +60,11 @@ export default function Auth() {
   const [stores, setStores] = useState<StoreItem[]>([]);
   const [currentStore, setCurrentStore] = useState('STORE-001');
   const [loading, setLoading] = useState(true);
+  const [showNewUser, setShowNewUser] = useState(false);
+  const [editUser, setEditUser] = useState<AuthUser | null>(null);
+  const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Admin', active: true });
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [ipRestrictionEnabled, setIpRestrictionEnabled] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -86,6 +98,40 @@ export default function Auth() {
   const handleLogout = () => {
     localStorage.removeItem('pazarlogic-user');
     setCurrentUser(null);
+  };
+
+  const handleSaveUser = () => {
+    if (!newUser.name || !newUser.email) return;
+    if (editUser) {
+      setUsers(prev => prev.map(u => u.id === editUser.id ? { ...u, name: newUser.name, email: newUser.email, role: newUser.role.toLowerCase(), isActive: newUser.active } : u));
+    } else {
+      const user: AuthUser = {
+        id: `new-${Date.now()}`,
+        email: newUser.email,
+        name: newUser.name,
+        role: newUser.role.toLowerCase(),
+        phone: '',
+        isActive: newUser.active,
+        lastLogin: null,
+        storeId: 'STORE-001',
+      };
+      setUsers(prev => [user, ...prev]);
+    }
+    setShowNewUser(false);
+    setEditUser(null);
+    setNewUser({ name: '', email: '', role: 'Admin', active: true });
+  };
+
+  const handleEditUser = (user: AuthUser) => {
+    setEditUser(user);
+    const roleMap: Record<string, string> = { admin: 'Admin', operation: 'Operator', accounting: 'Operator', warehouse: 'Goruntuleyen', viewer: 'Goruntuleyen' };
+    setNewUser({ name: user.name, email: user.email, role: roleMap[user.role] || 'Admin', active: user.isActive });
+    setShowNewUser(true);
+  };
+
+  const handleDeleteUser = (user: AuthUser) => {
+    if (!confirm(`"${user.name}" kullaniciyi silmek istediginize emin misiniz?`)) return;
+    setUsers(prev => prev.filter(u => u.id !== user.id));
   };
 
   if (loading) {
@@ -236,7 +282,7 @@ export default function Auth() {
                   <p className="text-sm font-medium">Iki Faktorlu Dogrulama (2FA)</p>
                   <p className="text-xs text-slate-400">Ekstra guvenlik katmani</p>
                 </div>
-                <Switch />
+                <Switch checked={twoFactorEnabled} onCheckedChange={setTwoFactorEnabled} />
               </div>
               <div className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
                 <div>
@@ -255,7 +301,7 @@ export default function Auth() {
                   <p className="text-sm font-medium">IP Kisitlama</p>
                   <p className="text-xs text-slate-400">Belirli IP adreslerinden erisim</p>
                 </div>
-                <Switch />
+                <Switch checked={ipRestrictionEnabled} onCheckedChange={setIpRestrictionEnabled} />
               </div>
             </div>
           </CardContent>
@@ -265,10 +311,13 @@ export default function Auth() {
       {/* Users Table */}
       <Card className="mt-6">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <UserPlus className="h-4 w-4" />
-            Kullanici Listesi
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base flex items-center gap-2">
+              <UserPlus className="h-4 w-4" />
+              Kullanici Listesi
+            </CardTitle>
+            <Button size="sm" onClick={() => { setEditUser(null); setNewUser({ name: '', email: '', role: 'Admin', active: true }); setShowNewUser(true); }}><UserPlus className="h-4 w-4 mr-1" /> Yeni Kullanici</Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -280,6 +329,7 @@ export default function Auth() {
                   <th className="text-left py-2.5 px-3 font-medium text-slate-600">Rol</th>
                   <th className="text-left py-2.5 px-3 font-medium text-slate-600">Durum</th>
                   <th className="text-left py-2.5 px-3 font-medium text-slate-600">Son Giris</th>
+                  <th className="text-right py-2.5 px-3 font-medium text-slate-600">Islemler</th>
                 </tr>
               </thead>
               <tbody>
@@ -314,6 +364,12 @@ export default function Auth() {
                         ? new Date(u.lastLogin).toLocaleString('tr-TR')
                         : '-'}
                     </td>
+                    <td className="py-2.5 px-3 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button size="sm" variant="ghost" onClick={() => handleEditUser(u)}><Pencil className="h-3.5 w-3.5 mr-1" />Duzenle</Button>
+                        <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700" onClick={() => handleDeleteUser(u)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -321,6 +377,44 @@ export default function Auth() {
           </div>
         </CardContent>
       </Card>
+
+      {/* New/Edit User Dialog */}
+      <Dialog open={showNewUser} onOpenChange={setShowNewUser}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editUser ? 'Kullanici Duzenle' : 'Yeni Kullanici'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Ad Soyad</Label>
+              <Input className="mt-1" value={newUser.name} onChange={e => setNewUser(p => ({ ...p, name: e.target.value }))} placeholder="Ad Soyad" />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input className="mt-1" type="email" value={newUser.email} onChange={e => setNewUser(p => ({ ...p, email: e.target.value }))} placeholder="ornek@email.com" />
+            </div>
+            <div>
+              <Label>Rol</Label>
+              <Select value={newUser.role} onValueChange={v => setNewUser(p => ({ ...p, role: v }))}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Rol secin" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Admin">Admin</SelectItem>
+                  <SelectItem value="Operator">Operator</SelectItem>
+                  <SelectItem value="Goruntuleyen">Goruntuleyen</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox id="user-active" checked={newUser.active} onCheckedChange={(checked) => setNewUser(p => ({ ...p, active: checked === true }))} />
+              <Label htmlFor="user-active" className="text-sm">Aktif</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewUser(false)}>Iptal</Button>
+            <Button onClick={handleSaveUser}>{editUser ? 'Guncelle' : 'Olustur'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -267,7 +267,7 @@ export async function POST(request: Request) {
           );
         }
 
-        const results = [];
+        const results: any[] = [];
         let updatedCount = 0;
         let createdCount = 0;
         let errorCount = 0;

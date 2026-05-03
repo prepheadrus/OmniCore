@@ -35,7 +35,7 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json(jobs, { next: { revalidate: 0 } });
+    return NextResponse.json(jobs);
   } catch {
     return NextResponse.json(
       { error: 'Failed to fetch AI content jobs' },
@@ -259,7 +259,7 @@ Aşağıdakileri sağla:
       },
     });
 
-    return NextResponse.json(job, { status: 201, next: { revalidate: 0 } });
+    return NextResponse.json(job, { status: 201 });
   } catch (error) {
     console.error('[AI-CONTENT] Error:', error);
     return NextResponse.json(
@@ -275,7 +275,8 @@ Aşağıdakileri sağla:
 // PUT — Update an AI content job (mark completed, applied, etc.)
 export async function PUT(req: Request) {
   try {
-    const id = req.nextUrl.searchParams.get('id');
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
@@ -296,7 +297,7 @@ export async function PUT(req: Request) {
       data: updateData,
     });
 
-    return NextResponse.json(job, { next: { revalidate: 0 } });
+    return NextResponse.json(job);
   } catch {
     return NextResponse.json(
       { error: 'Failed to update AI content job' },
@@ -308,14 +309,15 @@ export async function PUT(req: Request) {
 // DELETE — Delete an AI content job
 export async function DELETE(req: Request) {
   try {
-    const id = req.nextUrl.searchParams.get('id');
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
     await db.aiContentJob.delete({ where: { id } });
 
-    return NextResponse.json({ success: true }, { next: { revalidate: 0 } });
+    return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(
       { error: 'Failed to delete AI content job' },

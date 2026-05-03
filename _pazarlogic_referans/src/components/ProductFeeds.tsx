@@ -132,6 +132,7 @@ export default function ProductFeeds() {
   const [categoryMappings, setCategoryMappings] = useState<CategoryMapping[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncingId, setSyncingId] = useState<string | null>(null);
+  const [deleteDialogFeedId, setDeleteDialogFeedId] = useState<string | null>(null);
 
   // New-feed form
   const [formName, setFormName] = useState('');
@@ -486,9 +487,9 @@ export default function ProductFeeds() {
                           {syncingId === feed.id ? 'Senkronize ediliyor...' : 'Şimdi Senkronize Et'}
                         </Button>
 
-                        <Dialog>
+                        <Dialog open={deleteDialogFeedId === feed.id} onOpenChange={(open) => { if (!open) setDeleteDialogFeedId(null); }}>
                           <DialogTrigger asChild>
-                            <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 gap-1.5 text-xs">
+                            <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 gap-1.5 text-xs" onClick={() => setDeleteDialogFeedId(feed.id)}>
                               <Trash2 className="h-3.5 w-3.5" />
                               Sil
                             </Button>
@@ -501,13 +502,13 @@ export default function ProductFeeds() {
                               <strong>{feed.name}</strong> adlı feed&apos;i silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
                             </p>
                             <div className="flex justify-end gap-2">
-                              <Button variant="outline" size="sm" onClick={() => {}}>
+                              <Button variant="outline" size="sm" onClick={() => setDeleteDialogFeedId(null)}>
                                 İptal
                               </Button>
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => handleDelete(feed)}
+                                onClick={() => { handleDelete(feed); setDeleteDialogFeedId(null); }}
                               >
                                 Evet, Sil
                               </Button>

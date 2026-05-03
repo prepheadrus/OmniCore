@@ -200,6 +200,7 @@ export default function BrandProtection() {
   const [sSearch, setSSearch] = useState('');
   const [sMarketplace, setSMarketplace] = useState<string>('all');
   const [sStatus, setSStatus] = useState<string>('all');
+  const [scanning, setScanning] = useState(false);
 
   /* ---------- Load Data ---------- */
   useEffect(() => {
@@ -323,10 +324,25 @@ export default function BrandProtection() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="text-white border-white/20 hover:bg-white/10">
-              <RefreshCw className="h-4 w-4 mr-1" /> Tarama Başlat
+            <Button variant="outline" size="sm" className="text-white border-white/20 hover:bg-white/10" disabled={scanning} onClick={() => {
+              setScanning(true);
+              setTimeout(() => setScanning(false), 2000);
+            }}>
+              <RefreshCw className={cn('h-4 w-4 mr-1', scanning && 'animate-spin')} /> {scanning ? 'Taranıyor...' : 'Tarama Başlat'}
             </Button>
-            <Button variant="outline" size="sm" className="text-white border-white/20 hover:bg-white/10">
+            <Button variant="outline" size="sm" className="text-white border-white/20 hover:bg-white/10" onClick={() => {
+              const csv = [
+                ['Ürün', 'SKU', 'Satıcı', 'Pazaryeri', 'Tespit Fiyatı', 'MAP Fiyatı', 'Sapma %', 'Şiddet', 'Durum'],
+                ...violations.map((v) => [v.productName, v.sku, v.seller, v.marketplace, v.detectedPrice, v.mapPrice, v.deviation, SEVERITY_CFG[v.severity].label, STATUS_CFG[v.status].label]),
+              ].map((row) => row.join(',')).join('\n');
+              const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'marka-koruma-raporu.csv';
+              a.click();
+              URL.revokeObjectURL(url);
+            }}>
               <Download className="h-4 w-4 mr-1" /> Rapor İndir
             </Button>
           </div>

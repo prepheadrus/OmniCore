@@ -89,6 +89,36 @@ export default function FulfillmentPipeline() {
     setDetailOpen(true);
   };
 
+  const STAGE_FLOW: Record<Stage, Stage> = {
+    new: 'confirmed',
+    confirmed: 'picking',
+    picking: 'packing',
+    packing: 'ready',
+    ready: 'shipped',
+    shipped: 'shipped',
+  };
+
+  const handleAdvanceStage = (order: FulfillmentOrder) => {
+    const nextStage = STAGE_FLOW[order.stage];
+    if (!nextStage || nextStage === order.stage) return;
+    const now = new Date().toISOString();
+    const updatedOrder = { ...order, stage: nextStage, updatedAt: now };
+    setSelectedOrder(updatedOrder);
+    setData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        pipeline: prev.pipeline.map((col) =>
+          col.stage === order.stage
+            ? { ...col, orders: col.orders.filter((o) => o.id !== order.id) }
+            : col.stage === nextStage
+              ? { ...col, orders: [...col.orders, updatedOrder] }
+              : col
+        ),
+      };
+    });
+  };
+
   if (loading || !data) {
     return (
       <div className={cn('min-h-screen bg-slate-50 p-6 transition-all', sidebarOpen ? 'lg:ml-64' : 'ml-16')}>
@@ -286,11 +316,11 @@ export default function FulfillmentPipeline() {
                 <div><p className="text-xs text-slate-500">Tarih</p><p className="font-medium">{new Date(selectedOrder.createdAt).toLocaleString('tr-TR')}</p></div>
               </div>
               <div className="flex gap-2 pt-2 border-t">
-                {selectedOrder.stage === 'new' && <Button className="flex-1 gap-1 text-sm"><CheckCircle className="h-3.5 w-3.5" />Onayla</Button>}
-                {selectedOrder.stage === 'confirmed' && <Button className="flex-1 gap-1 text-sm"><Package className="h-3.5 w-3.5" />Toplamaya Başla</Button>}
-                {selectedOrder.stage === 'picking' && <Button className="flex-1 gap-1 text-sm"><Package className="h-3.5 w-3.5" />Paketlemeye Al</Button>}
-                {selectedOrder.stage === 'packing' && <Button className="flex-1 gap-1 text-sm"><Truck className="h-3.5 w-3.5" />Kargoya Ver</Button>}
-                {selectedOrder.stage === 'ready' && <Button className="flex-1 gap-1 text-sm"><CheckCircle className="h-3.5 w-3.5" />Kargo Oluştur</Button>}
+                {selectedOrder.stage === 'new' && <Button className="flex-1 gap-1 text-sm" onClick={() => handleAdvanceStage(selectedOrder)}><CheckCircle className="h-3.5 w-3.5" />Onayla</Button>}
+                {selectedOrder.stage === 'confirmed' && <Button className="flex-1 gap-1 text-sm" onClick={() => handleAdvanceStage(selectedOrder)}><Package className="h-3.5 w-3.5" />Toplamaya Başla</Button>}
+                {selectedOrder.stage === 'picking' && <Button className="flex-1 gap-1 text-sm" onClick={() => handleAdvanceStage(selectedOrder)}><Package className="h-3.5 w-3.5" />Paketlemeye Al</Button>}
+                {selectedOrder.stage === 'packing' && <Button className="flex-1 gap-1 text-sm" onClick={() => handleAdvanceStage(selectedOrder)}><Truck className="h-3.5 w-3.5" />Kargoya Ver</Button>}
+                {selectedOrder.stage === 'ready' && <Button className="flex-1 gap-1 text-sm" onClick={() => handleAdvanceStage(selectedOrder)}><CheckCircle className="h-3.5 w-3.5" />Kargo Oluştur</Button>}
               </div>
             </div>
           )}

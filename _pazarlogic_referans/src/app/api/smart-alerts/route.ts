@@ -12,7 +12,7 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json(rules, { next: { revalidate: 0 } });
+    return NextResponse.json(rules);
   } catch {
     return NextResponse.json(
       { error: 'Failed to fetch smart alert rules' },
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json(rule, { status: 201, next: { revalidate: 0 } });
+    return NextResponse.json(rule, { status: 201 });
   } catch {
     return NextResponse.json(
       { error: 'Failed to create smart alert rule' },
@@ -76,7 +76,8 @@ export async function POST(req: Request) {
 // PUT — Update a smart alert rule
 export async function PUT(req: Request) {
   try {
-    const id = req.nextUrl.searchParams.get('id');
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
@@ -106,7 +107,7 @@ export async function PUT(req: Request) {
       data: updateData,
     });
 
-    return NextResponse.json(rule, { next: { revalidate: 0 } });
+    return NextResponse.json(rule);
   } catch {
     return NextResponse.json(
       { error: 'Failed to update smart alert rule' },
@@ -118,14 +119,15 @@ export async function PUT(req: Request) {
 // DELETE — Delete a smart alert rule
 export async function DELETE(req: Request) {
   try {
-    const id = req.nextUrl.searchParams.get('id');
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
     await db.smartAlertRule.delete({ where: { id } });
 
-    return NextResponse.json({ success: true }, { next: { revalidate: 0 } });
+    return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(
       { error: 'Failed to delete smart alert rule' },
