@@ -158,7 +158,7 @@ export function CampaignSheet({ isOpen, onClose, initialData }: CampaignSheetPro
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-product-ids" className="text-xs font-medium text-slate-700">Ürün ID'leri (JSON)</Label>
+                  <Label htmlFor="edit-product-ids" className="text-xs font-medium text-slate-700">Ürün ID&apos;leri (JSON)</Label>
                   <Textarea id="edit-product-ids" defaultValue="[]" className="h-20 shadow-none bg-slate-50 font-mono text-xs resize-none" />
                 </div>
                 <div className="space-y-2">
@@ -224,7 +224,7 @@ export function CampaignSheet({ isOpen, onClose, initialData }: CampaignSheetPro
                 </div>
 
                 <div className="space-y-2 pt-2">
-                  <Label htmlFor="new-product-ids" className="text-xs font-medium text-slate-700">Ürün ID'leri (JSON)</Label>
+                  <Label htmlFor="new-product-ids" className="text-xs font-medium text-slate-700">Ürün ID&apos;leri (JSON)</Label>
                   <Textarea id="new-product-ids" defaultValue="[]" className="h-20 shadow-none border-slate-200 font-mono text-xs resize-none text-slate-600" />
                 </div>
                 <div className="space-y-2">

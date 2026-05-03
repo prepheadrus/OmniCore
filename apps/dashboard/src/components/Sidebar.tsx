@@ -36,7 +36,7 @@ import {
   Scale,
   Trophy,
   Zap
-, Brain} from 'lucide-react';
+, Brain, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -49,6 +49,7 @@ export default function Sidebar() {
       items: [
         { name: 'Panel', icon: LayoutDashboard, href: '/' },
         { name: 'Analizler', icon: BarChart2, href: '/analytics' },
+        { name: 'Raporlar', icon: FileText, href: '/reports' },
       ],
     },
     {
@@ -67,6 +68,8 @@ export default function Sidebar() {
         { name: 'Feed Optimizasyonu', icon: Wand2, href: '/feed-optimizer' },
         { name: 'Stok Senkronizasyonu', icon: ArrowRightLeft, href: '/stock-sync' },
         { name: 'Müşteriler', icon: Users, href: '/customers' },
+        { name: 'Müşteri Soruları', icon: HelpCircle, href: '/customers/questions' },
+        { name: 'Canlı Destek', icon: MessageCircle, href: '/customers/chat' },
       ],
     },
     {
