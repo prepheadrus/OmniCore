@@ -11,7 +11,6 @@ import {
   Users,
   Truck,
   FileText,
-  Radar,
   Tags,
   RefreshCcw,
   Settings,
@@ -22,30 +21,22 @@ import {
   Wand2,
   ArrowRightLeft,
   TrendingUp,
-  Calculator,
   PackageCheck,
   Building2,
   ScanBarcode,
-  Sparkles,
   Bot,
-  GitBranch,
   Megaphone,
-  DollarSign,
   Star,
   FlaskConical,
   Scale,
-  Trophy,
-  Zap,
-Brain,
-MessageCircle,
-Activity,
-ArrowRightLeft as AdvancedRma,
-Crosshair,
-GitPullRequest,
-Truck as CarrierRules,
-FileCheck2,
-ShoppingCart as AutoProc,
-Printer
+  Brain,
+  MessageCircle,
+  Activity,
+  ArrowRightLeft as AdvancedRma,
+  Crosshair,
+  GitPullRequest,
+  ShoppingCart as AutoProc,
+  Printer
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -68,18 +59,14 @@ export default function Sidebar() {
         { name: 'Siparişler', icon: ShoppingCart, href: '/orders' },
         { name: 'Akıllı Yönlendirme', icon: GitPullRequest, href: '/order-routing' },
         { name: 'Gelişmiş İade (RMA)', icon: AdvancedRma, href: '/advanced-rma' },
-        { name: 'Kargo Kuralları', icon: CarrierRules, href: '/shipping-rules' },
         { name: 'Etiket Şablonları', icon: Printer, href: '/template-designer' },
-        { name: 'Akıllı Sipariş Kuralları', icon: GitBranch, href: '/smart-order-rules' },
         { name: 'Sipariş Karşılama', icon: PackageCheck, href: '/fulfillment-pipeline' },
         { name: 'Kargo & Lojistik', icon: Truck, href: '/shipments' },
         { name: 'İadeler', icon: Undo, href: '/returns' },
         { name: 'Ürünler', icon: Package, href: '/products' },
         { name: 'Depo Yönetimi (WMS)', icon: Building2, href: '/warehouse-management' },
         { name: 'Barkod Okuma (WMS)', icon: ScanBarcode, href: '/barcode-scanner' },
-        { name: 'Feed Yönetimi', icon: Rss, href: '/feeds' },
-        { name: 'Feed Şablonları', icon: Layers, href: '/feed-templates' },
-        { name: 'Feed Optimizasyonu', icon: Wand2, href: '/feed-optimizer' },
+        { name: 'Katalog & Feed', icon: Rss, href: '/feeds' },
         { name: 'Stok Senkronizasyonu', icon: ArrowRightLeft, href: '/stock-sync' },
         { name: 'Müşteriler', icon: Users, href: '/customers' },
         { name: 'Müşteri Soruları', icon: HelpCircle, href: '/customers/questions' },
@@ -91,31 +78,23 @@ export default function Sidebar() {
       items: [
         { name: 'Tedarikçiler', icon: Truck, href: '/procurement/suppliers' },
         { name: 'Otonom Satınalma', icon: AutoProc, href: '/auto-procurement' },
-        { name: 'Mutabakat', icon: FileCheck2, href: '/reconciliation' },
         { name: 'Alım Faturaları', icon: FileText, href: '/procurement/invoices' },
-        { name: 'Fiyat Yönetimi', icon: DollarSign, href: '/price-management' },
+        { name: 'Akıllı Fiyatlandırma', icon: Tags, href: '/pricing' },
         { name: 'Kargo Karşılaştırma', icon: Scale, href: '/carrier-rates' },
-        { name: 'Kampanya Yönetimi', icon: Megaphone, href: '/campaigns' },
-        { name: 'Reklam Yönetimi', icon: Megaphone, href: '/advertising' },
-        { name: 'ROI & Kar Analizi', icon: TrendingUp, href: '/roi-profit' },
-        { name: 'Kar Marjı Simülatörü', icon: Calculator, href: '/profit-simulator' },
+        { name: 'Pazarlama & Reklam', icon: Megaphone, href: '/campaigns' },
+        { name: 'Finansal Zeka', icon: TrendingUp, href: '/roi-profit' },
       ],
     },
     {
       title: 'ZEKA & SİSTEM',
       items: [
-        { name: 'Veri Otomasyonu', icon: Bot, href: '/automation' },
+        { name: 'Otomasyon Merkezi', icon: Bot, href: '/automation' },
         { name: 'Pazar Yeri Sağlığı', icon: Activity, href: '/marketplace-health' },
         { name: 'Öneri Motoru', icon: Crosshair, href: '/recommendations' },
-        { name: 'Dinamik Fiyatlandırma', icon: Zap, href: '/dynamic-pricing' },
         { name: 'A/B Test', icon: FlaskConical, href: '/ab-testing' },
-        { name: 'İçerik Optimizasyonu', icon: Sparkles, href: '/content-rules' },
         { name: 'AI İçerik Stüdyosu', icon: Wand2, href: '/ai-content' },
         { name: 'AI SEO Motoru', icon: Brain, href: '/ai-seo' },
         { name: 'Listeleme Kalitesi', icon: Star, href: '/listing-quality' },
-        { name: 'Rekabet Radarı', icon: Radar, href: '/radar' },
-        { name: 'Buy Box Optimizasyonu', icon: Trophy, href: '/buybox-optimizer' },
-        { name: 'Akıllı Fiyatlandırma', icon: Tags, href: '/pricing' },
         { name: 'Senkronizasyon', icon: RefreshCcw, href: '/sync' },
         { name: 'Log & İzleme', icon: FileText, href: '/audit' },
         { name: 'Marka Koruma & MAP', icon: ShieldAlert, href: '/brand-protection' },
@@ -152,14 +131,17 @@ export default function Sidebar() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-sm duration-200 ease-in-out font-medium border ${
+                    className={`flex items-center space-x-3 px-3 py-1.5 rounded-md transition-colors duration-150 ${
                       isActive
-                        ? 'bg-white text-[#2d3435] shadow-none border-slate-200'
-                        : 'text-[#5a6061] hover:text-[#2d3435] hover:bg-[#ebeeef]/50 border-transparent'
+                        ? 'bg-white text-[#2d3435] shadow-sm ring-1 ring-black/5'
+                        : 'text-[#5a6061] hover:bg-[#e8ecec] hover:text-[#2d3435]'
                     }`}
                   >
-                    <Icon size={18} className={isActive ? 'text-[#2d3435]' : 'text-[#5a6061]'} />
-                    <span>{item.name}</span>
+                    <Icon
+                      size={16}
+                      className={isActive ? 'text-[#2d3435]' : 'text-[#848d8f]'}
+                    />
+                    <span className="font-medium">{item.name}</span>
                   </Link>
                 );
               })}
@@ -168,27 +150,22 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Bottom Actions */}
-      <div className="mt-auto space-y-0.5 pt-4 border-t border-[#dde4e5]">
+      {/* Footer / Settings */}
+      <div className="pt-4 mt-auto border-t border-[#dde4e5] space-y-0.5">
         <Link
           href="/settings"
-          className="flex items-center space-x-3 px-3 py-2 text-[#5a6061] hover:text-[#2d3435] hover:bg-[#ebeeef]/50 duration-200 ease-in-out rounded-sm font-medium"
+          className={`flex items-center space-x-3 px-3 py-1.5 rounded-md transition-colors duration-150 ${
+            pathname === '/settings'
+              ? 'bg-white text-[#2d3435] shadow-sm ring-1 ring-black/5'
+              : 'text-[#5a6061] hover:bg-[#e8ecec] hover:text-[#2d3435]'
+          }`}
         >
-          <Settings size={18} />
-          <span>Ayarlar</span>
+          <Settings size={16} className="text-[#848d8f]" />
+          <span className="font-medium">Ayarlar</span>
         </Link>
-        <Link
-          href="/support"
-          className="flex items-center space-x-3 px-3 py-2 text-[#5a6061] hover:text-[#2d3435] hover:bg-[#ebeeef]/50 duration-200 ease-in-out rounded-sm font-medium"
-        >
-          <HelpCircle size={18} />
-          <span>Destek</span>
-        </Link>
-        <button
-          className="w-full flex items-center space-x-3 px-3 py-2 text-[#5a6061] hover:text-[#2d3435] hover:bg-[#ebeeef]/50 duration-200 ease-in-out rounded-sm font-medium"
-        >
-          <LogOut size={18} />
-          <span>Çıkış</span>
+        <button className="w-full flex items-center space-x-3 px-3 py-1.5 rounded-md text-[#5a6061] hover:bg-[#fcecec] hover:text-[#e03131] transition-colors duration-150">
+          <LogOut size={16} className="text-[#848d8f]" />
+          <span className="font-medium">Çıkış Yap</span>
         </button>
       </div>
     </aside>
