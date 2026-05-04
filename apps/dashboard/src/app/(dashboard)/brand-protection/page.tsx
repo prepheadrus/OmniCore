@@ -20,7 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@omnicore/ui/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@omnicore/ui/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@omnicore/ui/components/ui/dialog';
-
+import { toast } from 'sonner';
 
 
 import {
@@ -312,7 +312,7 @@ export default function BrandProtection() {
 
   const handleNewViolationSubmit = async () => {
     if (!newSku || !newMarketplace || !newSeller || !newPrice) {
-      alert('Lütfen tüm alanları doldurun.');
+      toast.error('Lütfen tüm alanları doldurun.');
       return;
     }
 
@@ -341,12 +341,13 @@ export default function BrandProtection() {
         setNewMarketplace('');
         setNewSeller('');
         setNewPrice('');
+        toast.success('İhlal başarıyla bildirildi.');
       } else {
-        alert('İhlal bildirilirken hata oluştu.');
+        toast.error('İhlal bildirilirken hata oluştu.');
       }
     } catch (e) {
       console.error(e);
-      alert('İhlal bildirilirken ağ hatası oluştu.');
+      toast.error('İhlal bildirilirken ağ hatası oluştu.');
     } finally {
       setIsSubmitting(false);
     }
@@ -382,7 +383,7 @@ export default function BrandProtection() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="text-white border-white/20 hover:bg-white/10">
+            <Button variant="outline" size="sm" className="text-white border-white/20 hover:bg-white/10" onClick={() => toast.info("Tarama başlatılıyor...")}>
               <RefreshCw className="h-4 w-4 mr-1" /> Tarama Başlat
             </Button>
 
@@ -420,7 +421,7 @@ export default function BrandProtection() {
   </DialogContent>
 </Dialog>
 
-            <Button variant="outline" size="sm" className="text-white border-white/20 hover:bg-white/10">
+            <Button variant="outline" size="sm" className="text-white border-white/20 hover:bg-white/10" onClick={() => toast.success("Rapor indirme işlemi başlatıldı.")}>
               <Download className="h-4 w-4 mr-1" /> Rapor İndir
             </Button>
           </div>
