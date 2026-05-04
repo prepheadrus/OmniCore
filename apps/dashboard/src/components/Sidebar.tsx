@@ -32,7 +32,6 @@ import {
   Brain,
   MessageCircle,
   Activity,
-  ArrowRightLeft as AdvancedRma,
   Crosshair,
   GitPullRequest,
   ShoppingCart as AutoProc,
@@ -58,7 +57,6 @@ export default function Sidebar() {
       items: [
         { name: 'Siparişler', icon: ShoppingCart, href: '/orders' },
         { name: 'Akıllı Yönlendirme', icon: GitPullRequest, href: '/order-routing' },
-        { name: 'Gelişmiş İade (RMA)', icon: AdvancedRma, href: '/advanced-rma' },
         { name: 'Etiket Şablonları', icon: Printer, href: '/template-designer' },
         { name: 'Sipariş Karşılama', icon: PackageCheck, href: '/fulfillment-pipeline' },
         { name: 'Kargo & Lojistik', icon: Truck, href: '/shipments' },
