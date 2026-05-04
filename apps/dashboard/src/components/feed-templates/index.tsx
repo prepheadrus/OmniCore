@@ -6,6 +6,7 @@ import {
   Check, AlertTriangle, XCircle, Info, Play, Settings, Zap, Globe, FileText,
   RefreshCw, ArrowRight,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 /* ─── types ─── */
 interface Template {
@@ -227,7 +228,7 @@ function TemplateLibrary() {
   };
 
   const handleUse = (t: Template) => {
-    alert(`"${t.name}" şablonu kullanılıyor...\nPlatform: ${t.platform}\nFormat: ${t.format.toUpperCase()}`);
+    toast.info(`"${t.name}" şablonu kullanılıyor...\nPlatform: ${t.platform}\nFormat: ${t.format.toUpperCase()}`);
   };
 
   const pageNumbers = Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
@@ -511,7 +512,7 @@ function FeedCreator() {
       if (selectedTemplateId) body.templateId = selectedTemplateId;
       const res = await fetch('/api/feed-templates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       if (res.ok) {
-        alert('Feed başarıyla kaydedildi!');
+        toast.success('Feed başarıyla kaydedildi!');
         setStep(1);
         setSelectedPlatform('');
         setSelectedTemplateId('');

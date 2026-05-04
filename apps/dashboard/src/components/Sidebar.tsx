@@ -64,6 +64,7 @@ export default function Sidebar() {
         { name: 'Kargo & Lojistik', icon: Truck, href: '/shipments' },
         { name: 'İadeler', icon: Undo, href: '/returns' },
         { name: 'Ürünler', icon: Package, href: '/products' },
+        { name: 'Envanter', icon: Package, href: '/inventory' },
         { name: 'Depo Yönetimi (WMS)', icon: Building2, href: '/warehouse-management' },
         { name: 'Barkod Okuma (WMS)', icon: ScanBarcode, href: '/barcode-scanner' },
         { name: 'Katalog & Feed', icon: Rss, href: '/feeds' },
@@ -78,6 +79,7 @@ export default function Sidebar() {
       items: [
         { name: 'Tedarikçiler', icon: Truck, href: '/procurement/suppliers' },
         { name: 'Otonom Satınalma', icon: AutoProc, href: '/auto-procurement' },
+        { name: 'Satınalma Siparişleri', icon: FileText, href: '/procurement/purchase-orders' },
         { name: 'Alım Faturaları', icon: FileText, href: '/procurement/invoices' },
         { name: 'Akıllı Fiyatlandırma', icon: Tags, href: '/pricing' },
         { name: 'Kargo Karşılaştırma', icon: Scale, href: '/carrier-rates' },
