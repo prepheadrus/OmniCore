@@ -35,8 +35,18 @@ import {
   FlaskConical,
   Scale,
   Trophy,
-  Zap
-, Brain, MessageCircle } from 'lucide-react';
+  Zap,
+Brain,
+MessageCircle,
+Activity,
+ArrowRightLeft as AdvancedRma,
+Crosshair,
+GitPullRequest,
+Truck as CarrierRules,
+FileCheck2,
+ShoppingCart as AutoProc,
+Printer
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -56,6 +66,10 @@ export default function Sidebar() {
       title: 'OPERASYON',
       items: [
         { name: 'Siparişler', icon: ShoppingCart, href: '/orders' },
+        { name: 'Akıllı Yönlendirme', icon: GitPullRequest, href: '/order-routing' },
+        { name: 'Gelişmiş İade (RMA)', icon: AdvancedRma, href: '/advanced-rma' },
+        { name: 'Kargo Kuralları', icon: CarrierRules, href: '/shipping-rules' },
+        { name: 'Etiket Şablonları', icon: Printer, href: '/template-designer' },
         { name: 'Akıllı Sipariş Kuralları', icon: GitBranch, href: '/smart-order-rules' },
         { name: 'Sipariş Karşılama', icon: PackageCheck, href: '/fulfillment-pipeline' },
         { name: 'Kargo & Lojistik', icon: Truck, href: '/shipments' },
@@ -76,6 +90,8 @@ export default function Sidebar() {
       title: 'EKONOMİ',
       items: [
         { name: 'Tedarikçiler', icon: Truck, href: '/procurement/suppliers' },
+        { name: 'Otonom Satınalma', icon: AutoProc, href: '/auto-procurement' },
+        { name: 'Mutabakat', icon: FileCheck2, href: '/reconciliation' },
         { name: 'Alım Faturaları', icon: FileText, href: '/procurement/invoices' },
         { name: 'Fiyat Yönetimi', icon: DollarSign, href: '/price-management' },
         { name: 'Kargo Karşılaştırma', icon: Scale, href: '/carrier-rates' },
@@ -89,6 +105,8 @@ export default function Sidebar() {
       title: 'ZEKA & SİSTEM',
       items: [
         { name: 'Veri Otomasyonu', icon: Bot, href: '/automation' },
+        { name: 'Pazar Yeri Sağlığı', icon: Activity, href: '/marketplace-health' },
+        { name: 'Öneri Motoru', icon: Crosshair, href: '/recommendations' },
         { name: 'Dinamik Fiyatlandırma', icon: Zap, href: '/dynamic-pricing' },
         { name: 'A/B Test', icon: FlaskConical, href: '/ab-testing' },
         { name: 'İçerik Optimizasyonu', icon: Sparkles, href: '/content-rules' },
