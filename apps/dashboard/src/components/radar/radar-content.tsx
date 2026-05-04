@@ -36,7 +36,7 @@ const mockProducts = [
   { id: "4", name: "5'li Fırça Seti", sku: "PKB-004", price: 166, strategy: "AggressiveBuyboxStrategy" },
 ];
 
-export default function RadarPage() {
+export default function RadarPageContent() {
   const [chartData, setChartData] = useState<CompetitorData[]>([]);
 
   useEffect(() => {
