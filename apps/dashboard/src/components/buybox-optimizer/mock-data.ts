@@ -1,0 +1,107 @@
+import { BuyBoxProduct } from './types';
+
+export const MOCK_PRODUCTS: BuyBoxProduct[] = [
+  {
+    id: 'bb-001', name: 'Xiaomi Redmi Note 13 Pro 256GB', asin: 'B0CJMRXQK7',
+    ourPrice: 12999, buyBoxPrice: 12999, buyBoxOwner: 'Biz', won: true, winRate: 92,
+    suggestedPrice: 12999, marketplace: 'Amazon',
+    competitors: [
+      { name: 'ElektronikWorld', price: 13149, rating: 4.6, fba: true, deliveryDays: 1 },
+      { name: 'TeknoPlus', price: 13299, rating: 4.3, fba: true, deliveryDays: 1 },
+      { name: 'GadgetStore', price: 13499, rating: 4.1, fba: false, deliveryDays: 3 },
+    ],
+    priceHistory: [
+      { date: '01.07', ourPrice: 13499, buyBoxPrice: 13499 },
+      { date: '05.07', ourPrice: 13349, buyBoxPrice: 13299 },
+      { date: '09.07', ourPrice: 13249, buyBoxPrice: 13199 },
+      { date: '13.07', ourPrice: 13149, buyBoxPrice: 13149 },
+      { date: '17.07', ourPrice: 13099, buyBoxPrice: 13099 },
+      { date: '21.07', ourPrice: 13049, buyBoxPrice: 13049 },
+      { date: '25.07', ourPrice: 12999, buyBoxPrice: 12999 },
+    ],
+    reasoning: 'Mevcut fiyatınız Buy Box\'ı %92 oranında kazanmanızı sağlıyor. Rakiplerinizden en az 150₺ ucuzsunuz.',
+    lastUpdated: '25.07.2025 14:32',
+  },
+  {
+    id: 'bb-002', name: 'Apple AirPods Pro 2. USB-C', asin: 'B0CHWRXH8B',
+    ourPrice: 8499, buyBoxPrice: 8299, buyBoxOwner: 'TechMall', won: false, winRate: 34,
+    suggestedPrice: 8279, marketplace: 'Amazon',
+    competitors: [
+      { name: 'TechMall', price: 8299, rating: 4.8, fba: true, deliveryDays: 1 },
+      { name: 'AppleShop', price: 8399, rating: 4.9, fba: true, deliveryDays: 1 },
+      { name: 'BizeTrade', price: 8499, rating: 4.4, fba: false, deliveryDays: 2 },
+    ],
+    priceHistory: [
+      { date: '01.07', ourPrice: 8799, buyBoxPrice: 8599 },
+      { date: '05.07', ourPrice: 8699, buyBoxPrice: 8499 },
+      { date: '09.07', ourPrice: 8599, buyBoxPrice: 8399 },
+      { date: '13.07', ourPrice: 8499, buyBoxPrice: 8399 },
+      { date: '17.07', ourPrice: 8499, buyBoxPrice: 8299 },
+      { date: '21.07', ourPrice: 8499, buyBoxPrice: 8299 },
+      { date: '25.07', ourPrice: 8499, buyBoxPrice: 8299 },
+    ],
+    reasoning: 'TechMall 200₺ daha ucuz ve FBA kullanıyor. Fiyatı 8.279₺\'ya düşürerek Buy Box\'ı geri kazanabilirsiniz. Marjınız hâlâ %18 olacak.',
+    lastUpdated: '25.07.2025 14:28',
+  },
+  {
+    id: 'bb-003', name: 'Samsung Galaxy Watch 6 Classic 47mm', asin: 'B0C7TJHMSK',
+    ourPrice: 7499, buyBoxPrice: 7499, buyBoxOwner: 'Biz', won: true, winRate: 78,
+    suggestedPrice: 7499, marketplace: 'Amazon',
+    competitors: [
+      { name: 'SaatMerkezi', price: 7649, rating: 4.5, fba: true, deliveryDays: 1 },
+      { name: 'WatchPro', price: 7799, rating: 4.2, fba: false, deliveryDays: 2 },
+    ],
+    priceHistory: [
+      { date: '01.07', ourPrice: 7799, buyBoxPrice: 7799 },
+      { date: '05.07', ourPrice: 7699, buyBoxPrice: 7699 },
+      { date: '09.07', ourPrice: 7599, buyBoxPrice: 7599 },
+      { date: '13.07', ourPrice: 7599, buyBoxPrice: 7549 },
+      { date: '17.07', ourPrice: 7499, buyBoxPrice: 7499 },
+      { date: '21.07', ourPrice: 7499, buyBoxPrice: 7499 },
+      { date: '25.07', ourPrice: 7499, buyBoxPrice: 7499 },
+    ],
+    reasoning: 'Buy Box\'ı aktif olarak kazanmaktasınız. En yakın rakip 150₺ üzerinizde. Mevcut fiyatı koruyun.',
+    lastUpdated: '25.07.2025 14:15',
+  },
+  {
+    id: 'bb-004', name: 'Philips Airfryer XXL HD9867', asin: 'B0BRKS5NLQ',
+    ourPrice: 5999, buyBoxPrice: 5849, buyBoxOwner: 'EvMarket', won: false, winRate: 45,
+    suggestedPrice: 5829, marketplace: 'Trendyol',
+    competitors: [
+      { name: 'EvMarket', price: 5849, rating: 4.7, fba: true, deliveryDays: 1 },
+      { name: 'BeyazEsyaPro', price: 5999, rating: 4.4, fba: true, deliveryDays: 1 },
+      { name: 'MutfakKutusu', price: 6099, rating: 4.0, fba: false, deliveryDays: 3 },
+    ],
+    priceHistory: [
+      { date: '01.07', ourPrice: 6299, buyBoxPrice: 6149 },
+      { date: '05.07', ourPrice: 6199, buyBoxPrice: 5999 },
+      { date: '09.07', ourPrice: 6099, buyBoxPrice: 5999 },
+      { date: '13.07', ourPrice: 5999, buyBoxPrice: 5899 },
+      { date: '17.07', ourPrice: 5999, buyBoxPrice: 5849 },
+      { date: '21.07', ourPrice: 5999, buyBoxPrice: 5849 },
+      { date: '25.07', ourPrice: 5999, buyBoxPrice: 5849 },
+    ],
+    reasoning: 'EvMarket 150₺ ucuz ve TrendyolExpress kulllanıyor. 5829₺\'ya düşürerek kazanma şansınızı %85\'e çıkarabilirsiniz.',
+    lastUpdated: '25.07.2025 13:58',
+  },
+  {
+    id: 'bb-005', name: 'Dyson V15 Detect Absolute', asin: 'B0B3K5G7X9',
+    ourPrice: 24999, buyBoxPrice: 24999, buyBoxOwner: 'Biz', won: true, winRate: 88,
+    suggestedPrice: 24999, marketplace: 'Hepsiburada',
+    competitors: [
+      { name: 'TemizlikEv', price: 25499, rating: 4.5, fba: true, deliveryDays: 1 },
+      { name: 'PremiumTech', price: 25999, rating: 4.3, fba: false, deliveryDays: 2 },
+    ],
+    priceHistory: [
+      { date: '01.07', ourPrice: 25999, buyBoxPrice: 25999 },
+      { date: '05.07', ourPrice: 25499, buyBoxPrice: 25499 },
+      { date: '09.07', ourPrice: 25249, buyBoxPrice: 25249 },
+      { date: '13.07', ourPrice: 25199, buyBoxPrice: 25199 },
+      { date: '17.07', ourPrice: 24999, buyBoxPrice: 24999 },
+      { date: '21.07', ourPrice: 24999, buyBoxPrice: 24999 },
+      { date: '25.07', ourPrice: 24999, buyBoxPrice: 24999 },
+    ],
+    reasoning: 'Güçlü Buy Box konumundasınız. En yakın rakip 500₺ üzerinizde. Stratejinizi koruyun.',
+    lastUpdated: '25.07.2025 13:45',
+  }
+];
