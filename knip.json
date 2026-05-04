@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/knip@3/schema-json",
+  "entry": [
+    "apps/api/src/main.ts",
+    "apps/api/src/**/*.module.ts",
+    "apps/dashboard/src/app/layout.tsx",
+    "apps/dashboard/src/app/**/page.tsx",
+    "apps/dashboard/src/app/**/layout.tsx",
+    "apps/dashboard/src/app/**/loading.tsx",
+    "apps/dashboard/src/app/**/route.ts",
+    "libs/**/src/index.ts",
+    "apps/**/*.spec.ts",
+    "apps/**/*.spec.tsx",
+    "libs/**/*.spec.ts",
+    "libs/**/*.spec.tsx",
+    "apps/api-e2e/src/**/*.ts",
+    "apps/dashboard-e2e/src/**/*.ts"
+  ],
+  "project": ["apps/**/*.ts", "apps/**/*.tsx", "libs/**/*.ts", "libs/**/*.tsx"]
+}
