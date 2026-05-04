@@ -13,6 +13,11 @@ import {
 
 export default function Header() {
   const { availableChannels, selectedChannelId, setSelectedChannelId } = useChannel();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="flex justify-between items-center h-12 px-6 w-full sticky top-0 z-40 bg-[#f9f9f9] text-[#2d3435] text-[13px] leading-tight antialiased shadow-none border-none">
@@ -32,18 +37,22 @@ export default function Header() {
 
         {/* Channel Selection Dropdown */}
         <div className="hidden md:block w-48">
-          <Select value={selectedChannelId} onValueChange={setSelectedChannelId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Kanal Seçin" className="text-[13px]" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableChannels.map((channel) => (
-                <SelectItem key={channel.id} value={channel.id}>
-                  {channel.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {mounted ? (
+            <Select value={selectedChannelId} onValueChange={setSelectedChannelId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Kanal Seçin" className="text-[13px]" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableChannels.map((channel) => (
+                  <SelectItem key={channel.id} value={channel.id}>
+                    {channel.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
+          )}
         </div>
 
         {/* Notifications */}
