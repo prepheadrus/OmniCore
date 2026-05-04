@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@omnicore/ui/components/ui/badge";
 import { Button } from "@omnicore/ui/components/ui/button";
@@ -11,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@omnicore/ui/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, ClipboardCheck } from "lucide-react";
 import { ReturnOrder, ReturnStatus } from "./mock-data";
 import { toast } from "sonner";
 
@@ -42,7 +43,7 @@ const statusMap: Record<ReturnStatus, { label: string; colorClass: string }> = {
   },
 };
 
-export const columns: ColumnDef<ReturnOrder>[] = [
+export const columns = (onOpenQC: (order: ReturnOrder) => void): ColumnDef<ReturnOrder>[] => [
   {
     accessorKey: "id",
     header: "İade Kodu",
@@ -110,6 +111,14 @@ export const columns: ColumnDef<ReturnOrder>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Aksiyonlar</DropdownMenuLabel>
             <DropdownMenuItem
+              onClick={() => onOpenQC(returnOrder)}
+              className="flex items-center"
+            >
+              <ClipboardCheck className="mr-2 h-4 w-4" />
+              Kalite Kontrol (RMA) Yap
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
               onClick={() => {
                 toast("İade detayları yükleniyor...", {
                   description: `${returnOrder.id} numaralı iade detayları getiriliyor.`,
@@ -118,7 +127,6 @@ export const columns: ColumnDef<ReturnOrder>[] = [
             >
               İade Detayını Gör
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
                 toast.success("İade talebi onaylandı", {
