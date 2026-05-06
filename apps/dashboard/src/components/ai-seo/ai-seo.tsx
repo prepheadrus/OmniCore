@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import { Card, CardContent, CardHeader, CardTitle } from '@omnicore/ui/components/ui/card';
 import { Badge } from '@omnicore/ui/components/ui/badge';
 import { Button } from '@omnicore/ui/components/ui/button';
@@ -221,7 +222,7 @@ function MarkdownContent({ content }: { content: string }) {
       elements.push(
         <ul key={`ul-${elements.length}`} className="list-disc list-inside space-y-1 mb-3 text-sm text-slate-600">
           {listItems.map((item, i) => (
-            <li key={i} dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />
+            <li key={i} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>')) }} />
           ))}
         </ul>
       );
@@ -231,7 +232,7 @@ function MarkdownContent({ content }: { content: string }) {
       elements.push(
         <ol key={`ol-${elements.length}`} className="list-decimal list-inside space-y-1 mb-3 text-sm text-slate-600">
           {olItems.map((item, i) => (
-            <li key={i} dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />
+            <li key={i} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>')) }} />
           ))}
         </ol>
       );
@@ -334,7 +335,7 @@ function MarkdownContent({ content }: { content: string }) {
 
     flushList();
     elements.push(
-      <p key={i} className="text-sm text-slate-600 mb-2 leading-relaxed" dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-800">$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`(.*?)`/g, '<code class="bg-slate-100 text-emerald-700 px-1.5 py-0.5 rounded text-xs">$1</code>') }} />
+      <p key={i} className="text-sm text-slate-600 mb-2 leading-relaxed" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-800">$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`(.*?)`/g, '<code class="bg-slate-100 text-emerald-700 px-1.5 py-0.5 rounded text-xs">$1</code>')) }} />
     );
   }
 
