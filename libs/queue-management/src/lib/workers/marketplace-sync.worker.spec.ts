@@ -89,7 +89,7 @@ describe('MarketplaceSyncWorker', () => {
         update: jest.fn(),
       },
       stockMovement: {
-        create: jest.fn(),
+        create: jest.fn(), createMany: jest.fn(),
       },
     };
 
@@ -141,7 +141,7 @@ describe('MarketplaceSyncWorker', () => {
         update: jest.fn(),
       },
       stockMovement: {
-        create: jest.fn(),
+        create: jest.fn(), createMany: jest.fn(),
       },
     };
 
