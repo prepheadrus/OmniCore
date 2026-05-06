@@ -101,21 +101,35 @@ export class MarketplaceSyncWorker extends WorkerHost {
                const resolvedItems = await this.bomResolverService.resolveBundle(variantToProcess.id, quantitySold);
 
                // 2 & 3. For each physical item, log StockMovement and decrement stock
-               for (const [physicalVariantId, totalDeduction] of resolvedItems.entries()) {
-                 await tx.stockMovement.create({
-                   data: {
-                     productVariantId: physicalVariantId,
-                     channelId: channelId,
-                     eventType: 'SALE',
-                     quantityChange: -totalDeduction,
-                     referenceId: order.orderNumber,
-                   }
-                 });
+               const resolvedItemsArray = Array.from(resolvedItems.entries());
 
-                 await tx.productVariant.update({
+               // Bulk create StockMovements
+               const stockMovementsData = resolvedItemsArray.map(([physicalVariantId, totalDeduction]) => ({
+                 productVariantId: physicalVariantId,
+                 channelId: channelId,
+                 eventType: 'SALE' as const,
+                 quantityChange: -totalDeduction,
+                 referenceId: order.orderNumber,
+               }));
+
+               if (stockMovementsData.length > 0) {
+                 await tx.stockMovement.createMany({
+                   data: stockMovementsData
+                 });
+               }
+
+               // Bulk update ProductVariants via Promise.all (memory-first approach)
+               const updatePromises = resolvedItemsArray.map(([physicalVariantId, totalDeduction]) =>
+                 tx.productVariant.update({
                    where: { id: physicalVariantId },
                    data: { stock: { decrement: totalDeduction } }
-                 });
+                 })
+               );
+
+               // Execute updates in chunks of 50 to prevent hitting connection limits
+               const chunkSize = 50;
+               for (let i = 0; i < updatePromises.length; i += chunkSize) {
+                 await Promise.all(updatePromises.slice(i, i + chunkSize));
                }
             }
           });
